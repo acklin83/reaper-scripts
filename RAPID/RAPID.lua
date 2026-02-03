@@ -35,7 +35,7 @@
 --   - JS_ReaScriptAPI (optional, for multi-file dialogs)
 -- @link GitHub https://github.com/acklin83/RAPID
 -- @provides
---   [main] RAPID.lua
+--   [main] .
 
 
 local r = reaper
