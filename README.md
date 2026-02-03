@@ -16,12 +16,6 @@ ReaPack repository for REAPER scripts by Frank Acklin.
 ### RAPID
 Recording Auto-Placement & Intelligent Dynamics — automates track mapping, media import, and LUFS normalization.
 
-- [Source Repository](https://github.com/acklin83/RAPID)
-
-### Mixnote
-REAPER integration for the Mixnote audio review platform — view client comments with timeline sync.
-
-- [Source Repository](https://github.com/acklin83/mixnote)
 
 ## License
 
