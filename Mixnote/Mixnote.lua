@@ -1,7 +1,8 @@
 -- @description Mixnote - REAPER Integration for Audio Review Platform
 -- @author Frank Acklin
--- @version 2.0
+-- @version 2.0.1
 -- @changelog
+--   Fixed ReaPack metadata for package distribution
 --   Initial ReaPack release
 --   Waveform display with comment markers
 --   Timeline-based comment management

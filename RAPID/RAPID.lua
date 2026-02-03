@@ -1,7 +1,8 @@
 -- @description RAPID - Recording Auto-Placement & Intelligent Dynamics
 -- @author Frank Acklin
--- @version 2.4
+-- @version 2.4.1
 -- @changelog
+--   Fixed ReaPack metadata for package distribution
 --   LUFS Calibration System: Create/update profiles from reference tracks
 --   Per-profile LUFS measurement settings (segment size, percentile, threshold)
 --   Normalization resets Item Gain and Take Volume before processing
