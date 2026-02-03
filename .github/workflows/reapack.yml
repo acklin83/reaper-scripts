@@ -25,6 +25,9 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           rm -f index.xml
+          echo "=== Checking packages first ==="
+          reapack-index --check . 2>&1 || true
+          echo "=== Now building index ==="
           reapack-index \
             --name "Frank Acklin Scripts" \
             --url-template 'https://github.com/acklin83/reaper-scripts/raw/$commit/$path' \
