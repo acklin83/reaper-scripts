@@ -16,8 +16,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install reapack-index
+      - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
           sudo gem install reapack-index
 
       - name: Build index
