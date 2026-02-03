@@ -1,48 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="e30b9e5808db7d94b1ff7027beceb9e1f09882b2">
-  <category name="Mixnote">
-    <reapack name="Mixnote.lua" type="script" desc="Mixnote - REAPER Integration for Audio Review Platform">
-      <metadata>
-        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
-{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
-\widowctrl\hyphauto
-
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Mixnote REAPER Integration\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Connect REAPER to your self-hosted Mixnote audio review platform. View client comments directly in your DAW with timeline synchronization.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Waveform display with clickable comment markers\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Timeline-based comments with timecode sync\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Project/song/version navigation\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Add, reply, and resolve comments from REAPER\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Calibration system for timeline alignment\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Dark theme matching Mixnote web interface\sa180\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6.0+\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (required)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Running Mixnote server instance\sa180\par}
-}
-]]></description>
-        <link rel="website" href="https://github.com/acklin83/mixnote">GitHub</link>
-      </metadata>
-      <version name="2.0" author="Frank Acklin" time="2026-02-03T17:42:24Z">
-        <changelog><![CDATA[Initial ReaPack release
-Waveform display with comment markers
-Timeline-based comment management
-Project/song/version navigation
-Calibration system for timeline sync]]></changelog>
-        <source main="main">https://github.com/acklin83/reaper-scripts/raw/741101328467b77bc3949aa05813c210b65a1618/Mixnote/Mixnote.lua</source>
-      </version>
-      <version name="2.0.1" author="Frank Acklin" time="2026-02-03T18:42:03Z">
-        <changelog><![CDATA[Fixed ReaPack metadata for package distribution
-Initial ReaPack release
-Waveform display with comment markers
-Timeline-based comment management
-Project/song/version navigation
-Calibration system for timeline sync]]></changelog>
-        <source main="main">https://github.com/acklin83/reaper-scripts/raw/8b01c38285e917657dceb71cb00b28b4585ec9dc/Mixnote/Mixnote.lua</source>
-      </version>
-    </reapack>
-  </category>
+<index version="1" name="Frank Acklin Scripts" commit="fa58300c3f8cf32ab5133a7bf19594d4c6f5b70b">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
