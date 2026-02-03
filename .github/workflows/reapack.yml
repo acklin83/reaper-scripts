@@ -22,12 +22,10 @@ jobs:
 
       - name: Build index
         run: |
-          reapack-index --scan . --output index.xml
-
-      - name: Commit and push
-        run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add index.xml
-          git diff --staged --quiet || git commit -m "Update ReaPack index"
+          reapack-index --name "Frank Acklin Scripts" --commit --scan . --output index.xml
+
+      - name: Push changes
+        run: |
           git push
