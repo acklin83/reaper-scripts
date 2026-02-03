@@ -29,8 +29,6 @@
 --   - ReaImGui (required)
 --   - Running Mixnote server instance
 -- @link GitHub https://github.com/acklin83/mixnote
--- @provides
---   [main] .
 
 
 ---------------------------------------------------------------------------

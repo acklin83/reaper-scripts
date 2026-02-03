@@ -35,8 +35,6 @@
 --   - SWS Extension (required)
 --   - JS_ReaScriptAPI (optional, for multi-file dialogs)
 -- @link GitHub https://github.com/acklin83/RAPID
--- @provides
---   [main] .
 
 
 local r = reaper
