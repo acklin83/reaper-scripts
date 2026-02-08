@@ -4624,6 +4624,7 @@ local function measureLoudestItem(items, measureType, lufsSettings)
                 else -- LUFS
                     -- LUFS-M max measurement with configurable percentile
                     local itemLen = r.GetMediaItemInfo_Value(item, "D_LENGTH")
+                    local takeOffset = r.GetMediaItemTakeInfo_Value(take, "D_STARTOFFS")
                     local measurements = {}
 
                     local pos = 0
@@ -4634,8 +4635,8 @@ local function measureLoudestItem(items, measureType, lufsSettings)
                             source,
                             LUFS_TYPE_M_MAX,
                             -23.0,  -- Temporary reference
-                            pos,
-                            segEnd
+                            takeOffset + pos,
+                            takeOffset + segEnd
                         )
 
                         if volumeMultiplier and volumeMultiplier > 0 then
