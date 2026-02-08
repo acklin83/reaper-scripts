@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="fa58300c3f8cf32ab5133a7bf19594d4c6f5b70b">
+<index version="1" name="Frank Acklin Scripts" commit="b104e48530c06abca2b0eec5d74db2d4a50b02f5">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -9,11 +9,13 @@
 
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 RAPID\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 Professional workflow automation for REAPER that automates track mapping, media import, and LUFS normalization.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Three Workflows\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Four Workflows\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Full Workflow}: Import + mapping + normalization in one pass\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import Mode}: Map recording tracks to mix template (preserves FX, sends, routing)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import Mode (Single RPP)}: Map recording tracks to mix template (preserves FX, sends, routing)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import Mode (Multi-RPP)}: Import multiple RPP files into one template with merged tempo\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Normalize Mode}: Standalone LUFS normalization on existing tracks\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Multi-RPP import with merged tempo, regions, and markers\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Fuzzy matching with aliases for automatic track suggestions\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Multi-slot mapping with auto-duplicate for multiple sources\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab LUFS calibration system for creating custom normalization profiles\par}
@@ -43,6 +45,15 @@ Per-profile LUFS measurement settings (segment size, percentile, threshold)
 Normalization resets Item Gain and Take Volume before processing
 Fixed mode switching: tracks reload when toggling Import/Normalize]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/8b01c38285e917657dceb71cb00b28b4585ec9dc/RAPID/RAPID.lua</source>
+      </version>
+      <version name="2.5" author="Frank Acklin" time="2026-02-08T13:00:48Z">
+        <changelog><![CDATA[Multi-RPP Import: import multiple RPP files into one template
+Merged tempo/time-signatures with full API fidelity (no project reload)
+Time-based offset system (seconds) for all positioning
+Track consolidation with lane alignment and group flag copying
+Column-based mapping UI with per-RPP dropdowns and drag-drop reordering
+Editable template track names in both single and multi-RPP mode]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/b104e48530c06abca2b0eec5d74db2d4a50b02f5/RAPID/RAPID.lua</source>
       </version>
     </reapack>
   </category>
