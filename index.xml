@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="b104e48530c06abca2b0eec5d74db2d4a50b02f5">
+<index version="1" name="Frank Acklin Scripts" commit="c8e68a63b6b8dce5dfffe8a297cf38a79fe491d4">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
