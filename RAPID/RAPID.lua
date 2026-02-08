@@ -1,26 +1,29 @@
 -- @description RAPID - Recording Auto-Placement & Intelligent Dynamics
 -- @author Frank Acklin
--- @version 2.4.1
+-- @version 2.5
 -- @changelog
---   Fixed ReaPack metadata for package distribution
---   LUFS Calibration System: Create/update profiles from reference tracks
---   Per-profile LUFS measurement settings (segment size, percentile, threshold)
---   Normalization resets Item Gain and Take Volume before processing
---   Fixed mode switching: tracks reload when toggling Import/Normalize
+--   Multi-RPP Import: import multiple RPP files into one template
+--   Merged tempo/time-signatures with full API fidelity (no project reload)
+--   Time-based offset system (seconds) for all positioning
+--   Track consolidation with lane alignment and group flag copying
+--   Column-based mapping UI with per-RPP dropdowns and drag-drop reordering
+--   Editable template track names in both single and multi-RPP mode
 -- @about
 --   # RAPID
 --
 --   Professional workflow automation for REAPER that automates track mapping,
 --   media import, and LUFS normalization.
 --
---   ## Three Workflows
+--   ## Four Workflows
 --
 --   - **Full Workflow**: Import + mapping + normalization in one pass
---   - **Import Mode**: Map recording tracks to mix template (preserves FX, sends, routing)
+--   - **Import Mode (Single RPP)**: Map recording tracks to mix template (preserves FX, sends, routing)
+--   - **Import Mode (Multi-RPP)**: Import multiple RPP files into one template with merged tempo
 --   - **Normalize Mode**: Standalone LUFS normalization on existing tracks
 --
 --   ## Features
 --
+--   - Multi-RPP import with merged tempo, regions, and markers
 --   - Fuzzy matching with aliases for automatic track suggestions
 --   - Multi-slot mapping with auto-duplicate for multiple sources
 --   - LUFS calibration system for creating custom normalization profiles
@@ -35,12 +38,50 @@
 --   - SWS Extension (required)
 --   - JS_ReaScriptAPI (optional, for multi-file dialogs)
 -- @link GitHub https://github.com/acklin83/RAPID
-
+-- @provides
+--   [main] .
+--
+-- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.5
+--
+-- Unified version combining RAPID (Import & Mapping) with Little Joe (Normalize-Only)
+--
+-- Modes:
+-- ------
+-- [x] Import  [x] Normalize = Full RAPID workflow (import + map + normalize)
+-- [x] Import  [ ] Normalize = Import & map only (no normalization)
+-- [ ] Import  [x] Normalize = Little Joe mode (normalize existing tracks)
+--
+-- See Project Notes for full documentation
+--
+-- NEW in v2.5:
+-- - Multi-RPP Import: Import multiple RPP files into the same template
+-- - Drag-and-drop reordering of RPP queue
+-- - Per-RPP regions created automatically
+-- - Tempo/time-signature changes merged from all RPPs (time-based)
+-- - Markers imported with correct measure offsets
+-- - Configurable gap between RPPs (in measures, default: 2)
+-- - JS_ReaScriptAPI multi-file dialog support
+--
+-- NEW in v2.4:
+-- - LUFS Calibration System: Create/update profiles from perfectly leveled reference tracks
+-- - Per-profile LUFS measurement settings (segment size, percentile, threshold)
+-- - Removed global LUFS settings (now profile-specific or use defaults)
+-- - "Calibrate from Selection" button in Settings → Normalization tab
+--
+-- NEW in v2.3:
+-- - Editable track names, duplicate slot improvements, delete unused toggle
+-- - Offline media fix (progressive path suffix matching)
+-- - DrawList lock icon, help text rewrite
+--
+-- NEW in v2.2:
+-- - MixnoteStyle dark theme (Indigo accent, 4-level background hierarchy)
+-- - Compact toolbar layout, sec_button for secondary actions
+--
 
 local r = reaper
 
 -- ===== VERSION =====
-local VERSION = "2.4"
+local VERSION = "2.5"
 local WINDOW_TITLE = "RAPID v" .. VERSION
 
 -- ===== Capability checks =====
@@ -212,7 +253,6 @@ local importMode = true      -- Import & mapping functionality (RAPID)
 local normalizeMode = true   -- Normalization functionality (Little Joe)
 
 -- ===== GLOBAL STATE =====
-local copyMediaOnCommit = false
 local normProfiles = {}
 local busKeywords = {}
 local aliases = {}
@@ -227,6 +267,7 @@ local settings = {
     -- Import mode settings
     autoMatchTracksOnImport = true,
     autoMatchProfilesOnImport = true,
+    copyMedia = false,  -- Copy media into project on commit (was copyMediaOnCommit)
 
     -- Normalize mode settings
     processPerRegion = true,
@@ -237,42 +278,52 @@ local settings = {
 
     -- UI settings
     swatch_size = 12,
-    enableConsoleLogging = false
+    enableConsoleLogging = false,
+    deleteUnused = false,  -- was standalone deleteUnusedMode (0/1), now boolean in settings
 }
 
 -- Mapping data (Import Mode)
-local recPathRPP = nil
-local recPathRPPDir = nil
+local recPath = {
+    rpp = nil,          -- Path to source .rpp file (was recPathRPP)
+    dir = nil,          -- Directory of source .rpp (was recPathRPPDir)
+    regionCount = 0,    -- Count of regions in source RPP (was recSourceRegionCount)
+}
 local recSources = {}
-local recSourceRegionCount = 0  -- Count of regions in source RPP
 local mixTargets = {}
 local map = {}
 local normMap = {}  -- Maps trackIndex -> slotIndex -> {profile, targetPeak}
 local keepMap = {}  -- Maps trackIndex -> slotIndex -> boolean (keep source name)
 local fxMap = {}    -- Maps trackIndex -> slotIndex -> boolean (keep source FX)
-local deleteUnusedMode = 0
+-- deleteUnusedMode consolidated into settings.deleteUnused (boolean) to save local slot
 
 -- Normalize-Only Mode data
 local tracks = {}          -- Array of {track, name} for normalize-only mode
 local normMapDirect = {}   -- Maps track index -> {profile, targetPeak} for normalize-only mode
 
--- UI state
-local previewMode = false
-local showSettings = false
-local showHelp = false
-local should_close = false
-local win_init_applied = false
+-- UI state (grouped to stay under Lua's 200 local variable limit)
+local uiFlags = {
+    settings = false,
+    help = false,
+    close = false,
+    winInit = false,
+}
 
--- Multi-select state (NEW for dev261125b)
+-- Multi-select & drag state
 local selectedRows = {}      -- Set of selected row IDs (format: "mixIdx_slotIdx")
-local lastClickedRow = nil   -- Last clicked row ID for Shift-range selection
-local dragSelectState = nil  -- Drag selection state for Sel column
-local dragLockState = nil    -- Drag state for Lock checkbox
-local dragKeepNameState = nil -- Drag state for Keep Name checkbox
-local dragKeepFXState = nil  -- Drag state for Keep FX checkbox
-local editingDestTrack = nil -- Edit key "i_s" currently being renamed (double-click)
-local editingDestBuf = ""    -- Buffer for the InputText
-local slotNameOverride = {}  -- slotNameOverride[i][s] = custom name for duplicate slots (s >= 2)
+local dragState = {
+    lastClicked = nil,   -- Last clicked row ID for Shift-range selection
+    sel = nil,       -- Drag selection state for Sel column
+    lock = nil,      -- Drag state for Lock checkbox
+    keepName = nil,  -- Drag state for Keep Name checkbox
+    keepFX = nil,    -- Drag state for Keep FX checkbox
+}
+
+-- Inline editing state
+local editState = {
+    track = nil,         -- Edit key "i_s" currently being renamed (double-click)
+    buf = "",            -- Buffer for the InputText
+    slotNames = {},      -- slotNames[i][s] = custom name for duplicate slots (s >= 2)
+}
 
 -- Calibration window state
 local calibrationWindow = {
@@ -292,10 +343,39 @@ local calibrationWindow = {
     errorMsg = "",
 }
 
--- Caches
-local hasKids = setmetatable({}, {__mode="k"})
+-- ===== MULTI-RPP IMPORT STATE (v2.5) =====
+local rppQueue = {}              -- Array of RPP entries for multi-import
+--[[
+rppQueue[i] = {
+    path = "/path/to/recording.rpp",
+    dir = "/path/to/",
+    name = "Song Name",           -- From filename, editable
+    rppText = "",                 -- Raw RPP text (cached for tempo extraction)
+    tracks = {},                  -- Extracted track data (like recSources entries)
+    lengthInMeasures = 0,         -- Length in measures (rounded up to complete measure)
+    measureOffset = 0,            -- Start measure on timeline (calculated)
+    qnOffset = 0,                 -- Start position in quarter notes (accumulated correctly)
+    tempoMap = {},                -- Extracted tempo/time-sig points
+    markers = {},                 -- Extracted markers
+    baseTempo = {bpm=120, num=4, denom=4},  -- Initial tempo
+}
+]]
+local multiMap = {}              -- multiMap[mixIdx][rppIdx] = trackIdxInRpp (or 0 = unmapped)
+local multiNormMap = {}          -- multiNormMap[mixIdx] = {profile, targetPeak}
+local multiRppSettings = {
+    enabled = false,              -- Toggle between single/multi RPP mode (was multiRppMode)
+    gapInMeasures = 2,            -- Gap between RPPs in measures (default: 2)
+    createRegions = true,         -- Create region per RPP
+    importMarkers = true,         -- Import markers from all RPPs
+    alignLanes = true,            -- Move items to highest lane for visibility across RPPs
+}
+
+-- Caches (grouped to reduce local count)
 local nameCache = setmetatable({}, {__mode="k"})
-local effColorCache = setmetatable({}, {__mode="k"})
+local trackCache = {
+    kids = setmetatable({}, {__mode="k"}),   -- was hasKids
+    color = setmetatable({}, {__mode="k"}),  -- was effColorCache
+}
 
 _G.__mr_offset = 0.0
 _G.__mixTargets = mixTargets
@@ -430,98 +510,81 @@ local function loadLastMapData()
     return t
 end
 
--- ===== FULL STATE SAVE/LOAD (for project reload) =====
 -- ===== IMPORT MARKERS/REGIONS/TEMPO (POST-COMMIT) =====
+-- Single-RPP: Import tempo, markers and regions from source RPP via API (no file-write or reload)
 local function importMarkersTempoPostCommit()
-    if not recPathRPP or recPathRPP == "" then
+    if not recPath.rpp or recPath.rpp == "" then
         log("No recording RPP loaded, skipping marker import\n")
         return
     end
-    
+
     log("\n=== Importing Markers/Regions/Tempo ===\n")
-    
-    -- Read source RPP  
-    local f = io.open(recPathRPP, "rb")
+    r.Undo_BeginBlock()
+
+    -- Read source RPP
+    local f = io.open(recPath.rpp, "rb")
     if not f then
         log("Cannot read source RPP\n")
         return
     end
     local src_txt = f:read("*a"):gsub("^\239\187\191", ""):gsub("\r\n", "\n"):gsub("\r", "\n")
     f:close()
-    
-    -- Extract TEMPO to <PROJBAY> section
-    local tempo_start = src_txt:find("\n%s*TEMPO%s+") or src_txt:find("^%s*TEMPO%s+")
-    if not tempo_start then
-        log("No TEMPO line found in source\n")
-        return
+
+    -- 1. Extract & apply tempo
+    local tempoMap, baseTempo = extractTempoMap(src_txt)
+
+    -- Set base tempo
+    r.SetCurrentBPM(0, baseTempo.bpm, true)
+
+    -- Delete existing tempo markers
+    for i = r.CountTempoTimeSigMarkers(0) - 1, 0, -1 do
+        r.DeleteTempoTimeSigMarker(0, i)
     end
-    tempo_start = (src_txt:sub(tempo_start, tempo_start) == "\n") and (tempo_start + 1) or tempo_start
-    
-    local projbay_start = src_txt:find("\n%s*<PROJBAY", tempo_start) or src_txt:find("^%s*<PROJBAY", tempo_start)
-    if not projbay_start then
-        log("No <PROJBAY> found in source\n")
-        return
+
+    -- Set tempo markers via API (for correct positioning)
+    for _, pt in ipairs(tempoMap) do
+        r.SetTempoTimeSigMarker(0, -1, -1, -1, pt.pos,
+            pt.bpm, pt.num or 0, pt.denom or 0, pt.shape == 0)  -- shape 0 = gradual (linear=true), shape 1 = square (linear=false)
     end
-    
-    local src_header = src_txt:sub(tempo_start, projbay_start - 1)
-    
-    -- Save current project
-    r.Main_SaveProject(0, false)
-    
-    -- Read current project
-    local _, cur_path = r.EnumProjects(-1, "")
-    if not cur_path or cur_path == "" then
-        log("Current project not saved\n")
-        return
+
+    -- Apply source RPP's envelope chunk directly (copies TEMPOENVEX verbatim for single-RPP)
+    if #tempoMap > 1 then
+        local envexStart = src_txt:find("<TEMPOENVEX\n")
+        if envexStart then
+            local envexEnd = src_txt:find("\n>", envexStart)
+            if envexEnd then
+                local envexChunk = src_txt:sub(envexStart, envexEnd + 1)
+                local masterTrack = r.GetMasterTrack(0)
+                local tempoEnv = masterTrack and r.GetTrackEnvelopeByName(masterTrack, "Tempo map")
+                if tempoEnv then
+                    local ok = r.SetEnvelopeStateChunk(tempoEnv, envexChunk, true)
+                    if ok then
+                        log("  Tempo envelope applied via chunk\n")
+                    else
+                        log("  WARNING: SetEnvelopeStateChunk failed, using API tempo only\n")
+                    end
+                end
+            end
+        end
     end
-    
-    f = io.open(cur_path, "rb")
-    if not f then
-        log("Cannot read current project\n")
-        return
+
+    -- 2. Import markers/regions via API
+    local markers = extractMarkersFromRpp(src_txt)
+    local markerCount, regionCount = 0, 0
+    for _, m in ipairs(markers) do
+        if m.isRegion then
+            r.AddProjectMarker2(0, true, m.pos, m.rgnend, m.name, -1, m.color)
+            regionCount = regionCount + 1
+        else
+            r.AddProjectMarker2(0, false, m.pos, 0, m.name, -1, m.color)
+            markerCount = markerCount + 1
+        end
     end
-    local cur_txt = f:read("*a"):gsub("^\239\187\191", ""):gsub("\r\n", "\n"):gsub("\r", "\n")
-    f:close()
-    
-    -- Find TEMPO/PROJBAY in current
-    local cur_tempo_start = cur_txt:find("\n%s*TEMPO%s+") or cur_txt:find("^%s*TEMPO%s+")
-    if not cur_tempo_start then
-        log("No TEMPO in current project\n")
-        return
-    end
-    cur_tempo_start = (cur_txt:sub(cur_tempo_start, cur_tempo_start) == "\n") and (cur_tempo_start + 1) or cur_tempo_start
-    
-    local cur_projbay_start = cur_txt:find("\n%s*<PROJBAY", cur_tempo_start) or cur_txt:find("^%s*<PROJBAY", cur_tempo_start)
-    if not cur_projbay_start then
-        log("No <PROJBAY> in current project\n")
-        return
-    end
-    
-    -- Build new project
-    local new_txt = cur_txt:sub(1, cur_tempo_start - 1) .. src_header .. cur_txt:sub(cur_projbay_start)
-    
-    -- Backup
-    local backup = cur_path .. ".backup_before_marker_import.rpp"
-    f = io.open(backup, "wb")
-    if f then f:write(cur_txt); f:close() end
-    
-    -- Write
-    f = io.open(cur_path, "wb")
-    if not f then
-        log("Cannot write modified project\n")
-        return
-    end
-    f:write(new_txt)
-    f:close()
-    
-    log("Markers/Regions/Tempo imported!\n")
-    log("Closing script - please restart manually after project reload.\n")
-    
-    -- Set flag to close script
-    should_close = true
-    
-    -- Reload project (script will close immediately after)
-    r.Main_openProject(cur_path)
+
+    r.UpdateTimeline()
+    r.Undo_EndBlock("RAPID: Import Markers/Tempomap", -1)
+    log(string.format("Markers/Regions/Tempo imported! (%d markers, %d regions, %d tempo points)\n",
+        markerCount, regionCount, #tempoMap))
 end
 
 -- ===== AUTO-RESUME NORMALIZATION AFTER RELOAD =====
@@ -602,7 +665,15 @@ local function saveIni()
     f:write("AutoMatchTracksOnImport=" .. tostring(settings.autoMatchTracksOnImport) .. "\n")
     f:write("AutoMatchProfilesOnImport=" .. tostring(settings.autoMatchProfilesOnImport) .. "\n")
     f:write("DeleteUnused=" .. tostring(settings.deleteUnused) .. "\n")
-    
+    f:write("\n")
+
+    -- [MultiRpp]
+    f:write("[MultiRpp]\n")
+    f:write("GapInMeasures=" .. tostring(multiRppSettings.gapInMeasures) .. "\n")
+    f:write("CreateRegions=" .. tostring(multiRppSettings.createRegions) .. "\n")
+    f:write("ImportMarkers=" .. tostring(multiRppSettings.importMarkers) .. "\n")
+    f:write("AlignLanes=" .. tostring(multiRppSettings.alignLanes) .. "\n")
+
     f:close()
 end
 
@@ -788,7 +859,24 @@ local function loadIni()
     settings.autoMatchTracksOnImport = parseBool("AutoMatchTracksOnImport", true)
     settings.autoMatchProfilesOnImport = parseBool("AutoMatchProfilesOnImport", true)
     settings.deleteUnused = parseBool("DeleteUnused", false)
-    deleteUnusedMode = settings.deleteUnused and 1 or 0
+
+    -- Parse [MultiRpp]
+    local function parseMultiRppBool(key, default)
+        local val = content:match("%[MultiRpp%].-" .. key .. "=(%w+)")
+        if val then return val == "true" end
+        return default
+    end
+
+    local function parseMultiRppInt(key, default)
+        local val = content:match("%[MultiRpp%].-" .. key .. "=(%d+)")
+        if val then return tonumber(val) end
+        return default
+    end
+
+    multiRppSettings.gapInMeasures = parseMultiRppInt("GapInMeasures", 2)
+    multiRppSettings.createRegions = parseMultiRppBool("CreateRegions", true)
+    multiRppSettings.importMarkers = parseMultiRppBool("ImportMarkers", true)
+    multiRppSettings.alignLanes = parseMultiRppBool("AlignLanes", true)
 
     -- Sync global mode variables
     importMode = settings.importMode
@@ -1485,9 +1573,9 @@ end
 local function rebuildMixTargets()
     mixTargets = {}
     protectedSet = protectedSet or {}
-    hasKids = setmetatable({}, {__mode = "k"})
+    trackCache.kids = setmetatable({}, {__mode = "k"})
     nameCache = setmetatable({}, {__mode = "k"})
-    effColorCache = setmetatable({}, {__mode = "k"})
+    trackCache.color = setmetatable({}, {__mode = "k"})
     
     local N = r.CountTracks(0)
     local busStack, activeBus = {}, false
@@ -1512,9 +1600,9 @@ local function rebuildMixTargets()
                 local nm = trName(tr)
                 nameCache[tr] = nm
                 mixTargets[#mixTargets + 1] = tr
-                for _, par in ipairs(visStack) do hasKids[par] = true end
+                for _, par in ipairs(visStack) do trackCache.kids[par] = true end
                 if d == 1 then visStack[#visStack + 1] = tr end
-                effColorCache[tr] = effective_rgb24(tr)
+                trackCache.color[tr] = effective_rgb24(tr)
             end
             
             if d < 0 then
@@ -1538,7 +1626,7 @@ end
 local function isLeafCached(tr)
     if not validTrack(tr) then return true end
     if isFolderHeader(tr) then return false end
-    return not (hasKids and hasKids[tr])
+    return not (trackCache.kids and trackCache.kids[tr])
 end
 
 -- ===== LOCK PARENT FOLDERS =====
@@ -1621,15 +1709,15 @@ local function loadRecRPP(path)
         return
     end
     
-    recPathRPP = path
-    recPathRPPDir = getDirname(path)
+    recPath.rpp = path
+    recPath.dir = getDirname(path)
     
     local txt = readAll(path)
     if not txt then return end
     
     -- Count regions in source RPP
-    recSourceRegionCount = countRegionsInRPP(txt)
-    log(string.format("Source RPP has %d regions\n", recSourceRegionCount))
+    recPath.regionCount = countRegionsInRPP(txt)
+    log(string.format("Source RPP has %d regions\n", recPath.regionCount))
     
     -- Extract all POOLEDENV sections from RPP
     local pooledEnvs = extractPooledEnvs(txt)
@@ -1698,9 +1786,1405 @@ end
 
 local function clearRecList()
     recSources = {}
-    recPathRPP = nil
-    recPathRPPDir = nil
+    recPath.rpp = nil
+    recPath.dir = nil
     _G.__recSources = recSources
+end
+
+-- ===== MULTI-RPP IMPORT FUNCTIONS (v2.5) =====
+
+-- Extract base tempo from RPP text
+local function extractBaseTempo(rppText)
+    local bpm, num, denom = rppText:match("TEMPO%s+([%d%.]+)%s+(%d+)%s+(%d+)")
+    return {
+        bpm = tonumber(bpm) or 120,
+        num = tonumber(num) or 4,
+        denom = tonumber(denom) or 4
+    }
+end
+
+-- Extract complete tempo map from RPP (TEMPO line + TEMPOENVEX points)
+local function extractTempoMap(rppText)
+    local points = {}
+    local baseTempo = extractBaseTempo(rppText)
+
+    -- Extract TEMPOENVEX points if present (authoritative source for shape + timesig)
+    -- Note: Lua's .- does not match newlines, so we use find/sub for multi-line blocks
+    local envexStart = rppText:find("<TEMPOENVEX\n")
+    local envex = nil
+    if envexStart then
+        local envexEnd = rppText:find("\n>", envexStart)
+        if envexEnd then
+            envex = rppText:sub(envexStart, envexEnd + 1)
+        end
+    end
+    if envex then
+        for line in envex:gmatch("PT%s+([^\n]+)") do
+            -- Real format: PT <pos> <bpm> <shape> [<timesig> <selected> <flags> ...]
+            -- Without timesig: PT <pos> <bpm> <shape>  (3 fields only)
+            local pos, bpm, shape, rest = line:match(
+                "([%d%.%-]+)%s+([%d%.]+)%s+(%d+)%s*(.*)"
+            )
+            if pos and bpm then
+                local pt = {
+                    pos = tonumber(pos),
+                    bpm = tonumber(bpm),
+                    shape = tonumber(shape) or 0,
+                    num = nil,
+                    denom = nil,
+                }
+
+                -- Field 4 = optional timesig (encoded as 65536*denom + num)
+                if rest and rest ~= "" then
+                    local timesig = rest:match("^(%d+)")
+                    if timesig then
+                        local ts = tonumber(timesig)
+                        if ts and ts > 0 then
+                            pt.denom = math.floor(ts / 65536)
+                            pt.num = ts % 65536
+                        end
+                    end
+                end
+
+                points[#points + 1] = pt
+            end
+        end
+    end
+
+    -- Fallback: if no TEMPOENVEX or no point at pos 0, add baseTempo as first point
+    -- (TEMPOENVEX PT 0 is authoritative when present — has correct shape value)
+    if #points == 0 or points[1].pos > 0 then
+        table.insert(points, 1, {
+            pos = 0,
+            bpm = baseTempo.bpm,
+            num = baseTempo.num,
+            denom = baseTempo.denom,
+            shape = 1,  -- shape 1 = square/instant (safe default)
+        })
+    end
+
+    -- Force shape=1 (SQUARE/instant) on the last tempo point of every RPP.
+    -- In standalone context, the last point's shape is irrelevant (REAPER ignores it).
+    -- But in multi-RPP merge, the last point is no longer last — shape=0 (gradual)
+    -- would cause an unwanted ramp to the next RPP's first tempo.
+    if #points > 0 then
+        points[#points].shape = 1  -- 1 = square/instant (no transition across RPP boundary)
+    end
+
+    return points, baseTempo
+end
+
+-- Extract markers from RPP text
+-- RPP MARKER format: MARKER <idx> <pos> "<name>" <flags> [0 <colortype> <colorflag> {GUID} 0]
+-- Regions use TWO MARKER lines: start (with name, flags bit0=1) + end (empty name "", same idx)
+-- Region-end lines have shortened format: MARKER <idx> <pos> "" <flags>
+local function extractMarkersFromRpp(rppText)
+    local allEntries = {}
+
+    for line in rppText:gmatch("[^\r\n]+") do
+        if line:match("^%s*MARKER%s+") then
+            local idx, pos, rest = line:match("^%s*MARKER%s+(%S+)%s+([%d%.%-]+)%s+(.+)")
+            if idx and pos and rest then
+                local name, afterName = rest:match('^"([^"]*)"(.*)')
+                if not name then
+                    name, afterName = rest:match("^(%S+)(.*)")
+                end
+
+                local flags, color = 0, 0
+                if afterName then
+                    local parts = {}
+                    for p in afterName:gmatch("%S+") do parts[#parts + 1] = p end
+                    flags = tonumber(parts[1]) or 0
+                    -- Color info is at parts[3] (after "0 <colortype>") if present
+                    -- Full format: flags 0 colortype colorflag {GUID} 0
+                    -- For API import we only need the color value from REAPER's native format
+                    color = tonumber(parts[3]) or 0
+                end
+
+                local isRegion = (flags % 2 == 1)  -- bit 0 = isRegion
+
+                allEntries[#allEntries + 1] = {
+                    idx = tonumber(idx),
+                    pos = tonumber(pos),
+                    name = name or "",
+                    isRegion = isRegion,
+                    flags = flags,
+                    rgnend = 0,
+                    color = color
+                }
+            end
+        end
+    end
+
+    -- Second pass: pair region-end markers with their start markers
+    -- Region-end markers have empty name "" and same idx as their start
+    local regionStarts = {}  -- idx -> entry (last seen start for this idx)
+    for _, m in ipairs(allEntries) do
+        if m.isRegion and m.name ~= "" then
+            regionStarts[m.idx] = m
+        end
+    end
+
+    -- Filter: remove end-markers and set rgnend on matching starts
+    local markers = {}
+    for _, m in ipairs(allEntries) do
+        if m.isRegion and m.name == "" then
+            -- This is a region-end marker — set rgnend on matching start
+            local startEntry = regionStarts[m.idx]
+            if startEntry then
+                startEntry.rgnend = m.pos
+            end
+            -- Don't add to output (skip region-end markers)
+        else
+            markers[#markers + 1] = m
+        end
+    end
+
+    return markers
+end
+
+-- Calculate RPP length in measures (finds last item end, rounds up to complete measure)
+-- Returns: measures (integer, rounded up), totalQN (float, exact beat count)
+local function calculateRppLengthInMeasures(rppText, baseTempo, tempoMap)
+    local maxEndTime = 0
+
+    -- Scan line-by-line for POSITION/LENGTH pairs inside ITEM blocks
+    -- (indented RPP format makes <ITEM.-\n> pattern unreliable)
+    local curPos = nil
+    for line in rppText:gmatch("[^\n]+") do
+        local p = line:match("^%s*POSITION%s+([%d%.]+)")
+        if p then curPos = tonumber(p) or 0 end
+        local l = line:match("^%s*LENGTH%s+([%d%.]+)")
+        if l and curPos then
+            local itemEnd = curPos + (tonumber(l) or 0)
+            if itemEnd > maxEndTime then maxEndTime = itemEnd end
+            curPos = nil
+        end
+    end
+
+    -- Simple fallback if no tempo map with multiple points
+    if not tempoMap or #tempoMap < 2 then
+        local qnPerMeasure = (baseTempo.num or 4) * (4 / (baseTempo.denom or 4))
+        local bpm = baseTempo.bpm or 120
+        local totalBeats = maxEndTime * (bpm / 60)
+        return math.ceil(totalBeats / qnPerMeasure), totalBeats, maxEndTime
+    end
+
+    -- Build segments from tempo map
+    -- PT positions in TEMPOENVEX are in SECONDS (not quarter notes!)
+    -- Shape: 0 = gradual/linear ramp, 1 = square/instant (inverted from API's lineartempo)
+    local segs = {}
+    local curNum, curDenom = baseTempo.num or 4, baseTempo.denom or 4
+    for i, pt in ipairs(tempoMap) do
+        if pt.num and pt.num > 0 then curNum = pt.num end
+        if pt.denom and pt.denom > 0 then curDenom = pt.denom end
+        segs[i] = { time = pt.pos, bpm = pt.bpm, shape = pt.shape, num = curNum, denom = curDenom }
+    end
+
+    -- Integrate BPM over time to get total QN at maxEndTime
+    -- Also track QN breakpoints for measure calculation
+    local totalQN = 0
+    local qnBreaks = {}  -- {qnStart, num, denom} for each segment
+    for i = 1, #segs do
+        local s = segs[i]
+        qnBreaks[i] = { qnStart = totalQN, num = s.num, denom = s.denom }
+        local nextTime = (i < #segs) and segs[i + 1].time or maxEndTime
+        if nextTime > maxEndTime then nextTime = maxEndTime end
+        local deltaTime = nextTime - s.time
+        if deltaTime > 0 then
+            -- shape=0 means GRADUAL (linear ramp), shape=1 means SQUARE (constant)
+            if s.shape == 0 and i < #segs and s.bpm ~= segs[i + 1].bpm then
+                -- Linear ramp: QN = deltaTime * (bpm2 - bpm1) / (60 * ln(bpm2/bpm1))
+                local bpm2 = segs[i + 1].bpm
+                totalQN = totalQN + deltaTime * (bpm2 - s.bpm) / (60 * math.log(bpm2 / s.bpm))
+            else
+                -- Constant tempo: QN = deltaTime * bpm / 60
+                totalQN = totalQN + deltaTime * s.bpm / 60
+            end
+        end
+        if nextTime >= maxEndTime then break end
+    end
+
+    -- Convert totalQN to measures using time signature changes at QN breakpoints
+    local totalMeasures = 0
+    for i = 1, #qnBreaks do
+        local qnStart = qnBreaks[i].qnStart
+        local qnEnd = (i < #qnBreaks) and qnBreaks[i + 1].qnStart or totalQN
+        local qnInSeg = qnEnd - qnStart
+        if qnInSeg > 0 then
+            local qnPerMeasure = qnBreaks[i].num * (4 / qnBreaks[i].denom)
+            totalMeasures = totalMeasures + qnInSeg / qnPerMeasure
+        end
+    end
+
+    -- Round up to complete measure; also return totalQN for direct use (avoids lossy measures*qnPerMeasure)
+    return math.ceil(totalMeasures), totalQN, maxEndTime
+end
+
+-- Load RPP into the multi-RPP queue
+local function loadRppToQueue(path)
+    if not path or path == "" then return false end
+
+    local txt = readAll(path)
+    if not txt then return false end
+
+    local dir = getDirname(path)
+    local filename = path:match("([^/\\]+)%.[rR][pP][pP]$") or path:match("([^/\\]+)$") or "Unnamed"
+
+    -- Extract tempo map and base tempo
+    local tempoMap, baseTempo = extractTempoMap(txt)
+
+    -- Extract markers
+    local markers = extractMarkersFromRpp(txt)
+
+    -- Calculate length in measures, quarter notes, and absolute time
+    local lengthInMeasures, lengthInQN, maxEndTime = calculateRppLengthInMeasures(txt, baseTempo, tempoMap)
+    if lengthInMeasures < 1 then lengthInMeasures = 1 end
+
+    -- PT positions in TEMPOENVEX are already in seconds — assign directly
+    for _, pt in ipairs(tempoMap) do
+        pt.time = pt.pos
+    end
+
+    log(string.format("  loadRppToQueue '%s': measures=%d, lengthInQN=%.4f, maxEndTime=%.4fs, baseTempo=%.1f bpm %d/%d\n",
+        filename, lengthInMeasures, lengthInQN or -1, maxEndTime or 0, baseTempo.bpm, baseTempo.num or 4, baseTempo.denom or 4))
+
+    -- Extract tracks (same as loadRecRPP)
+    local regionCount = countRegionsInRPP(txt)
+    local pooledEnvs = extractPooledEnvs(txt)
+    local chunks = extractTrackChunks(txt)
+
+    local tracks = {}
+    for _, ch in ipairs(chunks) do
+        local nm = parseTopLevelName(ch)
+        if nm == "" then nm = "(unnamed)" end
+        local has = chunkHasMedia(ch)
+
+        if (ONLY_WITH_MEDIA and has) or (not ONLY_WITH_MEDIA) then
+            local usedPoolIDs = getPoolIDsFromChunk(ch)
+            local neededPools = {}
+            for poolID, _ in pairs(usedPoolIDs) do
+                if pooledEnvs[poolID] then
+                    neededPools[#neededPools + 1] = pooledEnvs[poolID]
+                end
+            end
+
+            tracks[#tracks + 1] = {
+                src = "rpp",
+                name = nm,
+                chunk = ch,
+                hasMedia = has,
+                pooledEnvs = neededPools
+            }
+        end
+    end
+
+    -- Add to queue
+    rppQueue[#rppQueue + 1] = {
+        path = path,
+        dir = dir,
+        name = filename,
+        rppText = txt,
+        tracks = tracks,
+        lengthInMeasures = lengthInMeasures,
+        lengthInQN = lengthInQN or (lengthInMeasures * (baseTempo.num or 4) * (4 / (baseTempo.denom or 4))),  -- fallback
+        maxEndTime = maxEndTime or 0,  -- RPP duration in seconds (max item end)
+        measureOffset = 0,  -- Will be calculated
+        qnOffset = 0,       -- Will be calculated (for tempo envelope only)
+        timeOffset = 0,     -- Will be calculated (for item/region/marker positioning)
+        tempoMap = tempoMap,
+        markers = markers,
+        baseTempo = baseTempo,
+        regionCount = regionCount
+    }
+
+    recalculateQueueOffsets()
+    return true
+end
+
+-- Remove RPP from queue
+local function removeRppFromQueue(idx)
+    if idx < 1 or idx > #rppQueue then return end
+    local oldCount = #rppQueue
+    table.remove(rppQueue, idx)
+    -- Shift multiMap entries: remove column idx, shift higher indices down
+    for i, _ in pairs(multiMap) do
+        local row = multiMap[i]
+        if row then
+            -- Remove the entry for the deleted RPP, shift rest down
+            for r = idx, oldCount - 1 do
+                row[r] = row[r + 1]
+            end
+            row[oldCount] = nil
+        end
+    end
+    recalculateQueueOffsets()
+end
+
+-- Move RPP in queue (for reordering)
+local function moveRppInQueue(fromIdx, toIdx)
+    if fromIdx < 1 or fromIdx > #rppQueue then return end
+    if toIdx < 1 or toIdx > #rppQueue then return end
+    if fromIdx == toIdx then return end
+
+    local n = #rppQueue
+    local item = table.remove(rppQueue, fromIdx)
+    table.insert(rppQueue, toIdx, item)
+
+    -- Reorder multiMap columns to match the new queue order
+    -- Same logic: remove column fromIdx, insert at toIdx
+    for i, _ in pairs(multiMap) do
+        local row = multiMap[i]
+        if row then
+            local saved = row[fromIdx]
+            if fromIdx < toIdx then
+                for r = fromIdx, toIdx - 1 do row[r] = row[r + 1] end
+            else
+                for r = fromIdx, toIdx + 1, -1 do row[r] = row[r - 1] end
+            end
+            row[toIdx] = saved
+        end
+    end
+
+    recalculateQueueOffsets()
+end
+
+-- Calculate measure/time/beat offsets for all RPPs in queue
+-- Time-based: timeOffset (seconds) is primary for item/region/marker positioning
+-- Beat-based: qnOffset is kept for tempo envelope PT positions only
+function recalculateQueueOffsets()
+    local currentMeasure = 0
+    local currentTime = 0
+    local currentQN = 0
+
+    for i, rpp in ipairs(rppQueue) do
+        rpp.measureOffset = currentMeasure
+        rpp.timeOffset = currentTime
+        rpp.qnOffset = currentQN
+
+        -- Calculate measure/time constants from base tempo
+        local num = rpp.baseTempo.num or 4
+        local denom = rpp.baseTempo.denom or 4
+        local qnPerMeasure = num * (4 / denom)
+        local baseBPM = rpp.baseTempo.bpm or 120
+        local secPerMeasure = qnPerMeasure * 60 / baseBPM
+
+        -- Round RPP duration up to next measure boundary (at base tempo)
+        local rppMeasuresCeil = math.ceil((rpp.maxEndTime or 0) / secPerMeasure)
+        if rppMeasuresCeil < 1 then rppMeasuresCeil = 1 end
+        local rppTimeRounded = rppMeasuresCeil * secPerMeasure
+        local gapTime = multiRppSettings.gapInMeasures * secPerMeasure
+
+        -- QN offset synchronized with time (both use rounded-up measure count)
+        local rppQNRounded = rppMeasuresCeil * qnPerMeasure
+        local gapQN = multiRppSettings.gapInMeasures * qnPerMeasure
+
+        log(string.format("  recalcQueueOff RPP %d '%s': measOff=%d timeOff=%.4fs qnOff=%.4f maxEnd=%.4fs lenMeas=%d rounded=%d meas\n",
+            i, rpp.name, rpp.measureOffset, rpp.timeOffset, rpp.qnOffset, rpp.maxEndTime or 0, rpp.lengthInMeasures or 0, rppMeasuresCeil))
+
+        -- Use actual lengthInMeasures (accounts for tempo/timesig changes) for measure display
+        currentMeasure = currentMeasure + (rpp.lengthInMeasures or rppMeasuresCeil) + multiRppSettings.gapInMeasures
+        currentTime = currentTime + rppTimeRounded + gapTime
+        currentQN = currentQN + rppQNRounded + gapQN
+    end
+
+    -- Rebuild recSources from all queued RPPs with rppIndex metadata
+    rebuildRecSourcesFromQueue()
+end
+
+-- Rebuild recSources array from queue (for track mapping compatibility)
+function rebuildRecSourcesFromQueue()
+    if #rppQueue == 0 then return end
+
+    recSources = {}
+
+    for rppIdx, rpp in ipairs(rppQueue) do
+        for _, track in ipairs(rpp.tracks) do
+            recSources[#recSources + 1] = {
+                src = "rpp",
+                name = track.name,
+                chunk = track.chunk,
+                hasMedia = track.hasMedia,
+                pooledEnvs = track.pooledEnvs,
+                -- Multi-RPP metadata
+                rppIndex = rppIdx,
+                rppMeasureOffset = rpp.measureOffset,
+                rppName = rpp.name
+            }
+        end
+    end
+
+    -- Also set recPath.rpp to first RPP for marker import compatibility
+    if rppQueue[1] then
+        recPath.rpp = rppQueue[1].path
+        recPath.dir = rppQueue[1].dir
+    end
+
+    _G.__recSources = recSources
+end
+
+-- Build merged tempo section text for project
+local function buildMergedTempoSection()
+    if #rppQueue == 0 then return nil end
+
+    local lines = {}
+
+    -- First RPP's base tempo becomes project tempo
+    local firstTempo = rppQueue[1].baseTempo
+    lines[#lines + 1] = string.format("TEMPO %.14g %d %d",
+        firstTempo.bpm, firstTempo.num, firstTempo.denom)
+
+    -- NOTE: MARKER lines are NOT written here. They are created via API
+    -- (createMultiRppRegions + importMultiRppMarkers) and REAPER writes them
+    -- to the .rpp on save. writeMultiRppTempoSection() preserves existing
+    -- MARKER lines from the saved .rpp when replacing TEMPO+TEMPOENVEX.
+
+    -- Build TEMPOENVEX with all tempo points from all RPPs
+    local allPoints = {}
+
+    for _, rpp in ipairs(rppQueue) do
+        local offsetSeconds = rpp.timeOffset  -- PT positions in TEMPOENVEX are in seconds
+
+        for _, pt in ipairs(rpp.tempoMap) do
+            local adjPos = pt.pos + offsetSeconds  -- pt.pos is seconds within RPP
+
+            allPoints[#allPoints + 1] = {
+                pos = adjPos,
+                bpm = pt.bpm,
+                shape = pt.shape,
+                num = pt.num,
+                denom = pt.denom
+            }
+        end
+    end
+
+    -- Sort by position
+    table.sort(allPoints, function(a, b) return a.pos < b.pos end)
+
+    -- Build TEMPOENVEX block
+    if #allPoints > 1 then  -- Only if there are tempo changes
+        lines[#lines + 1] = "<TEMPOENVEX"
+        lines[#lines + 1] = "ACT 1 -1"
+        lines[#lines + 1] = "VIS 1 0 1"
+        lines[#lines + 1] = "LANEHEIGHT 0 0"
+        lines[#lines + 1] = "ARM 0"
+        lines[#lines + 1] = "DEFSHAPE 0 -1 -1"
+
+        for _, pt in ipairs(allPoints) do
+            local ptLine
+            if pt.num and pt.denom and pt.num > 0 and pt.denom > 0 then
+                local timesig = pt.denom * 65536 + pt.num
+                ptLine = string.format("PT %.14g %.14g %d %d",
+                    pt.pos, pt.bpm, pt.shape, timesig)
+            else
+                ptLine = string.format("PT %.14g %.14g %d",
+                    pt.pos, pt.bpm, pt.shape)
+            end
+            lines[#lines + 1] = ptLine
+        end
+
+        lines[#lines + 1] = ">"
+    end
+
+    return table.concat(lines, "\n")
+end
+
+-- Apply full-fidelity tempo via SetEnvelopeStateChunk (no file I/O or reload needed)
+-- Reads beat positions from REAPER's API markers (set by setTempoViaAPI using time positions),
+-- then builds TEMPOENVEX chunk with correct shape/tension values from rppQueue data.
+-- NOTE: This function is retained but NOT called in commitMultiRpp().
+-- setTempoViaAPI() now maps shapes correctly (linear = pt.shape == 0), so API markers
+-- have full fidelity. Calling this function corrupted REAPER's internal beat positions
+-- because deleting API markers before SetEnvelopeStateChunk caused TIMELOCKMODE 2
+-- items to recalculate, and the rebuilt markers had different internal beat positions.
+local function applyTempoViaEnvelopeChunk()
+    if #rppQueue == 0 then return false end
+    log("\n=== Applying Full-Fidelity Tempo via Envelope Chunk ===\n")
+
+    -- Build a lookup of shape values from rppQueue (keyed by approximate time position)
+    local shapeByTime = {}  -- { {time=, shape=, num=, denom=}, ... }
+    for _, rpp in ipairs(rppQueue) do
+        for _, pt in ipairs(rpp.tempoMap) do
+            shapeByTime[#shapeByTime + 1] = {
+                time = rpp.timeOffset + (pt.time or 0),
+                shape = pt.shape,
+                num = pt.num,
+                denom = pt.denom
+            }
+        end
+    end
+    table.sort(shapeByTime, function(a, b) return a.time < b.time end)
+
+    -- Read back API markers — PT positions in TEMPOENVEX are in SECONDS (not QN)
+    local existingCount = r.CountTempoTimeSigMarkers(0)
+    log(string.format("  Reading %d existing API tempo markers\n", existingCount))
+
+    if existingCount < 2 then
+        log("  No tempo changes to apply (single tempo throughout)\n")
+        return true
+    end
+
+    -- Build allPoints by matching API markers with our shape data (both sorted by time)
+    local allPoints = {}
+    local shapeIdx = 1
+    for i = 0, existingCount - 1 do
+        local ok, timepos, measurepos, beatpos, bpm, tsnum, tsdenom, lineartempo =
+            r.GetTempoTimeSigMarker(0, i)
+        if ok then
+            -- Find matching shape from our rppQueue data (sequential match by closest time)
+            -- Shape mapping: lineartempo=true → gradual → shape=0; lineartempo=false → square → shape=1
+            local bestShape = lineartempo and 0 or 1  -- fallback from API linear flag
+            local bestNum, bestDenom = nil, nil
+            local bestDist = math.huge
+            -- Search forward from last match position for efficiency
+            for si = shapeIdx, #shapeByTime do
+                local dist = math.abs(shapeByTime[si].time - timepos)
+                if dist < bestDist then
+                    bestDist = dist
+                    bestShape = shapeByTime[si].shape
+                    bestNum = shapeByTime[si].num
+                    bestDenom = shapeByTime[si].denom
+                    shapeIdx = si  -- advance for next iteration
+                elseif dist > bestDist then
+                    break  -- past the closest match, stop searching
+                end
+            end
+
+            -- Use time sig from our data if API doesn't have it
+            local useNum = (tsnum > 0) and tsnum or bestNum
+            local useDenom = (tsdenom > 0) and tsdenom or bestDenom
+
+            allPoints[#allPoints + 1] = {
+                pos = timepos,  -- SECONDS — TEMPOENVEX PT positions are in seconds
+                bpm = bpm,
+                shape = bestShape,
+                num = useNum,
+                denom = useDenom
+            }
+
+            log(string.format("  API marker %d: time=%.4f bpm=%.4f shape=%d ts=%s\n",
+                i, timepos, bpm, bestShape,
+                useNum and string.format("%d/%d", useNum, useDenom or 4) or "-"))
+        end
+    end
+
+    -- Build TEMPOENVEX chunk
+    local lines = {}
+    lines[#lines + 1] = "<TEMPOENVEX"
+    lines[#lines + 1] = "ACT 1 -1"
+    lines[#lines + 1] = "VIS 1 0 1"
+    lines[#lines + 1] = "LANEHEIGHT 0 0"
+    lines[#lines + 1] = "ARM 0"
+    lines[#lines + 1] = "DEFSHAPE 0 -1 -1"
+    for _, pt in ipairs(allPoints) do
+        if pt.num and pt.denom and pt.num > 0 and pt.denom > 0 then
+            local ts = pt.denom * 65536 + pt.num
+            lines[#lines + 1] = string.format("PT %.14g %.14g %d %d",
+                pt.pos, pt.bpm, pt.shape, ts)
+        else
+            lines[#lines + 1] = string.format("PT %.14g %.14g %d",
+                pt.pos, pt.bpm, pt.shape)
+        end
+    end
+    lines[#lines + 1] = ">"
+    local chunk = table.concat(lines, "\n")
+
+    -- Delete all existing API tempo markers first to prevent duplicates
+    -- (REAPER's tempo envelope has a dual-source system: internal markers + envelope chunk.
+    --  If we don't clear the markers, SetEnvelopeStateChunk merges rather than replaces.)
+    for i = existingCount - 1, 0, -1 do
+        r.DeleteTempoTimeSigMarker(0, i)
+    end
+
+    -- Apply to master tempo envelope
+    local masterTrack = r.GetMasterTrack(0)
+    local tempoEnv = masterTrack and r.GetTrackEnvelopeByName(masterTrack, "Tempo map")
+    if not tempoEnv then
+        log("  ERROR: Cannot get tempo envelope\n")
+        return false
+    end
+
+    log("  Chunk to apply (" .. #allPoints .. " points):\n")
+    for cline in chunk:gmatch("[^\n]+") do
+        log("    " .. cline .. "\n")
+    end
+
+    local ok = r.SetEnvelopeStateChunk(tempoEnv, chunk, true)
+    if not ok then
+        log("  ERROR: SetEnvelopeStateChunk failed\n")
+        return false
+    end
+
+    r.UpdateTimeline()
+    r.UpdateArrange()
+
+    -- Verify
+    local resultCount = r.CountTempoTimeSigMarkers(0)
+    log(string.format("  Result: %d tempo markers after chunk apply (expected %d)\n",
+        resultCount, #allPoints))
+
+    log("  Tempo envelope applied successfully\n")
+    return true
+end
+
+-- Write merged tempo/marker section to current project (FALLBACK — only used if SetEnvelopeStateChunk fails)
+local function writeMultiRppTempoSection()
+    if #rppQueue == 0 then
+        log("No RPPs in queue, skipping tempo merge\n")
+        return
+    end
+
+    log("\n=== Writing Multi-RPP Tempo/Markers ===\n")
+
+    -- Build merged section
+    local mergedSection = buildMergedTempoSection()
+    if not mergedSection then
+        log("Failed to build merged tempo section\n")
+        return
+    end
+
+    -- Save current project
+    r.Main_SaveProject(0, false)
+
+    -- Read current project
+    local _, cur_path = r.EnumProjects(-1, "")
+    if not cur_path or cur_path == "" then
+        log("Current project not saved\n")
+        return
+    end
+
+    local f = io.open(cur_path, "rb")
+    if not f then
+        log("Cannot read current project\n")
+        return
+    end
+    local cur_txt = f:read("*a"):gsub("^\239\187\191", ""):gsub("\r\n", "\n"):gsub("\r", "\n")
+    f:close()
+
+    -- Find TEMPO and PROJBAY in current project
+    local cur_tempo_start = cur_txt:find("\n%s*TEMPO%s+") or cur_txt:find("^%s*TEMPO%s+")
+    if not cur_tempo_start then
+        log("No TEMPO in current project\n")
+        return
+    end
+    cur_tempo_start = (cur_txt:sub(cur_tempo_start, cur_tempo_start) == "\n") and (cur_tempo_start + 1) or cur_tempo_start
+
+    local cur_projbay_start = cur_txt:find("\n%s*<PROJBAY", cur_tempo_start) or cur_txt:find("^%s*<PROJBAY", cur_tempo_start)
+    if not cur_projbay_start then
+        log("No <PROJBAY> in current project\n")
+        return
+    end
+
+    -- Extract existing MARKER lines from the TEMPO-to-PROJBAY section
+    -- (REAPER writes API-created markers/regions here on save)
+    local tempoToProjbay = cur_txt:sub(cur_tempo_start, cur_projbay_start - 1)
+    local existingMarkers = {}
+    for line in tempoToProjbay:gmatch("[^\n]+") do
+        if line:match("^%s*MARKER%s+") then
+            existingMarkers[#existingMarkers + 1] = line
+        end
+    end
+    local markerBlock = (#existingMarkers > 0) and (table.concat(existingMarkers, "\n") .. "\n") or ""
+    log(string.format("  Preserved %d MARKER lines from saved .rpp\n", #existingMarkers))
+
+    -- Build new project text: TEMPO+TEMPOENVEX (from mergedSection) + preserved MARKERs + rest
+    local new_txt = cur_txt:sub(1, cur_tempo_start - 1) .. mergedSection .. "\n" .. markerBlock .. cur_txt:sub(cur_projbay_start)
+
+    -- Backup
+    local backup = cur_path .. ".backup_before_multirpp.rpp"
+    f = io.open(backup, "wb")
+    if f then f:write(cur_txt); f:close() end
+
+    -- Write
+    f = io.open(cur_path, "wb")
+    if not f then
+        log("Cannot write modified project\n")
+        return
+    end
+    f:write(new_txt)
+    f:close()
+
+    log("Multi-RPP Tempo/Markers written!\n")
+    log(string.format("  %d RPPs, %d total tempo points\n", #rppQueue,
+        (function() local c=0; for _,rpp in ipairs(rppQueue) do c=c+#rpp.tempoMap end return c end)()))
+end
+
+-- Clear multi-RPP queue
+local function clearRppQueue()
+    rppQueue = {}
+    multiMap = {}
+    multiNormMap = {}
+    recSources = {}
+    recPath.rpp = nil
+    recPath.dir = nil
+    _G.__recSources = recSources
+end
+
+-- Shift all envelope points on a track by delta seconds
+local function shiftTrackEnvelopesBy(tr, delta)
+    if not (validTrack(tr) and delta and math.abs(delta) >= 1e-9) then return end
+
+    local envCount = r.CountTrackEnvelopes(tr)
+    for e = 0, envCount - 1 do
+        local env = r.GetTrackEnvelope(tr, e)
+        if env then
+            local ptCount = r.CountEnvelopePoints(env)
+            -- Iterate backwards to avoid index shifting issues
+            for p = ptCount - 1, 0, -1 do
+                local retval, time, value, shape, tension, selected = r.GetEnvelopePoint(env, p)
+                if retval then
+                    r.SetEnvelopePoint(env, p, time + delta, value, shape, tension, selected, true)
+                end
+            end
+            r.Envelope_SortPoints(env)
+        end
+    end
+end
+
+-- Move all items from srcTrack to destTrack (preserving positions)
+local function moveItemsToTrack(srcTrack, destTrack)
+    if not (validTrack(srcTrack) and validTrack(destTrack)) then return end
+
+    -- Move items from last to first to avoid index issues
+    local cnt = r.CountTrackMediaItems(srcTrack)
+    for i = cnt - 1, 0, -1 do
+        local item = r.GetTrackMediaItem(srcTrack, i)
+        if item then
+            r.MoveMediaItemToTrack(item, destTrack)
+        end
+    end
+end
+
+-- Copy envelope points from srcTrack to destTrack (additive, no clearing)
+local function copyEnvelopePointsToTrack(srcTrack, destTrack)
+    if not (validTrack(srcTrack) and validTrack(destTrack)) then return end
+
+    local srcEnvCount = r.CountTrackEnvelopes(srcTrack)
+    for e = 0, srcEnvCount - 1 do
+        local srcEnv = r.GetTrackEnvelope(srcTrack, e)
+        if srcEnv then
+            -- Get envelope name to find matching dest envelope
+            local _, srcEnvName = r.GetEnvelopeName(srcEnv)
+
+            -- Find or create matching envelope on dest track
+            local destEnv = nil
+            local destEnvCount = r.CountTrackEnvelopes(destTrack)
+            for d = 0, destEnvCount - 1 do
+                local env = r.GetTrackEnvelope(destTrack, d)
+                if env then
+                    local _, dName = r.GetEnvelopeName(env)
+                    if dName == srcEnvName then
+                        destEnv = env
+                        break
+                    end
+                end
+            end
+
+            if not destEnv then
+                -- Try to make the envelope visible on dest track (creates it)
+                -- Use chunk-based approach to copy envelope structure
+                local _, srcEnvChunk = r.GetEnvelopeStateChunk(srcEnv, "", false)
+                if srcEnvChunk and srcEnvChunk ~= "" then
+                    -- Find the envelope on dest by enabling it via chunk manipulation
+                    -- For now, skip envelopes that don't exist on dest
+                    goto nextEnv
+                end
+            end
+
+            if destEnv then
+                local ptCount = r.CountEnvelopePoints(srcEnv)
+                for p = 0, ptCount - 1 do
+                    local retval, time, value, shape, tension, selected = r.GetEnvelopePoint(srcEnv, p)
+                    if retval then
+                        r.InsertEnvelopePoint(destEnv, time, value, shape, tension, selected, true)
+                    end
+                end
+                r.Envelope_SortPoints(destEnv)
+            end
+
+            ::nextEnv::
+        end
+    end
+end
+
+-- Set tempo markers via API (for correct item positioning before track import)
+local function setTempoViaAPI()
+    if #rppQueue == 0 then return end
+
+    log("\n=== Setting tempo via API for Multi-RPP ===\n")
+
+    -- Delete existing tempo markers (except the first/default)
+    local existingCount = r.CountTempoTimeSigMarkers(0)
+    for i = existingCount - 1, 0, -1 do
+        r.DeleteTempoTimeSigMarker(0, i)
+    end
+
+    -- Collect all tempo points with time-based offsets
+    local allPoints = {}
+
+    for _, rpp in ipairs(rppQueue) do
+        for _, pt in ipairs(rpp.tempoMap) do
+            allPoints[#allPoints + 1] = {
+                timepos = rpp.timeOffset + (pt.time or 0),  -- Absolute project time in seconds
+                bpm = pt.bpm,
+                num = pt.num or 0,
+                denom = pt.denom or 0,
+                linear = pt.shape == 0  -- shape 0 = gradual (linear=true), shape 1 = square (linear=false)
+            }
+        end
+    end
+
+    -- Sort by time position
+    table.sort(allPoints, function(a, b) return a.timepos < b.timepos end)
+
+    -- Set first point as project tempo
+    if allPoints[1] then
+        r.SetCurrentBPM(0, allPoints[1].bpm, true)
+    end
+
+    -- Add all tempo markers via API using time positions
+    for _, pt in ipairs(allPoints) do
+        r.SetTempoTimeSigMarker(0, -1, pt.timepos, -1, -1,
+            pt.bpm, pt.num, pt.denom, pt.linear)
+    end
+
+    r.UpdateTimeline()
+    log(string.format("  Set %d tempo markers via API\n", #allPoints))
+    for _, pt in ipairs(allPoints) do
+        log(string.format("  API tempo set: time=%.4fs bpm=%.4f linear=%s num=%d denom=%d\n",
+            pt.timepos, pt.bpm, tostring(pt.linear), pt.num, pt.denom))
+    end
+end
+
+-- Create regions for each RPP in the queue
+local function createMultiRppRegions()
+    if not multiRppSettings.createRegions then return end
+
+    log("\n=== Creating Multi-RPP Regions ===\n")
+
+    for i, rpp in ipairs(rppQueue) do
+        -- Use time-based offsets directly (no beat→time conversion needed)
+        local startTime = rpp.timeOffset
+        local endTime = rpp.timeOffset + (rpp.maxEndTime or 0)
+
+        r.AddProjectMarker2(0, true, startTime, endTime, rpp.name, -1, 0)
+        log(string.format("  Region '%s': %.2fs - %.2fs\n", rpp.name, startTime, endTime))
+    end
+end
+
+-- Import markers from all RPPs with correct time offsets
+local function importMultiRppMarkers()
+    if not multiRppSettings.importMarkers then return end
+
+    log("\n=== Importing Multi-RPP Markers ===\n")
+
+    for _, rpp in ipairs(rppQueue) do
+        -- Use time-based offset directly
+        local offsetTime = rpp.timeOffset
+
+        for _, m in ipairs(rpp.markers) do
+            local adjPos = m.pos + offsetTime
+            if m.isRegion then
+                local adjEnd = m.rgnend + offsetTime
+                r.AddProjectMarker2(0, true, adjPos, adjEnd, m.name, -1, m.color)
+            else
+                r.AddProjectMarker2(0, false, adjPos, 0, m.name, -1, m.color)
+            end
+        end
+    end
+end
+
+-- Auto-match one RPP column against template tracks (same logic as autosuggest)
+local function multiRppAutoMatchColumn(rppIdx)
+    if rppIdx < 1 or rppIdx > #rppQueue then return end
+    local rpp = rppQueue[rppIdx]
+    if not rpp or not rpp.tracks then return end
+
+    local R = #rpp.tracks
+    local M = #mixTargets
+    if M == 0 or R == 0 then return end
+
+    -- Track which RPP tracks and template tracks are already assigned in this column
+    local usedR = {}
+    local usedM = {}
+    for mi, row in pairs(multiMap) do
+        if row[rppIdx] and row[rppIdx] > 0 then
+            usedR[row[rppIdx]] = true
+            usedM[mi] = true
+        end
+    end
+
+    local function eligible(i)
+        local tr = mixTargets[i]
+        if not validTrack(tr) then return false end
+        local nm = nameCache[tr] or trName(tr)
+        if protectedSet[nm] then return false end
+        if isFolderHeader(tr) then return false end
+        return true
+    end
+
+    -- Match scoring (same priority as autosuggest's calculateMatchScore)
+    local function getFirstWord(name)
+        local normalized = normalizeName(name)
+        return normalized:match("^(%w+)") or normalized
+    end
+
+    local function calcScore(mixName, recName)
+        local mnorm = normalizeName(mixName)
+        local rnorm = normalizeName(recName)
+        if mnorm == "" or rnorm == "" then return 0 end
+        -- PRIORITY 1: Exact match (100%)
+        if mnorm == rnorm then return 1.0 end
+        -- PRIORITY 2: Prefix match with space/digit boundary (95%)
+        local mnorm_escaped = mnorm:gsub("([%.%-%+%*%?%[%]%(%)%^%$%%])", "%%%1")
+        local rnorm_escaped = rnorm:gsub("([%.%-%+%*%?%[%]%(%)%^%$%%])", "%%%1")
+        if rnorm:match("^" .. mnorm_escaped .. "[%s%d]") then return 0.95 end
+        if mnorm:match("^" .. rnorm_escaped .. "[%s%d]") then return 0.95 end
+        -- PRIORITY 3: First word exact match (85%)
+        local mixFirstWord = getFirstWord(mixName)
+        local recFirstWord = getFirstWord(recName)
+        if mixFirstWord ~= "" and recFirstWord ~= "" and
+           mixFirstWord == recFirstWord and #mixFirstWord > 1 then
+            return 0.85
+        end
+        -- PRIORITY 4: Contains match with word boundaries (75%)
+        local shorterLen = math.min(#mnorm, #rnorm)
+        local longerLen = math.max(#mnorm, #rnorm)
+        if shorterLen >= 3 and longerLen > shorterLen + 2 then
+            local shorter = (#mnorm < #rnorm) and mnorm or rnorm
+            local longer = (#mnorm < #rnorm) and rnorm or mnorm
+            local sh_esc = shorter:gsub("([%.%-%+%*%?%[%]%(%)%^%$%%])", "%%%1")
+            if longer:find("^" .. sh_esc .. "%s") or
+               longer:find("%s" .. sh_esc .. "%s") or
+               longer:find("%s" .. sh_esc .. "$") then
+                return 0.75
+            end
+        end
+        -- PRIORITY 5: Fuzzy similarity
+        return baseSimilarity(mixName, recName)
+    end
+
+    -- First pass: Alias matching
+    for i = 1, M do
+        if eligible(i) and not usedM[i] then
+            local mixL = trimLower(nameCache[mixTargets[i]] or trName(mixTargets[i]))
+            for j = 1, R do
+                if not usedR[j] then
+                    local recName = rpp.tracks[j].name or ""
+                    if recName:find("%.") then
+                        recName = recName:gsub("%.(%w+)$", " %1"):gsub("^%s+", "")
+                    end
+                    local dstL = findAliasTarget(recName)
+                    if dstL and dstL == mixL then
+                        multiMap[i] = multiMap[i] or {}
+                        multiMap[i][rppIdx] = j
+                        usedR[j] = true
+                        usedM[i] = true
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    -- Second pass: Score-based matching with global optimization
+    local allMatches = {}
+    for j = 1, R do
+        if not usedR[j] then
+            local recName = rpp.tracks[j].name or ""
+            if recName:find("%.") then
+                recName = recName:gsub("%.(%w+)$", " %1"):gsub("^%s+", "")
+            end
+            for i = 1, M do
+                if eligible(i) and not usedM[i] then
+                    local mixName = nameCache[mixTargets[i]] or trName(mixTargets[i])
+                    local score = calcScore(mixName, recName)
+                    if score >= AUTOSUGGEST_THRESH then
+                        allMatches[#allMatches + 1] = {
+                            recIdx = j,
+                            mixIdx = i,
+                            score = score,
+                            recName = recName,
+                            mixName = mixName
+                        }
+                    end
+                end
+            end
+        end
+    end
+
+    -- Sort by score (highest first), then by name length
+    table.sort(allMatches, function(a, b)
+        if math.abs(a.score - b.score) > 0.001 then
+            return a.score > b.score
+        end
+        return #a.mixName < #b.mixName
+    end)
+
+    -- Group by recording track and assign best available match
+    local matchesByRec = {}
+    for _, match in ipairs(allMatches) do
+        if not matchesByRec[match.recIdx] then
+            matchesByRec[match.recIdx] = {}
+        end
+        table.insert(matchesByRec[match.recIdx], match)
+    end
+
+    for recIdx, matches in pairs(matchesByRec) do
+        if not usedR[recIdx] then
+            for _, match in ipairs(matches) do
+                if not usedM[match.mixIdx] then
+                    multiMap[match.mixIdx] = multiMap[match.mixIdx] or {}
+                    multiMap[match.mixIdx][rppIdx] = recIdx
+                    usedR[recIdx] = true
+                    usedM[match.mixIdx] = true
+                    lockParentFolders(match.mixIdx)
+                    break
+                end
+            end
+        end
+    end
+end
+
+-- Auto-match all RPP columns
+local function multiRppAutoMatchAll()
+    for rppIdx = 1, #rppQueue do
+        multiRppAutoMatchColumn(rppIdx)
+    end
+end
+
+-- Forward declarations for functions defined later but used in commitMultiRpp
+local sanitizeChunk
+local fixChunkMediaPaths
+local postprocessTrackCopyRelink
+local copyFX
+local cloneSends
+local rewireReceives
+local copyTrackControls
+local shiftTrackItemsBy
+local replaceGroupFlagsInChunk
+
+-- ===== MULTI-RPP COMMIT FLOW =====
+local function commitMultiRpp()
+    if #rppQueue == 0 then return end
+
+    log("\n========================================\n")
+    log("=== MULTI-RPP COMMIT START ===\n")
+    log(string.format("=== %d RPPs in queue ===\n", #rppQueue))
+    log("========================================\n")
+
+    r.Undo_BeginBlock()
+    r.PreventUIRefresh(1)
+
+    -- STEP 1: Set tempo via API (for correct positioning during track import)
+    setTempoViaAPI()
+
+    -- Tempo map is now fully set via API with correct shapes (linear = pt.shape == 0).
+    -- applyTempoViaEnvelopeChunk() is no longer called here — API markers have full fidelity
+    -- (shapes 0/1 map perfectly to linear true/false). Calling SetEnvelopeStateChunk after
+    -- deleting API markers corrupted REAPER's internal beat positions (TIMELOCKMODE 2 issue).
+    -- REAPER will generate the correct TEMPOENVEX from internal markers on save.
+
+    -- Use time-based offsets directly (no beat→time conversion)
+    local regionOffsets = {}  -- rppIdx -> startTime (seconds)
+    for rppIdx, rpp in ipairs(rppQueue) do
+        regionOffsets[rppIdx] = rpp.timeOffset
+        log(string.format("  RPP %d '%s': timeOffset=%.4fs\n",
+            rppIdx, rpp.name, rpp.timeOffset))
+    end
+
+    -- STEP 2: Import tracks, shift, consolidate
+    local matchedSet = {}
+
+    for i, mixTr in ipairs(mixTargets) do
+        if not validTrack(mixTr) then goto nextTemplate end
+        if not multiMap[i] then goto nextTemplate end
+
+        -- Collect which RPPs have a mapping for this template track
+        local mappedRpps = {}
+        for rppIdx = 1, #rppQueue do
+            local trackIdx = multiMap[i] and multiMap[i][rppIdx]
+            if trackIdx and trackIdx > 0 then
+                local rpp = rppQueue[rppIdx]
+                local entry = rpp and rpp.tracks[trackIdx]
+                if entry then
+                    mappedRpps[#mappedRpps + 1] = {
+                        rppIdx = rppIdx,
+                        entry = entry,
+                        offset = regionOffsets[rppIdx] or 0,
+                        rppDir = rpp.dir
+                    }
+                end
+            end
+        end
+
+        if #mappedRpps == 0 then goto nextTemplate end
+
+        local mixName = nameCache[mixTr] or trName(mixTr)
+        local mixColor = effective_rgb24(mixTr)
+        local mixIdx = idxOf(mixTr)
+        local mixDepth = folderDepth(mixTr)
+
+        -- Extract template GROUP_FLAGS for later application (same as single-RPP)
+        local _, templateChunk = r.GetTrackStateChunk(mixTr, "", false)
+        local templateGroupFlags = templateChunk:match("(GROUP_FLAGS[^\r\n]*)")
+
+        log(string.format("\n--- Template: '%s' (%d RPP mappings) ---\n", mixName, #mappedRpps))
+
+        -- 4a: Import all mapped tracks (insert after template)
+        local importedTracks = {}
+        for _, mp in ipairs(mappedRpps) do
+            local insertIdx = mixIdx + #importedTracks + 1
+            r.InsertTrackAtIndex(insertIdx, true)
+            local newTr = r.GetTrack(0, insertIdx)
+
+            if validTrack(newTr) and mp.entry.src == "rpp" then
+                local chunk = sanitizeChunk(mp.entry.chunk)
+
+                -- Fix media paths relative to source RPP dir
+                local savedDir = recPath.dir
+                recPath.dir = mp.rppDir
+                chunk = fixChunkMediaPaths(chunk, settings.copyMedia)
+                recPath.dir = savedDir
+
+                -- 4b: Shift item positions and envelope points in chunk before applying
+                -- (shifting via API after SetTrackStateChunk can fail inside PreventUIRefresh)
+                -- Must be done BEFORE adding POOLEDENV (pooled envs use beat-based positions)
+                if mp.offset > 0 then
+                    local posCount, ptCount
+                    chunk, posCount = chunk:gsub("(\n%s*POSITION%s+)([%d%.%-]+)", function(prefix, pos)
+                        return prefix .. string.format("%.10f", tonumber(pos) + mp.offset)
+                    end)
+                    -- Shift envelope points (PT <time> ...) in track envelopes
+                    chunk, ptCount = chunk:gsub("(\n%s*PT%s+)([%d%.%-]+)", function(prefix, t)
+                        return prefix .. string.format("%.10f", tonumber(t) + mp.offset)
+                    end)
+                    log(string.format("  Shifted RPP %d: %d POSITIONs, %d PTs by %.2fs\n",
+                        mp.rppIdx, posCount, ptCount, mp.offset))
+                end
+
+                -- Add POOLEDENV if needed (after shifting — pooled envs are beat-based, not shifted)
+                if mp.entry.pooledEnvs and #mp.entry.pooledEnvs > 0 then
+                    local closingPos = chunk:find(">%s*$")
+                    if closingPos then
+                        local pooledEnvText = ""
+                        for _, poolChunk in ipairs(mp.entry.pooledEnvs) do
+                            pooledEnvText = pooledEnvText .. poolChunk
+                        end
+                        chunk = chunk:sub(1, closingPos - 1) .. pooledEnvText .. chunk:sub(closingPos)
+                    end
+                end
+
+                local chunkOk = r.SetTrackStateChunk(newTr, chunk, false)
+                if not chunkOk then
+                    log(string.format("  WARNING: SetTrackStateChunk FAILED for RPP %d track '%s'\n",
+                        mp.rppIdx, mp.entry.name or "?"))
+                end
+                postprocessTrackCopyRelink(newTr, settings.copyMedia)
+
+                r.SetMediaTrackInfo_Value(newTr, "I_FOLDERDEPTH", 0)
+                r.SetMediaTrackInfo_Value(newTr, "I_RECARM", 0)
+                r.SetMediaTrackInfo_Value(newTr, "B_SHOWINMIXER", 1)
+                r.SetMediaTrackInfo_Value(newTr, "B_SHOWINTCP", 1)
+
+                importedTracks[#importedTracks + 1] = newTr
+            end
+        end
+
+        if #importedTracks == 0 then goto nextTemplate end
+
+        -- 4c.pre: Align lanes for visibility across imported tracks (BEFORE consolidation)
+        -- When RPPs have different numbers of fixed lanes (e.g. Kulti=2 lanes, Mels=3 lanes),
+        -- items on the active lane of each RPP need to be copied to the highest active lane
+        -- so all are visible after consolidation. Original lanes are preserved.
+        if multiRppSettings.alignLanes and #importedTracks > 1 then
+            local maxActiveLane = 0
+            local trackActiveLanes = {}
+
+            for t, tr in ipairs(importedTracks) do
+                if validTrack(tr) then
+                    -- Find the highest lane with items on this track
+                    local highestLane = 0
+                    local cnt = r.CountTrackMediaItems(tr)
+                    for idx = 0, cnt - 1 do
+                        local item = r.GetTrackMediaItem(tr, idx)
+                        local lane = r.GetMediaItemInfo_Value(item, "I_FIXEDLANE")
+                        if lane > highestLane then highestLane = lane end
+                    end
+
+                    -- Find which lane is active (check from highest down)
+                    local activeLane = 0
+                    for lane = highestLane, 0, -1 do
+                        local plays = r.GetMediaTrackInfo_Value(tr, "C_LANEPLAYS:" .. lane)
+                        if plays == 1 then
+                            activeLane = lane
+                            break
+                        end
+                    end
+
+                    trackActiveLanes[t] = activeLane
+                    if activeLane > maxActiveLane then maxActiveLane = activeLane end
+                end
+            end
+
+            -- For tracks whose active lane < maxActiveLane: copy active-lane items to maxActiveLane
+            if maxActiveLane > 0 then
+                for t, tr in ipairs(importedTracks) do
+                    local activeLane = trackActiveLanes[t] or 0
+                    if activeLane < maxActiveLane and validTrack(tr) then
+                        local cnt = r.CountTrackMediaItems(tr)
+                        local itemsToCopy = {}
+                        for idx = 0, cnt - 1 do
+                            local item = r.GetTrackMediaItem(tr, idx)
+                            local lane = r.GetMediaItemInfo_Value(item, "I_FIXEDLANE")
+                            if lane == activeLane then
+                                itemsToCopy[#itemsToCopy + 1] = item
+                            end
+                        end
+                        -- Duplicate items to maxActiveLane via chunk copy
+                        for _, item in ipairs(itemsToCopy) do
+                            local newItem = r.AddMediaItemToTrack(tr)
+                            local _, itemChunk = r.GetItemStateChunk(item, "", false)
+                            r.SetItemStateChunk(newItem, itemChunk, false)
+                            r.SetMediaItemInfo_Value(newItem, "I_FIXEDLANE", maxActiveLane)
+                        end
+                        -- Activate maxActiveLane on this track
+                        r.SetMediaTrackInfo_Value(tr, "C_LANEPLAYS:" .. activeLane, 0)
+                        r.SetMediaTrackInfo_Value(tr, "C_LANEPLAYS:" .. maxActiveLane, 1)
+                        log(string.format("  Track %d: copied %d items from lane %d to lane %d\n",
+                            t, #itemsToCopy, activeLane, maxActiveLane))
+                    end
+                end
+            end
+        end
+
+        -- 4c: Consolidate all imported tracks onto the first one
+        local masterTrack = importedTracks[1]
+        for t = 2, #importedTracks do
+            local srcTrack = importedTracks[t]
+            if validTrack(srcTrack) then
+                moveItemsToTrack(srcTrack, masterTrack)
+                copyEnvelopePointsToTrack(srcTrack, masterTrack)
+                log(string.format("  Consolidated track %d onto master\n", t))
+            end
+        end
+
+        -- 4d: Copy FX/Sends/Groups from template
+        copyFX(mixTr, masterTrack)
+        cloneSends(mixTr, masterTrack)
+        copyTrackControls(mixTr, masterTrack)
+        rewireReceives(mixTr, masterTrack)
+
+        -- Copy group flags from template (same approach as single-RPP)
+        if templateGroupFlags then
+            local _, masterChunk = r.GetTrackStateChunk(masterTrack, "", false)
+            masterChunk = replaceGroupFlagsInChunk(masterChunk, templateGroupFlags)
+            r.SetTrackStateChunk(masterTrack, masterChunk, false)
+        end
+
+        -- Set name and color
+        setTrName(masterTrack, mixName)
+        if mixColor ~= 0 then r.SetTrackColor(masterTrack, mixColor) end
+
+        -- 4e: Delete extra imported tracks (now empty)
+        for t = #importedTracks, 2, -1 do
+            local srcTrack = importedTracks[t]
+            if validTrack(srcTrack) then
+                r.DeleteTrack(srcTrack)
+            end
+        end
+
+        -- 4f: Delete template track
+        if validTrack(mixTr) then
+            r.DeleteTrack(mixTr)
+            matchedSet[mixTr] = true
+        end
+
+        ::nextTemplate::
+    end
+
+    -- STEP 3: Delete unused template tracks (if enabled)
+    if settings.deleteUnused then
+        r.Main_OnCommand(40297, 0)  -- Unselect all tracks
+
+        for _, tr in ipairs(mixTargets) do
+            if validTrack(tr) then
+                local name = nameCache[tr] or trName(tr)
+                if not matchedSet[tr] and not protectedSet[name] then
+                    r.SetTrackSelected(tr, true)
+                end
+            end
+        end
+
+        r.Main_OnCommand(40005, 0)  -- Remove selected tracks
+        r.Main_OnCommand(40297, 0)  -- Unselect all
+    end
+
+    r.PreventUIRefresh(-1)
+    r.TrackList_AdjustWindows(false)
+    r.UpdateArrange()
+
+    -- STEP 4: Create regions and import markers
+    -- Tempo map is already final (set via API in STEP 1)
+    createMultiRppRegions()
+    importMultiRppMarkers()
+
+    -- STEP 5: Normalization (per region)
+    if normalizeMode then
+        log("\n=== Multi-RPP Normalization (per region) ===\n")
+        local regions = scanRegions()
+
+        for i = 0, r.CountTracks(0) - 1 do
+            local tr = r.GetTrack(0, i)
+            if validTrack(tr) then
+                local tName = trName(tr)
+
+                -- Find normalization profile for this track
+                local normInfo = nil
+                for mi, mixTr in ipairs(mixTargets) do
+                    local mName = nameCache[mixTr] or trName(mixTr)
+                    if mName == tName and multiNormMap[mi] then
+                        normInfo = multiNormMap[mi]
+                        break
+                    end
+                end
+
+                if normInfo and normInfo.profile ~= "-" then
+                    local profile = getProfileByName(normInfo.profile)
+                    if profile then
+                        local normType, targetValue, usedProfile
+                        if normInfo.profile == "Peak" then
+                            normType = "Peak"
+                            targetValue = normInfo.targetPeak
+                        elseif normInfo.profile == "RMS" then
+                            normType = "RMS"
+                            targetValue = normInfo.targetPeak
+                        else
+                            normType = "LUFS"
+                            targetValue = calculateLUFS(normInfo.targetPeak, profile.offset)
+                            usedProfile = profile
+                        end
+                        normalizeTrack(tr, normType, targetValue, regions, nil, usedProfile)
+                    end
+                end
+            end
+        end
+    end
+
+    -- STEP 6: Build peaks for new tracks
+    r.Main_OnCommand(40047, 0)  -- Build missing peaks
+
+    -- STEP 7: Minimize all tracks
+    r.PreventUIRefresh(1)
+    for i = 0, r.CountTracks(0) - 1 do
+        local tr = r.GetTrack(0, i)
+        r.SetMediaTrackInfo_Value(tr, "I_HEIGHTOVERRIDE", 26)
+    end
+    r.PreventUIRefresh(-1)
+    r.TrackList_AdjustWindows(false)
+
+    r.Undo_EndBlock("RAPID v" .. VERSION .. ": Multi-RPP Import", -1)
+    uiFlags.close = true
 end
 
 -- ===== APPLY LAST MAP =====
@@ -2135,6 +3619,87 @@ local function autoMatchProfiles()
     end
 end
 
+-- ===== AUTO-MATCH PROFILES FOR MULTI-RPP =====
+local function autoMatchProfilesMulti()
+    if #mixTargets == 0 or #normProfiles == 0 then return end
+
+    local thresh = 0.40
+
+    for i, tr in ipairs(mixTargets) do
+        local trackName = nameCache[tr] or trName(tr)
+
+        if protectedSet[trackName] then goto continue end
+
+        -- Only match tracks that have a recording assignment in multiMap
+        local hasRecording = false
+        if multiMap[i] then
+            for _, v in pairs(multiMap[i]) do
+                if v and v > 0 then hasRecording = true; break end
+            end
+        end
+        if not hasRecording then goto continue end
+
+        -- FIRST: Check profileAliases (contains match, longest first)
+        local foundAlias = false
+        local trackNameLower = trackName:lower()
+
+        local sortedAliases = {}
+        for _, alias in ipairs(profileAliases) do
+            sortedAliases[#sortedAliases + 1] = alias
+        end
+        table.sort(sortedAliases, function(a, b)
+            return #(a.src or "") > #(b.src or "")
+        end)
+
+        for _, alias in ipairs(sortedAliases) do
+            local srcList = alias.src or ""
+            for srcPart in (srcList .. ","):gmatch("([^,]+),") do
+                local srcLower = srcPart:gsub("^%s+", ""):gsub("%s+$", ""):lower()
+                if srcLower ~= "" and trackNameLower:find(srcLower, 1, true) then
+                    local targetProfileName = alias.dst or ""
+                    for _, profile in ipairs(normProfiles) do
+                        if profile.name:lower() == targetProfileName:lower() then
+                            multiNormMap[i] = {
+                                profile = profile.name,
+                                targetPeak = profile.defaultPeak or -6
+                            }
+                            foundAlias = true
+                            break
+                        end
+                    end
+                    if foundAlias then break end
+                end
+            end
+            if foundAlias then break end
+        end
+
+        if foundAlias then goto continue end
+
+        -- SECOND: Fuzzy matching
+        local bestProfile = nil
+        local bestScore = thresh
+
+        for _, profile in ipairs(normProfiles) do
+            local score = baseSimilarity(trackName, profile.name)
+            if score > bestScore then
+                bestProfile = profile
+                bestScore = score
+            end
+        end
+
+        if bestProfile then
+            multiNormMap[i] = {
+                profile = bestProfile.name,
+                targetPeak = bestProfile.defaultPeak or -6
+            }
+        else
+            multiNormMap[i] = multiNormMap[i] or {profile = "-", targetPeak = -6}
+        end
+
+        ::continue::
+    end
+end
+
 -- ===== NORMALIZE-ONLY MODE FUNCTIONS (from Little Joe) =====
 
 local function loadTracksWithItems()
@@ -2414,15 +3979,16 @@ local function doNormalizeDirectly()
 end
 
 -- ===== CHUNK SANITIZATION =====
-local function sanitizeChunk(chunk)
+sanitizeChunk = function(chunk)
+    -- Patterns use %s* after \n to handle indented RPP chunks (2 spaces per nesting level)
     return (chunk
-        :gsub("\nI_FOLDERDEPTH%s+%-?%d+", "\nI_FOLDERDEPTH 0")
-        :gsub("\nAUXRECV.-\n", "\n")
-        :gsub("\nHWOUT.-\n", "\n")
-        :gsub("\nRECARM %d+", "\nRECARM 0")
-        :gsub("\nISBUS%s+%d+%s+%d+", "\nISBUS 0 0")
-        :gsub("\nSHOWINMIX %-?%d+", "\nSHOWINMIX 1")
-        :gsub("\nSHOWINTCP %-?%d+", "\nSHOWINTCP 1"))
+        :gsub("\n%s*I_FOLDERDEPTH%s+%-?%d+", "\nI_FOLDERDEPTH 0")
+        :gsub("\n%s*AUXRECV.-\n", "\n")
+        :gsub("\n%s*HWOUT.-\n", "\n")
+        :gsub("\n%s*RECARM %d+", "\nRECARM 0")
+        :gsub("\n%s*ISBUS%s+%d+%s+%d+", "\nISBUS 0 0")
+        :gsub("\n%s*SHOWINMIX %-?%d+", "\nSHOWINMIX 1")
+        :gsub("\n%s*SHOWINTCP %-?%d+", "\nSHOWINTCP 1"))
 end
 
 local function extractMediaPathsFromChunk(chunk)
@@ -2472,7 +4038,7 @@ local function tryResolveMedia(oldPath, rppDir)
     return nil
 end
 
-local function fixChunkMediaPaths(chunk, doCopy)
+fixChunkMediaPaths = function(chunk, doCopy)
     if not chunk then return chunk end
 
     local mediaPaths = extractMediaPathsFromChunk(chunk)
@@ -2481,7 +4047,7 @@ local function fixChunkMediaPaths(chunk, doCopy)
     local newChunk = chunk
 
     for _, oldPath in ipairs(mediaPaths) do
-        local resolvedPath = tryResolveMedia(oldPath, recPathRPPDir)
+        local resolvedPath = tryResolveMedia(oldPath, recPath.dir)
 
         if resolvedPath then
             local finalPath = resolvedPath
@@ -2515,7 +4081,7 @@ local function fixChunkMediaPaths(chunk, doCopy)
 end
 
 -- ===== POST-PROCESS TRACK =====
-local function postprocessTrackCopyRelink(track, doCopy)
+postprocessTrackCopyRelink = function(track, doCopy)
     if not track or not r.ValidatePtr(track, "MediaTrack*") then return end
 
     local item_cnt = r.CountTrackMediaItems(track)
@@ -2543,7 +4109,7 @@ local function postprocessTrackCopyRelink(track, doCopy)
                                 end
                             elseif not fileExists(cur) then
                                 -- No-copy mode: resolve and relink offline sources
-                                local resolved = tryResolveMedia(cur, recPathRPPDir)
+                                local resolved = tryResolveMedia(cur, recPath.dir)
                                 if resolved and fileExists(resolved) then
                                     log(string.format("    relink: '%s' -> '%s'\n", cur, resolved))
                                     local newSrc = r.PCM_Source_CreateFromFile(resolved)
@@ -2551,7 +4117,7 @@ local function postprocessTrackCopyRelink(track, doCopy)
                                         r.SetMediaItemTake_Source(take, newSrc)
                                     end
                                 else
-                                    log(string.format("    STILL OFFLINE: '%s' (rppDir='%s')\n", cur, recPathRPPDir or "nil"))
+                                    log(string.format("    STILL OFFLINE: '%s' (rppDir='%s')\n", cur, recPath.dir or "nil"))
                                 end
                             end
                         end
@@ -2612,7 +4178,7 @@ local function createTrackWithAudioFileAtIndex(insertIdx, mixDepth, filePath, tr
         return nil
     end
     
-    if copyMediaOnCommit then
+    if settings.copyMedia then
         finalPath = copyMediaToProject(filePath)
     end
     
@@ -2651,7 +4217,7 @@ local function createTrackWithAudioFileAtIndex(insertIdx, mixDepth, filePath, tr
 end
 
 -- ===== COPY FX/SENDS/CONTROLS (v1.1 API-based - WORKS!) =====
-local function copyFX(src, dst)
+copyFX = function(src, dst)
     if not (validTrack(src) and validTrack(dst)) then return end
     -- Delete all FX on destination
     for i = r.TrackFX_GetCount(dst) - 1, 0, -1 do
@@ -2717,7 +4283,7 @@ local function clearSendsHW(tr)
     end
 end
 
-local function cloneSends(src, dst)
+cloneSends = function(src, dst)
     if not (validTrack(src) and validTrack(dst)) then return end
     if not HAVE_SWS then return end
     
@@ -2749,7 +4315,7 @@ local function cloneSends(src, dst)
     r.SetTrackColor(dst, effective_rgb24(src))
 end
 
-local function rewireReceives(src, dst)
+rewireReceives = function(src, dst)
     if not (validTrack(src) and validTrack(dst) and HAVE_SWS) then return end
     
     local N = r.CountTracks(0)
@@ -2775,7 +4341,7 @@ local function rewireReceives(src, dst)
     end
 end
 
-local function copyTrackControls(src, dst)
+copyTrackControls = function(src, dst)
     if not (validTrack(src) and validTrack(dst)) then return end
     local function c(k)
         r.SetMediaTrackInfo_Value(dst, k, r.GetMediaTrackInfo_Value(src, k))
@@ -2800,7 +4366,7 @@ local function copyTrackGroups(src, dst)
     log(string.format("  Copied groups: 0x%X\n", groupFlags))
 end
 
-local function replaceGroupFlagsInChunk(chunk, templateChunkGroupFlags)
+replaceGroupFlagsInChunk = function(chunk, templateChunkGroupFlags)
     log(string.format(">>> replaceGroupFlagsInChunk: templateChunkGroupFlags = '%s'\n", templateChunkGroupFlags or "NIL"))
     
     if not templateChunkGroupFlags or templateChunkGroupFlags == "" then
@@ -2833,7 +4399,7 @@ local function replaceGroupFlagsInChunk(chunk, templateChunkGroupFlags)
     return chunk
 end
 
-local function shiftTrackItemsBy(tr, delta)
+shiftTrackItemsBy = function(tr, delta)
     if not (validTrack(tr) and delta and math.abs(delta) >= 1e-9) then return end
     local cnt = r.CountTrackMediaItems(tr)
     for i = 0, cnt - 1 do
@@ -2883,7 +4449,7 @@ local function replaceMixWithSourceAtSamePosition(entry, mixTr)
         end
         
         local chunk = sanitizeChunk(entry.chunk)
-        chunk = fixChunkMediaPaths(chunk, copyMediaOnCommit)
+        chunk = fixChunkMediaPaths(chunk, settings.copyMedia)
 
         -- CRITICAL: Add POOLEDENV data to track chunk if this track has automation items
         if entry.pooledEnvs and #entry.pooledEnvs > 0 then
@@ -2916,7 +4482,7 @@ local function replaceMixWithSourceAtSamePosition(entry, mixTr)
         local checkAfter = r.GetMediaTrackInfo_Value(t, "I_GROUPFLAGS")
         log(string.format(">>> After SetTrackStateChunk: I_GROUPFLAGS = 0x%X (%d)\n", checkAfter, checkAfter))
         
-        postprocessTrackCopyRelink(t, copyMediaOnCommit)
+        postprocessTrackCopyRelink(t, settings.copyMedia)
         
         r.SetMediaTrackInfo_Value(t, "I_FOLDERDEPTH", mixDepth)
         r.SetMediaTrackInfo_Value(t, "I_RECARM", 0)
@@ -4028,6 +5594,18 @@ local function commitMappings()
         fxMap[mixIdx] = fxMap[mixIdx] or {}  -- NEW: Initialize fxMap
         
         local firstEntry = recSources[op.recIdxs[1]]
+
+        -- Multi-RPP: Use time-based offset directly
+        if multiRppSettings.enabled and firstEntry.rppMeasureOffset and firstEntry.rppMeasureOffset > 0 then
+            local rppIdx = firstEntry.rppIndex or 1
+            local rpp = rppQueue[rppIdx]
+            if rpp then
+                _G.__mr_offset = rpp.timeOffset or 0
+            end
+        else
+            _G.__mr_offset = 0.0
+        end
+
         local firstNew = replaceMixWithSourceAtSamePosition(firstEntry, mixTr)
         
         -- First track: use settings from original slot index
@@ -4035,8 +5613,8 @@ local function commitMappings()
         local firstKeepName = (keepMap[mixIdx][firstOrigSlot] == true)
         local firstKeepFX = (fxMap[mixIdx][firstOrigSlot] == true)
         local firstName
-        if slotNameOverride[mixIdx] and slotNameOverride[mixIdx][firstOrigSlot] then
-            firstName = slotNameOverride[mixIdx][firstOrigSlot]
+        if editState.slotNames[mixIdx] and editState.slotNames[mixIdx][firstOrigSlot] then
+            firstName = editState.slotNames[mixIdx][firstOrigSlot]
         elseif firstKeepName then
             firstName = firstEntry.name or mixName
         else
@@ -4075,15 +5653,26 @@ local function commitMappings()
             r.InsertTrackAtIndex(insertIdx, true)
             local newTr = r.GetTrack(0, insertIdx)
             local entry = recSources[op.recIdxs[s]]
-            
+
+            -- Multi-RPP: Use time-based offset directly
+            if multiRppSettings.enabled and entry.rppMeasureOffset and entry.rppMeasureOffset > 0 then
+                local rppIdx = entry.rppIndex or 1
+                local rpp = rppQueue[rppIdx]
+                if rpp then
+                    _G.__mr_offset = rpp.timeOffset or 0
+                end
+            else
+                _G.__mr_offset = 0.0
+            end
+
             -- Each duplicate gets its own keep name setting
             local origSlot = op.slotIdxs and op.slotIdxs[s] or s
             local slotKeepName = (keepMap[mixIdx][origSlot] == true)
             local slotName
 
             -- Check for user-defined name override first
-            if slotNameOverride[mixIdx] and slotNameOverride[mixIdx][origSlot] then
-                slotName = slotNameOverride[mixIdx][origSlot]
+            if editState.slotNames[mixIdx] and editState.slotNames[mixIdx][origSlot] then
+                slotName = editState.slotNames[mixIdx][origSlot]
             elseif slotKeepName then
                 slotName = entry.name or (mixName .. " " .. s)
             else
@@ -4104,7 +5693,7 @@ local function commitMappings()
                 end
             elseif entry then
                 local chunk = sanitizeChunk(entry.chunk)
-                chunk = fixChunkMediaPaths(chunk, copyMediaOnCommit)
+                chunk = fixChunkMediaPaths(chunk, settings.copyMedia)
                 
                 -- Replace GROUP_FLAGS in chunk with groups from firstNew (using cached chunk)
                 if firstNewChunk then
@@ -4116,7 +5705,7 @@ local function commitMappings()
                 end
                 
                 r.SetTrackStateChunk(newTr, chunk, false)
-                postprocessTrackCopyRelink(newTr, copyMediaOnCommit)
+                postprocessTrackCopyRelink(newTr, settings.copyMedia)
                 
                 r.SetMediaTrackInfo_Value(newTr, "I_FOLDERDEPTH", 0)
                 setTrName(newTr, slotName)
@@ -4152,7 +5741,7 @@ local function commitMappings()
     end
 
     -- Delete unused tracks
-    if deleteUnusedMode == 1 then
+    if settings.deleteUnused then
         local sel = {}
         for i = 0, r.CountTracks(0) - 1 do
             local t = r.GetTrack(0, i)
@@ -4186,7 +5775,7 @@ local function commitMappings()
     r.TrackList_AdjustWindows(false)
     r.UpdateArrange()
     
-    if copyMediaOnCommit then
+    if settings.copyMedia then
         -- Sweep only newly created tracks instead of entire project
         local media_dir = getProjectMediaDir()
         for _, tr in ipairs(allCreatedTracks) do
@@ -4466,10 +6055,10 @@ local function commitMappings()
     end
     r.PreventUIRefresh(-1)
     r.TrackList_AdjustWindows(false)
-    
+
     r.Undo_EndBlock("RAPID v" .. VERSION .. ": Commit", -1)
-    
-    should_close = true
+
+    uiFlags.close = true
 end
 
 -- ===== UI: MAIN WINDOW =====
@@ -4531,11 +6120,11 @@ local function drawUI_body()
     -- Settings/Help right-aligned in header
     r.ImGui_SameLine(ctx, r.ImGui_GetWindowWidth(ctx) - 120)
     if sec_button("Settings##header") then
-        showSettings = true
+        uiFlags.settings = true
     end
     r.ImGui_SameLine(ctx)
     if sec_button("Help##header") then
-        showHelp = true
+        uiFlags.help = true
     end
 
     r.ImGui_Separator(ctx)
@@ -4543,35 +6132,101 @@ local function drawUI_body()
     -- ===== IMPORT MODE UI =====
     if importMode then
 
-    -- Toolbar row 1: Load sources + Auto-match + Reload
-    if r.ImGui_Button(ctx, "Load .RPP") then
-        local ok, p = r.GetUserFileNameForRead("", "Select Recording .RPP", ".rpp")
-        if ok then
-            recSources = {}
-            loadRecRPP(p)
-            applyLastMap()
+    -- Toolbar row 1: Load sources + Auto-match + Multi-RPP toggle
+    if not multiRppSettings.enabled then
+        -- Single RPP mode
+        if r.ImGui_Button(ctx, "Load .RPP") then
+            local ok, p = r.GetUserFileNameForRead("", "Select Recording .RPP", ".rpp")
+            if ok then
+                recSources = {}
+                loadRecRPP(p)
+                applyLastMap()
 
-            if settings.autoMatchTracksOnImport then
-                autosuggest()
+                if settings.autoMatchTracksOnImport then
+                    autosuggest()
+                end
+                if settings.autoMatchProfilesOnImport and normalizeMode then
+                    autoMatchProfiles()
+                end
             end
-            if settings.autoMatchProfilesOnImport and normalizeMode then
-                autoMatchProfiles()
+        end
+    else
+        -- Multi-RPP mode: Load multiple RPPs
+        if r.ImGui_Button(ctx, "Add .RPP##multi") then
+            if HAVE_JS then
+                -- JS_ReaScriptAPI multi-file dialog
+                local ok, payload = r.JS_Dialog_BrowseForOpenFiles("Select Recording .RPP files", "", "", "RPP files (*.rpp)\0*.rpp\0", true)
+                if ok and payload and payload ~= "" then
+                    local files = parseSelectedFiles(payload)
+                    for _, p in ipairs(files) do
+                        loadRppToQueue(p)
+                    end
+                    applyLastMap()
+                    if settings.autoMatchTracksOnImport then autosuggest() end
+                    if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfiles() end
+                end
+            else
+                -- Fallback: single file dialog
+                local ok, p = r.GetUserFileNameForRead("", "Select Recording .RPP", ".rpp")
+                if ok then
+                    loadRppToQueue(p)
+                    applyLastMap()
+                    if settings.autoMatchTracksOnImport then autosuggest() end
+                    if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfiles() end
+                end
             end
+        end
+
+        r.ImGui_SameLine(ctx)
+        if sec_button("Clear Queue##multi") then
+            clearRppQueue()
+            multiMap = {}
+            multiNormMap = {}
         end
     end
 
     r.ImGui_SameLine(ctx)
-    if r.ImGui_Button(ctx, "Load audio files") then
-        local before = #recSources
-        loadRecFiles()
-        if #recSources > before then
-            applyLastMap()
 
-            if settings.autoMatchTracksOnImport then
-                autosuggest()
+    -- Multi-RPP toggle
+    local multiChanged, multiVal = r.ImGui_Checkbox(ctx, "Multi-RPP", multiRppSettings.enabled)
+    if multiChanged then
+        multiRppSettings.enabled = multiVal
+        if not multiVal then
+            -- Switching back to single mode: use first queued RPP or clear
+            if #rppQueue > 0 then
+                recPath.rpp = rppQueue[1].path
+                recPath.dir = rppQueue[1].dir
+                recSources = {}
+                loadRecRPP(rppQueue[1].path)
             end
-            if settings.autoMatchProfilesOnImport and normalizeMode then
-                autoMatchProfiles()
+            rppQueue = {}
+            multiMap = {}
+            multiNormMap = {}
+        else
+            -- Switching to multi mode: convert current single RPP to queue
+            if recPath.rpp and recPath.rpp ~= "" then
+                rppQueue = {}
+                multiMap = {}
+                multiNormMap = {}
+                loadRppToQueue(recPath.rpp)
+            end
+        end
+    end
+
+    if not multiRppSettings.enabled then
+        r.ImGui_SameLine(ctx)
+        if r.ImGui_Button(ctx, "Load audio files") then
+            local before = #recSources
+            loadRecFiles()
+            if #recSources > before then
+                applyLastMap()
+
+                if settings.autoMatchTracksOnImport then
+                    autosuggest()
+                end
+                if settings.autoMatchProfilesOnImport and normalizeMode then
+                    autoMatchProfiles()
+                end
             end
         end
     end
@@ -4591,36 +6246,394 @@ local function drawUI_body()
         end
     end
 
-    r.ImGui_SameLine(ctx)
-    r.ImGui_Dummy(ctx, 8, 0)
-    r.ImGui_SameLine(ctx)
-
-    if sec_button("Import Markers##import") then
-        if recPathRPP and recPathRPP ~= "" then
+    if not multiRppSettings.enabled and recPath.rpp then
+        r.ImGui_SameLine(ctx)
+        if sec_button("Import Markers/Tempomap") then
             importMarkersTempoPostCommit()
-        else
-            r.ShowMessageBox("Please load a Recording .RPP first.", "No RPP Loaded", 0)
         end
     end
 
-    -- RPP path info (compact)
-    if recPathRPP then
+    -- RPP path info (single mode) or queue info (multi mode)
+    if not multiRppSettings.enabled then
+        if recPath.rpp then
+            r.ImGui_SameLine(ctx)
+            r.ImGui_TextColored(ctx, theme.text_dim, "  RPP: " .. recPath.rpp)
+        end
+    else
         r.ImGui_SameLine(ctx)
-        r.ImGui_TextColored(ctx, theme.text_dim, "  RPP: " .. recPathRPP)
+        r.ImGui_TextColored(ctx, theme.text_dim, string.format("  %d RPPs queued", #rppQueue))
     end
 
     r.ImGui_Separator(ctx)
-    
-    
+
+    -- ===== MULTI-RPP QUEUE PANEL =====
+    if multiRppSettings.enabled and #rppQueue > 0 then
+        -- Collapsible queue panel
+        if r.ImGui_CollapsingHeader(ctx, "RPP Queue##multirpp", r.ImGui_TreeNodeFlags_DefaultOpen()) then
+            -- Settings row
+            r.ImGui_Text(ctx, "Gap:")
+            r.ImGui_SameLine(ctx)
+            r.ImGui_SetNextItemWidth(ctx, 100)
+            local gapChanged, gapVal = r.ImGui_InputInt(ctx, "measures##gap", multiRppSettings.gapInMeasures)
+            if gapChanged then
+                multiRppSettings.gapInMeasures = math.max(0, gapVal)
+                recalculateQueueOffsets()
+            end
+
+            r.ImGui_SameLine(ctx)
+            r.ImGui_Dummy(ctx, 8, 0)
+            r.ImGui_SameLine(ctx)
+
+            local regChanged, regVal = r.ImGui_Checkbox(ctx, "Create regions", multiRppSettings.createRegions)
+            if regChanged then multiRppSettings.createRegions = regVal end
+
+            r.ImGui_SameLine(ctx)
+            local markChanged, markVal = r.ImGui_Checkbox(ctx, "Import Markers + Tempo Map", multiRppSettings.importMarkers)
+            if markChanged then multiRppSettings.importMarkers = markVal end
+
+            r.ImGui_SameLine(ctx)
+            local laneChanged, laneVal = r.ImGui_Checkbox(ctx, "Align lanes", multiRppSettings.alignLanes)
+            if laneChanged then multiRppSettings.alignLanes = laneVal end
+
+            -- Queue table
+            local queueFlags = r.ImGui_TableFlags_Borders() | r.ImGui_TableFlags_RowBg()
+            if r.ImGui_BeginTable(ctx, "rppqueue", 6, queueFlags) then
+                local COLFIX = r.ImGui_TableColumnFlags_WidthFixed()
+                r.ImGui_TableSetupColumn(ctx, "##drag", COLFIX, 25)
+                r.ImGui_TableSetupColumn(ctx, "##", COLFIX, 30)
+                r.ImGui_TableSetupColumn(ctx, "Name")
+                r.ImGui_TableSetupColumn(ctx, "Measures", COLFIX, 70)
+                r.ImGui_TableSetupColumn(ctx, "Offset", COLFIX, 70)
+                r.ImGui_TableSetupColumn(ctx, "##remove", COLFIX, 25)
+                r.ImGui_TableHeadersRow(ctx)
+
+                local toRemove = nil
+                local dragSource = nil
+                local dragTarget = nil
+
+                for i, rpp in ipairs(rppQueue) do
+                    r.ImGui_TableNextRow(ctx)
+
+                    -- Drag handle column
+                    r.ImGui_TableSetColumnIndex(ctx, 0)
+                    r.ImGui_PushID(ctx, "drag" .. i)
+
+                    -- Drag source
+                    r.ImGui_Button(ctx, "=##draghandle")
+                    if r.ImGui_BeginDragDropSource(ctx, r.ImGui_DragDropFlags_None()) then
+                        r.ImGui_SetDragDropPayload(ctx, "RPP_QUEUE_ITEM", tostring(i))
+                        r.ImGui_Text(ctx, rpp.name)
+                        r.ImGui_EndDragDropSource(ctx)
+                        dragSource = i
+                    end
+
+                    -- Drag target (on the row)
+                    if r.ImGui_BeginDragDropTarget(ctx) then
+                        local rv, payload = r.ImGui_AcceptDragDropPayload(ctx, "RPP_QUEUE_ITEM")
+                        if rv then
+                            dragTarget = i
+                            local srcIdx = tonumber(payload)
+                            if srcIdx and srcIdx ~= i then
+                                moveRppInQueue(srcIdx, i)
+                            end
+                        end
+                        r.ImGui_EndDragDropTarget(ctx)
+                    end
+
+                    r.ImGui_PopID(ctx)
+
+                    -- Index column
+                    r.ImGui_TableSetColumnIndex(ctx, 1)
+                    r.ImGui_Text(ctx, tostring(i))
+
+                    -- Name column (editable)
+                    r.ImGui_TableSetColumnIndex(ctx, 2)
+                    r.ImGui_SetNextItemWidth(ctx, -1)
+                    local nameChanged, newName = r.ImGui_InputText(ctx, "##name" .. i, rpp.name)
+                    if nameChanged then rpp.name = newName end
+
+                    -- Measures column
+                    r.ImGui_TableSetColumnIndex(ctx, 3)
+                    r.ImGui_Text(ctx, tostring(rpp.lengthInMeasures))
+
+                    -- Offset column
+                    r.ImGui_TableSetColumnIndex(ctx, 4)
+                    r.ImGui_TextColored(ctx, theme.text_dim, "M" .. rpp.measureOffset)
+
+                    -- Remove button
+                    r.ImGui_TableSetColumnIndex(ctx, 5)
+                    if sec_button("x##remove" .. i) then
+                        toRemove = i
+                    end
+                end
+
+                r.ImGui_EndTable(ctx)
+
+                -- Handle removal after table iteration
+                if toRemove then
+                    removeRppFromQueue(toRemove)
+                end
+            end
+
+            -- Total info
+            if #rppQueue > 0 then
+                local totalMeasures = rppQueue[#rppQueue].measureOffset + rppQueue[#rppQueue].lengthInMeasures
+                r.ImGui_TextColored(ctx, theme.text_dim,
+                    string.format("Total: %d measures | %d tracks",
+                        totalMeasures, #recSources))
+            end
+        end
+
+        r.ImGui_Separator(ctx)
+    end
+
     -- Calculate available height for scrollable table
     local window_h = r.ImGui_GetWindowHeight(ctx)
     local cursor_y = r.ImGui_GetCursorPosY(ctx)
     local footer_height = 90  -- v2.2: compact footer (options + action row)
     local table_height = window_h - cursor_y - footer_height
-    
-    local flags = r.ImGui_TableFlags_Borders() | r.ImGui_TableFlags_RowBg() | 
+
+    local flags = r.ImGui_TableFlags_Borders() | r.ImGui_TableFlags_RowBg() |
                   r.ImGui_TableFlags_Resizable() | r.ImGui_TableFlags_ScrollY()
-    
+
+    -- ===== MULTI-RPP COLUMN MAPPING TABLE =====
+    if multiRppSettings.enabled and #rppQueue > 0 then
+
+    -- Columns: [Lock] [Template] [RPP1] [RPP2] ... [RPPn] [Normalize?] [Peak?]
+    local numRpps = #rppQueue
+    local numColumns = 3 + numRpps  -- Lock + Color + Template + RPP columns
+    if normalizeMode then numColumns = numColumns + 2 end  -- + Normalize + Peak
+
+    local scrollFlags = flags | r.ImGui_TableFlags_ScrollX()
+
+    if r.ImGui_BeginTable(ctx, "multimaptable", numColumns, scrollFlags, 0, table_height) then
+        local COLFIX = r.ImGui_TableColumnFlags_WidthFixed()
+
+        r.ImGui_TableSetupColumn(ctx, "##lock", COLFIX, 25.0)
+        r.ImGui_TableSetupColumn(ctx, "##color", COLFIX, 18.0)
+        r.ImGui_TableSetupColumn(ctx, "Template", COLFIX, 150.0)
+
+        for rppIdx, rpp in ipairs(rppQueue) do
+            r.ImGui_TableSetupColumn(ctx, rpp.name .. "##rpp" .. rppIdx, COLFIX, 130.0)
+        end
+
+        if normalizeMode then
+            r.ImGui_TableSetupColumn(ctx, "Normalize", COLFIX, 120.0)
+            r.ImGui_TableSetupColumn(ctx, "Peak dB", COLFIX, 80.0)
+        end
+
+        r.ImGui_TableSetupScrollFreeze(ctx, 3, 1)  -- Freeze Lock + Color + Template columns
+        r.ImGui_TableHeadersRow(ctx)
+
+        -- Auto-match button row
+        r.ImGui_TableNextRow(ctx)
+        r.ImGui_TableSetColumnIndex(ctx, 0)
+        r.ImGui_TableSetColumnIndex(ctx, 2)
+        if sec_button("Match All##multi") then
+            multiRppAutoMatchAll()
+            if normalizeMode then autoMatchProfilesMulti() end
+        end
+
+        for rppIdx = 1, numRpps do
+            r.ImGui_TableSetColumnIndex(ctx, 2 + rppIdx)
+            if sec_button("Match##rpp" .. rppIdx) then
+                multiRppAutoMatchColumn(rppIdx)
+            end
+        end
+
+        if normalizeMode then
+            r.ImGui_TableSetColumnIndex(ctx, 2 + numRpps + 1)
+            if sec_button("Match##multinorm") then
+                autoMatchProfilesMulti()
+            end
+        end
+
+        -- Track mapping rows
+        for i, tr in ipairs(mixTargets) do
+            if not validTrack(tr) then goto nextMixRow end
+
+            local trackName = nameCache[tr] or trName(tr)
+            local isLocked = protectedSet[trackName] and true or false
+            local isFolder = not isLeafCached(tr)
+
+            -- Delete unused: hide unmapped unlocked tracks
+            if settings.deleteUnused then
+                local hasAnyMapping = false
+                if multiMap[i] then
+                    for _, v in pairs(multiMap[i]) do
+                        if v and v > 0 then hasAnyMapping = true; break end
+                    end
+                end
+                if not hasAnyMapping and not isLocked and not isFolder then
+                    goto nextMixRow
+                end
+            end
+
+            r.ImGui_TableNextRow(ctx)
+
+            -- Lock column
+            r.ImGui_TableSetColumnIndex(ctx, 0)
+            local lockChanged, lockVal = r.ImGui_Checkbox(ctx, "##lock_" .. i, isLocked)
+            if lockChanged then
+                protectedSet[trackName] = lockVal or nil
+                saveProtected()
+            end
+
+            -- Color swatch column
+            r.ImGui_TableSetColumnIndex(ctx, 1)
+            do
+                local rgb = trackCache.color[tr] or 0
+                local u32 = u32_from_rgb24(rgb)
+                local dl = r.ImGui_GetWindowDrawList(ctx)
+                local x, y = r.ImGui_GetCursorScreenPos(ctx)
+                local swh = (settings.swatch_size or 12)
+                r.ImGui_DrawList_AddRectFilled(dl, x + 2, y + 3, x + 2 + swh, y + 3 + swh, u32, 3.0)
+                r.ImGui_DrawList_AddRect(dl, x + 2, y + 3, x + 2 + swh, y + 3 + swh, 0xFF000000, 3.0, 0, 1.0)
+                r.ImGui_Dummy(ctx, swh + 4, swh + 2)
+            end
+
+            -- Template name column (editable via double-click, same as single-RPP)
+            r.ImGui_TableSetColumnIndex(ctx, 2)
+            local displayName = trackName .. (isFolder and " (Folder)" or "")
+            local editKey = "multi_" .. i
+
+            if editState.track == editKey then
+                -- Edit mode: inline InputText
+                r.ImGui_SetNextItemWidth(ctx, -1)
+                local changed, newBuf = r.ImGui_InputText(ctx, "##multiDestName_" .. i,
+                    editState.buf, r.ImGui_InputTextFlags_AutoSelectAll())
+                editState.buf = newBuf
+                if not r.ImGui_IsItemActive(ctx) and not r.ImGui_IsItemDeactivated(ctx) then
+                    r.ImGui_SetKeyboardFocusHere(ctx, -1)
+                end
+                if r.ImGui_IsKeyPressed(ctx, r.ImGui_Key_Escape()) then
+                    editState.track = nil
+                    editState.buf = ""
+                elseif r.ImGui_IsItemDeactivated(ctx) then
+                    local trimmed = (editState.buf or ""):gsub("^%s+", ""):gsub("%s+$", "")
+                    if trimmed ~= "" then
+                        r.GetSetMediaTrackInfo_String(tr, "P_NAME", trimmed, true)
+                        nameCache[tr] = trimmed
+                    end
+                    editState.track = nil
+                    editState.buf = ""
+                end
+            else
+                -- Display mode: Selectable with double-click to edit
+                r.ImGui_SetNextItemWidth(ctx, -1)
+                if r.ImGui_Selectable(ctx, displayName .. "##multiDest_" .. i, false,
+                        r.ImGui_SelectableFlags_AllowDoubleClick()) then
+                    if r.ImGui_IsMouseDoubleClicked(ctx, r.ImGui_MouseButton_Left()) then
+                        editState.track = editKey
+                        editState.buf = trackName
+                    end
+                end
+            end
+
+            -- RPP columns (dropdown per RPP)
+            for rppIdx, rpp in ipairs(rppQueue) do
+                r.ImGui_TableSetColumnIndex(ctx, 2 + rppIdx)
+
+                multiMap[i] = multiMap[i] or {}
+                local currentIdx = multiMap[i][rppIdx] or 0
+                local currentName = "-"
+                if currentIdx > 0 and rpp.tracks[currentIdx] then
+                    currentName = rpp.tracks[currentIdx].name
+                end
+
+                -- Build assignment lookup for this RPP column
+                local assignedInCol = {}
+                for mi, row in pairs(multiMap) do
+                    if row[rppIdx] and row[rppIdx] > 0 then
+                        assignedInCol[row[rppIdx]] = mi
+                    end
+                end
+
+                r.ImGui_SetNextItemWidth(ctx, -1)
+                if r.ImGui_BeginCombo(ctx, "##map_" .. i .. "_" .. rppIdx, currentName) then
+                    -- "-" option (unmapped)
+                    if r.ImGui_Selectable(ctx, "-##unmap_" .. i .. "_" .. rppIdx, currentIdx == 0) then
+                        multiMap[i][rppIdx] = 0
+                    end
+
+                    -- Track options from this RPP (with dimming for assigned tracks)
+                    for j, track in ipairs(rpp.tracks) do
+                        local ownerMix = assignedInCol[j]
+                        local isMine = (ownerMix == i)
+                        local dim = ownerMix and not isMine
+                        local pushed = false
+
+                        if dim then
+                            r.ImGui_PushStyleVar(ctx, r.ImGui_StyleVar_Alpha(), 0.5)
+                            pushed = true
+                        end
+
+                        local label = track.name
+                        if ownerMix and not isMine then
+                            local ownerName = (validTrack(mixTargets[ownerMix]) and (nameCache[mixTargets[ownerMix]] or trName(mixTargets[ownerMix]))) or "?"
+                            label = label .. " [-> " .. ownerName .. "]"
+                        end
+
+                        local uniqueLabel = label .. "##" .. i .. "_" .. rppIdx .. "_" .. j
+                        if r.ImGui_Selectable(ctx, uniqueLabel, currentIdx == j) then
+                            -- If stealing from another template track, clear that assignment
+                            if ownerMix and not isMine then
+                                multiMap[ownerMix][rppIdx] = 0
+                            end
+                            multiMap[i][rppIdx] = j
+                        end
+
+                        if pushed then
+                            r.ImGui_PopStyleVar(ctx)
+                        end
+                    end
+
+                    r.ImGui_EndCombo(ctx)
+                end
+            end
+
+            -- Normalize columns
+            if normalizeMode then
+                multiNormMap[i] = multiNormMap[i] or {profile = "-", targetPeak = -6}
+
+                -- Profile dropdown
+                r.ImGui_TableSetColumnIndex(ctx, 2 + numRpps + 1)
+                r.ImGui_SetNextItemWidth(ctx, -1)
+                local currentProfile = multiNormMap[i].profile
+
+                if r.ImGui_BeginCombo(ctx, "##norm_" .. i, currentProfile) then
+                    if r.ImGui_Selectable(ctx, "-##normoff_" .. i, currentProfile == "-") then
+                        multiNormMap[i].profile = "-"
+                    end
+                    for _, p in ipairs(normProfiles) do
+                        if r.ImGui_Selectable(ctx, p.name .. "##norm_" .. i, currentProfile == p.name) then
+                            multiNormMap[i].profile = p.name
+                            if p.defaultPeak then
+                                multiNormMap[i].targetPeak = p.defaultPeak
+                            end
+                        end
+                    end
+                    r.ImGui_EndCombo(ctx)
+                end
+
+                -- Peak dB input
+                r.ImGui_TableSetColumnIndex(ctx, 2 + numRpps + 2)
+                r.ImGui_SetNextItemWidth(ctx, -1)
+                local peakChanged, peakVal = r.ImGui_InputInt(ctx, "##peak_" .. i, multiNormMap[i].targetPeak)
+                if peakChanged then
+                    multiNormMap[i].targetPeak = peakVal
+                end
+            end
+
+            ::nextMixRow::
+        end
+
+        r.ImGui_EndTable(ctx)
+    end
+
+    -- ===== SINGLE-RPP MAPPING TABLE =====
+    else
+
     -- Dynamic column count based on auto-normalize setting
     -- Columns: [Sel] [Color] [Lock] [Template Destinations] [Rec Sources] [Keep name] [Keep FX] [Normalize?] [Peak?] [x]
     local numColumns = normalizeMode and 10 or 8
@@ -4800,7 +6813,7 @@ local function drawUI_body()
         
         -- Pre-compute which folders have at least one child with a source or locked child
         local folderHasContent = {}
-        if deleteUnusedMode == 1 and #recSources > 0 then
+        if settings.deleteUnused and #recSources > 0 then
             -- Walk backwards: if a track has source/is locked, mark all parent folders
             local parentStack = {}  -- stack of folder indices
             for i, tr in ipairs(mixTargets) do
@@ -4846,7 +6859,7 @@ local function drawUI_body()
             local isLocked = protectedSet[trackName] and true or false
             local isFolder = not isLeafCached(tr)
             local hideRow
-            if deleteUnusedMode == 1 and #recSources > 0 then
+            if settings.deleteUnused and #recSources > 0 then
                 if isFolder then
                     hideRow = not isLocked and not folderHasContent[i]
                 else
@@ -4871,14 +6884,14 @@ local function drawUI_body()
                 
                 -- Drag-state selection (like in Stem Manager) - only when hovering
                 if r.ImGui_IsItemHovered(ctx, r.ImGui_HoveredFlags_AllowWhenBlockedByActiveItem()) then
-                    if dragSelectState == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
+                    if dragState.sel == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
                         -- Start drag: toggle state
-                        dragSelectState = not isSelected
-                        selectedRows[rowID] = dragSelectState or nil
-                        lastClickedRow = rowID
-                    elseif dragSelectState ~= nil and dragSelectState ~= isSelected then
+                        dragState.sel = not isSelected
+                        selectedRows[rowID] = dragState.sel or nil
+                        dragState.lastClicked = rowID
+                    elseif dragState.sel ~= nil and dragState.sel ~= isSelected then
                         -- Dragging and this row has different state - apply drag state
-                        selectedRows[rowID] = dragSelectState or nil
+                        selectedRows[rowID] = dragState.sel or nil
                     end
                 end
                 
@@ -4886,7 +6899,7 @@ local function drawUI_body()
                 if selectChanged then
                     local shiftDown = r.ImGui_IsKeyDown(ctx, r.ImGui_Key_LeftShift()) or r.ImGui_IsKeyDown(ctx, r.ImGui_Key_RightShift())
                     
-                    if shiftDown and lastClickedRow and lastClickedRow ~= rowID then
+                    if shiftDown and dragState.lastClicked and dragState.lastClicked ~= rowID then
                         -- Range select
                         local allRowIDs = {}
                         for ti = 1, #mixTargets do
@@ -4898,7 +6911,7 @@ local function drawUI_body()
                         
                         local startIdx, endIdx = nil, nil
                         for idx, id in ipairs(allRowIDs) do
-                            if id == lastClickedRow then startIdx = idx end
+                            if id == dragState.lastClicked then startIdx = idx end
                             if id == rowID then endIdx = idx end
                         end
                         
@@ -4910,20 +6923,20 @@ local function drawUI_body()
                             end
                         end
                     else
-                        -- Single toggle was already handled by dragSelectState
-                        if dragSelectState == nil then
+                        -- Single toggle was already handled by dragState.sel
+                        if dragState.sel == nil then
                             selectedRows[rowID] = selectValue or nil
                         end
                     end
                     
-                    lastClickedRow = rowID
+                    dragState.lastClicked = rowID
                 end
                 
                 -- Column 1: Color swatch
                 r.ImGui_TableSetColumnIndex(ctx, 1)
                 local name = nameCache[tr] or trName(tr)
                 do
-                    local rgb = effColorCache[tr] or 0
+                    local rgb = trackCache.color[tr] or 0
                     local u32 = u32_from_rgb24(rgb)
                     local dl = r.ImGui_GetWindowDrawList(ctx)
                     local x, y = r.ImGui_GetCursorScreenPos(ctx)
@@ -4941,15 +6954,15 @@ local function drawUI_body()
 
                     -- Drag-state for Lock checkbox
                     if r.ImGui_IsItemHovered(ctx, r.ImGui_HoveredFlags_AllowWhenBlockedByActiveItem()) then
-                        if dragLockState == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
-                            dragLockState = not checked
-                            protectedSet[name] = dragLockState or nil
-                        elseif dragLockState ~= nil and dragLockState ~= checked then
-                            protectedSet[name] = dragLockState or nil
+                        if dragState.lock == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
+                            dragState.lock = not checked
+                            protectedSet[name] = dragState.lock or nil
+                        elseif dragState.lock ~= nil and dragState.lock ~= checked then
+                            protectedSet[name] = dragState.lock or nil
                         end
                     end
 
-                    if ch and dragLockState == nil then
+                    if ch and dragState.lock == nil then
                         protectedSet[name] = nv or nil
                         saveProtected()
                     end
@@ -4963,24 +6976,24 @@ local function drawUI_body()
                 if s == 1 then
                     slotDisplayName = name
                 else
-                    slotDisplayName = (slotNameOverride[i] and slotNameOverride[i][s]) or name
+                    slotDisplayName = (editState.slotNames[i] and editState.slotNames[i][s]) or name
                 end
-                if editingDestTrack == editKey then
+                if editState.track == editKey then
                     -- Editing mode: InputText (full width)
                     r.ImGui_SetNextItemWidth(ctx, -1)
-                    local changed, newBuf = r.ImGui_InputText(ctx, "##destName_" .. globalRowID, editingDestBuf, r.ImGui_InputTextFlags_AutoSelectAll())
-                    editingDestBuf = newBuf
+                    local changed, newBuf = r.ImGui_InputText(ctx, "##destName_" .. globalRowID, editState.buf, r.ImGui_InputTextFlags_AutoSelectAll())
+                    editState.buf = newBuf
                     -- Auto-focus on first frame
                     if not r.ImGui_IsItemActive(ctx) and not r.ImGui_IsItemDeactivated(ctx) then
                         r.ImGui_SetKeyboardFocusHere(ctx, -1)
                     end
                     if r.ImGui_IsKeyPressed(ctx, r.ImGui_Key_Escape()) then
                         -- Escape: cancel without saving
-                        editingDestTrack = nil
-                        editingDestBuf = ""
+                        editState.track = nil
+                        editState.buf = ""
                     elseif r.ImGui_IsItemDeactivated(ctx) then
                         -- Enter, Tab, or click away: apply
-                        local trimmed = (editingDestBuf or ""):gsub("^%s+", ""):gsub("%s+$", "")
+                        local trimmed = (editState.buf or ""):gsub("^%s+", ""):gsub("%s+$", "")
                         if trimmed ~= "" then
                             if s == 1 then
                                 -- Slot 1: rename the actual REAPER track
@@ -4988,12 +7001,12 @@ local function drawUI_body()
                                 nameCache[tr] = trimmed
                             else
                                 -- Slot 2+: store as override (track created at commit)
-                                slotNameOverride[i] = slotNameOverride[i] or {}
-                                slotNameOverride[i][s] = trimmed
+                                editState.slotNames[i] = editState.slotNames[i] or {}
+                                editState.slotNames[i][s] = trimmed
                             end
                         end
-                        editingDestTrack = nil
-                        editingDestBuf = ""
+                        editState.track = nil
+                        editState.buf = ""
                     end
                 else
                     -- Display mode: Selectable (full cell width), double-click to edit
@@ -5006,8 +7019,8 @@ local function drawUI_body()
                     r.ImGui_SetNextItemWidth(ctx, -1)
                     if r.ImGui_Selectable(ctx, displayLabel .. "##dest_" .. globalRowID, false, r.ImGui_SelectableFlags_AllowDoubleClick()) then
                         if r.ImGui_IsMouseDoubleClicked(ctx, r.ImGui_MouseButton_Left()) then
-                            editingDestTrack = editKey
-                            editingDestBuf = slotDisplayName
+                            editState.track = editKey
+                            editState.buf = slotDisplayName
                         end
                     end
                     if r.ImGui_IsItemHovered(ctx) then
@@ -5021,7 +7034,7 @@ local function drawUI_body()
                     r.ImGui_Text(ctx, "(load .RPP or files)")
                 else
                     local current = slots[s] or 0
-                    local preview = (current > 0 and recSources[current].name) or "<none>"
+                    local preview = (current > 0 and recSources[current] and recSources[current].name) or "<none>"
                     
                     r.ImGui_SetNextItemWidth(ctx, -1)
                     if r.ImGui_BeginCombo(ctx, "##recSel_" .. globalRowID, preview) then
@@ -5097,16 +7110,16 @@ local function drawUI_body()
                 
                 -- Drag-state for Keep Name checkbox
                 if r.ImGui_IsItemHovered(ctx, r.ImGui_HoveredFlags_AllowWhenBlockedByActiveItem()) then
-                    if dragKeepNameState == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
-                        dragKeepNameState = not kn
-                        keepMap[i][s] = dragKeepNameState or nil
-                    elseif dragKeepNameState ~= nil and dragKeepNameState ~= kn then
-                        keepMap[i][s] = dragKeepNameState or nil
+                    if dragState.keepName == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
+                        dragState.keepName = not kn
+                        keepMap[i][s] = dragState.keepName or nil
+                    elseif dragState.keepName ~= nil and dragState.keepName ~= kn then
+                        keepMap[i][s] = dragState.keepName or nil
                     end
                 end
                 
                 if chkn then 
-                    if dragKeepNameState == nil then
+                    if dragState.keepName == nil then
                         -- Apply to all selected rows if multi-select active
                         local hasMultipleSelected = false
                         for _ in pairs(selectedRows) do hasMultipleSelected = true; break end
@@ -5136,16 +7149,16 @@ local function drawUI_body()
                 
                 -- Drag-state for Keep FX checkbox
                 if r.ImGui_IsItemHovered(ctx, r.ImGui_HoveredFlags_AllowWhenBlockedByActiveItem()) then
-                    if dragKeepFXState == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
-                        dragKeepFXState = not kfx
-                        fxMap[i][s] = dragKeepFXState or nil
-                    elseif dragKeepFXState ~= nil and dragKeepFXState ~= kfx then
-                        fxMap[i][s] = dragKeepFXState or nil
+                    if dragState.keepFX == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
+                        dragState.keepFX = not kfx
+                        fxMap[i][s] = dragState.keepFX or nil
+                    elseif dragState.keepFX ~= nil and dragState.keepFX ~= kfx then
+                        fxMap[i][s] = dragState.keepFX or nil
                     end
                 end
                 
                 if chkfx then 
-                    if dragKeepFXState == nil then
+                    if dragState.keepFX == nil then
                         -- Apply to all selected rows if multi-select active
                         local hasMultipleSelected = false
                         for _ in pairs(selectedRows) do hasMultipleSelected = true; break end
@@ -5272,9 +7285,9 @@ local function drawUI_body()
                     r.ImGui_SameLine(ctx)
                     if r.ImGui_Button(ctx, "-##del_" .. globalRowID) then
                         table.remove(map[i], s)
-                        -- Clean up slotNameOverride
-                        if slotNameOverride[i] then
-                            slotNameOverride[i][s] = nil
+                        -- Clean up editState.slotNames
+                        if editState.slotNames[i] then
+                            editState.slotNames[i][s] = nil
                         end
                         -- Clean up normMap
                         if normMap[i] then
@@ -5292,29 +7305,30 @@ local function drawUI_body()
     
     -- Clear drag states when mouse is released (drag complete)
     if r.ImGui_IsMouseReleased(ctx, r.ImGui_MouseButton_Left()) then
-        if dragSelectState ~= nil then dragSelectState = nil end
-        if dragLockState ~= nil then 
-            dragLockState = nil 
+        if dragState.sel ~= nil then dragState.sel = nil end
+        if dragState.lock ~= nil then 
+            dragState.lock = nil 
             saveProtected()  -- Save when drag ends
         end
-        if dragKeepNameState ~= nil then dragKeepNameState = nil end
-        if dragKeepFXState ~= nil then dragKeepFXState = nil end
+        if dragState.keepName ~= nil then dragState.keepName = nil end
+        if dragState.keepFX ~= nil then dragState.keepFX = nil end
     end
-    
+
+    end  -- end of if multiRppSettings.enabled ... else (single-RPP table)
+
     r.ImGui_Separator(ctx)
 
     -- Options row 1: Delete unused + Copy media
-    local delChanged, delVal = r.ImGui_Checkbox(ctx, "Delete unused", deleteUnusedMode == 1)
+    local delChanged, delVal = r.ImGui_Checkbox(ctx, "Delete unused", settings.deleteUnused)
     if delChanged then
-        deleteUnusedMode = delVal and 1 or 0
-        settings.deleteUnused = (deleteUnusedMode == 1)
+        settings.deleteUnused = delVal
         saveIni()
     end
     r.ImGui_SameLine(ctx)
     r.ImGui_Dummy(ctx, 12, 0)
     r.ImGui_SameLine(ctx)
-    local _, cmc = r.ImGui_Checkbox(ctx, "Copy media", copyMediaOnCommit)
-    copyMediaOnCommit = cmc
+    local _, cmc = r.ImGui_Checkbox(ctx, "Copy media", settings.copyMedia)
+    settings.copyMedia = cmc
 
     -- Options row 2: Normalization options (horizontal)
     if normalizeMode then
@@ -5344,7 +7358,7 @@ local function drawUI_body()
         end
     end
 
-    -- Info + Action buttons: Preview left, Commit+Close right
+    -- Info + Action buttons: Commit+Close right-aligned
     local processCount = 0
     for i, tr in ipairs(mixTargets) do
         local slots = map[i] or {0}
@@ -5356,10 +7370,6 @@ local function drawUI_body()
         end
     end
     r.ImGui_TextColored(ctx, theme.text_dim, string.format("%d tracks", processCount))
-    r.ImGui_SameLine(ctx)
-    if sec_button("Preview##import") then
-        previewMode = true
-    end
 
     local win_w = r.ImGui_GetContentRegionAvail(ctx)
     local commitW = r.ImGui_CalcTextSize(ctx, "Commit") + 16
@@ -5367,61 +7377,17 @@ local function drawUI_body()
     local padding = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_ItemSpacing())
     r.ImGui_SameLine(ctx, r.ImGui_GetWindowWidth(ctx) - commitW - closeW - padding - r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_WindowPadding()))
     if r.ImGui_Button(ctx, "Commit##import") then
-        commitMappings()
+        if multiRppSettings.enabled and #rppQueue > 0 then
+            commitMultiRpp()
+        else
+            commitMappings()
+        end
     end
     r.ImGui_SameLine(ctx)
     if sec_button("Close##import") then
-        should_close = true
+        uiFlags.close = true
     end
 
-    if previewMode then
-        r.ImGui_SetNextWindowSize(ctx, 600, 400, r.ImGui_Cond_FirstUseEver())
-        local vis, open = r.ImGui_Begin(ctx, "Preview", true)
-        
-        if vis then
-            r.ImGui_TextWrapped(ctx, (function()
-                local previewText = {}
-                for i, mixTr in ipairs(mixTargets) do
-                    if validTrack(mixTr) then
-                        local slots = map[i] or {0}
-                        local chosen = {}
-                        for _, ri in ipairs(slots) do
-                            if ri and ri > 0 and recSources[ri] then chosen[#chosen + 1] = ri end
-                        end
-                        
-                        if #chosen > 0 then
-                            local mixName = nameCache[mixTr] or trName(mixTr)
-                            local keepName = (keepSet[mixName] == true)
-                            local firstEntry = recSources[chosen[1]]
-                            local targetBase = keepName and (firstEntry.name or mixName) or mixName
-                            
-                            previewText[#previewText + 1] = "Replace '" .. mixName .. "' with:"
-                            for s, ri in ipairs(chosen) do
-                                local entry = recSources[ri]
-                                local newName = (s == 1) and targetBase or (targetBase .. " (" .. s .. ")")
-                                previewText[#previewText + 1] = "  - " .. newName .. " (" .. (entry.src == "file" and "file" or "RPP") .. ")"
-                            end
-                            
-                            if normalizeMode and normMap[i] and normMap[i].profile ~= "-" then
-                                local profile = getProfileByName(normMap[i].profile)
-                                if profile then
-                                    local targetLUFS = calculateLUFS(normMap[i].targetPeak, profile.offset)
-                                    previewText[#previewText + 1] = "  -> Normalize: " .. normMap[i].profile .. 
-                                        " @ " .. normMap[i].targetPeak .. " dB peak (" .. 
-                                        string.format("%.1f", targetLUFS) .. " LUFS-M)"
-                                end
-                            end
-                        end
-                    end
-                end
-                return table.concat(previewText, "\n")
-            end)())
-        end
-        
-        r.ImGui_End(ctx)
-        if not open then previewMode = false end
-    end
-    
     -- ===== END IMPORT MODE =====
     
     -- ===== NORMALIZE-ONLY MODE UI =====
@@ -5627,7 +7593,7 @@ local function drawUI_body()
         end
         r.ImGui_SameLine(ctx)
         if sec_button("Close##norm") then
-            should_close = true
+            uiFlags.close = true
         end
 
     -- ===== END NORMALIZE-ONLY MODE =====
@@ -5789,7 +7755,7 @@ end
 
 -- ===== UI: SETTINGS WINDOW =====
 local function drawSettingsWindow()
-    if not showSettings then return end
+    if not uiFlags.settings then return end
     
     r.ImGui_SetNextWindowSize(ctx, 700, 600, r.ImGui_Cond_FirstUseEver())
     local visible, open = r.ImGui_Begin(ctx, "Settings", true)
@@ -6130,12 +8096,12 @@ local function drawSettingsWindow()
         r.ImGui_End(ctx)
     end
     
-    if not open then showSettings = false end
+    if not open then uiFlags.settings = false end
 end
 
 -- ===== UI: HELP WINDOW =====
 local function drawHelpWindow()
-    if not showHelp then return end
+    if not uiFlags.help then return end
     
     r.ImGui_SetNextWindowSize(ctx, 950, 750, r.ImGui_Cond_FirstUseEver())
     local visible, open = r.ImGui_Begin(ctx, "Help - RAPID v" .. VERSION, true)
@@ -6146,26 +8112,31 @@ local function drawHelpWindow()
             -- ===== TAB: OVERVIEW =====
             if r.ImGui_BeginTabItem(ctx, "Overview") then
                 r.ImGui_TextWrapped(ctx, [[
-RAPID v2.3 - Recording Auto-Placement & Intelligent Dynamics
+RAPID v2.5 - Recording Auto-Placement & Intelligent Dynamics
 
 A professional workflow tool for REAPER that combines automated track
 mapping with intelligent LUFS-based normalization.
 
 --------------------------------------------------------------------
 
-THREE WORKFLOWS IN ONE:
+FOUR WORKFLOWS IN ONE:
 
-1. IMPORT MODE
+1. IMPORT MODE (Single RPP)
    -> Map recording tracks to your mix template
    -> Preserves all FX, sends, routing, automation
    -> Perfect for recurring workflows (podcasts, live recordings, etc.)
 
-2. NORMALIZE MODE
+2. MULTI-RPP IMPORT (NEW in v2.5)
+   -> Import multiple RPP session files into the same template
+   -> Automatic regions, merged tempo/markers, configurable gap
+   -> Drag-and-drop reorder, column-based mapping UI
+
+3. NORMALIZE MODE
    -> Standalone LUFS normalization for existing tracks
    -> No import needed - works on current project
    -> Quick loudness standardization
 
-3. IMPORT + NORMALIZE (Full Workflow)
+4. IMPORT + NORMALIZE (Full Workflow)
    -> Complete automation: import, map, and normalize
    -> One-click solution for production workflows
    -> Professional gain staging in seconds
@@ -6192,6 +8163,14 @@ KEY FEATURES:
   - Fuzzy matching handles typos and variations
   - Custom aliases for your workflow
   - Exact, contains, and similarity-based matching
+
+ Multi-RPP Import (NEW in v2.5)
+  - Import multiple RPP files into one template project
+  - Automatic regions per RPP (named from filename)
+  - Full tempo/time-signature merging (time-based)
+  - Configurable gap between RPPs (in measures)
+  - Drag-and-drop queue reordering
+  - Column-based mapping with per-RPP dropdowns
 
  LUFS-Based Normalization
   - Instrument-specific profiles (Kick, Snare, Bass, etc.)
@@ -6365,9 +8344,9 @@ AFTER COMMIT OPTIONS:
 
 --------------------------------------------------------------------
 
-MARKERS, REGIONS & TEMPO:
+MARKERS, REGIONS & TEMPO (Single RPP):
 
-Use "Import Markers" button to transfer:
+Use "Import Markers/Tempomap" button to transfer:
 - Markers from recording session
 - Regions with names
 - Tempo map
@@ -6377,12 +8356,57 @@ Reopen RAPID after import completes.
 
 --------------------------------------------------------------------
 
+MULTI-RPP IMPORT (NEW in v2.5):
+
+Import multiple RPP recording sessions into the same template.
+Each RPP gets its own region, with tempo and markers merged correctly.
+
+ When To Use
+  - Album/EP sessions (one RPP per song)
+  - Multi-day recordings into one mix project
+  - Compiling takes from different sessions
+
+ Step-by-Step Workflow
+  1. Enable "Multi-RPP" checkbox in toolbar
+  2. Click "Add .RPP" to load multiple session files
+     (or use multi-file dialog with JS_ReaScriptAPI)
+  3. Reorder RPPs via drag-and-drop in the queue
+  4. Set gap between RPPs (default: 2 measures)
+  5. Map tracks: one dropdown column per RPP
+  6. Use "Auto-match All" for automatic mapping
+  7. Assign normalization profiles if needed
+  8. Click "Commit" to execute
+
+ What Happens On Commit
+  - Tempo/time-signatures from all RPPs merged
+  - One region per RPP created (named from filename)
+  - Markers imported with correct measure offsets
+  - For each template track: all mapped RPP tracks imported,
+    shifted to correct position, consolidated onto one track
+  - FX/Sends/routing copied from template
+  - Normalization per region (if enabled)
+  - Tempo/time-signatures set via API with full shape fidelity
+
+ Settings
+  - Gap (measures): silence between RPPs (default: 2)
+  - Create regions: auto-create region per RPP
+  - Import markers: import markers from RPPs
+
+ Column-Based Mapping Table
+  - One column per loaded RPP
+  - Dropdown to select which RPP track maps to each template slot
+  - Horizontal scrolling when many RPPs are loaded
+  - Auto-match per column or all columns at once
+
+--------------------------------------------------------------------
+
 TIPS:
 
  Use protected tracks for master/bus tracks you never want deleted
  Keep Name is useful when recording track names are descriptive
  Multi-select + batch edit = fast workflow for many tracks
  Process per region is perfect for multi-song live recordings
+ Multi-RPP mode: gap completes the last measure before adding silence
 ]])
                 r.ImGui_EndTabItem(ctx)
             end
@@ -6998,6 +9022,37 @@ VERSION HISTORY
 
 --------------------------------------------------------------------
 
+v2.5 (February 2026)
+
+Multi-RPP Import:
+ Import multiple RPP files into the same mix template
+ Drag-and-drop reordering of RPP queue
+ Per-RPP regions created automatically (named from filename)
+ Tempo/time-signature changes merged from all RPPs (full fidelity)
+ Markers imported with correct measure offsets
+ Configurable gap between RPPs (in measures, default: 2)
+ Column-based UI with per-RPP dropdowns
+ Per-column and all-columns auto-matching
+ Track consolidation (import, shift, merge onto master track)
+ JS_ReaScriptAPI multi-file dialog support
+
+--------------------------------------------------------------------
+
+v2.4 (February 2026)
+
+LUFS Calibration System:
+ "Calibrate from Selection" button in Settings
+ Create/update profiles from reference tracks
+ Per-profile LUFS measurement settings
+ Calibration window with editable target peak
+
+Normalization:
+ Gain reset (Item Gain + Take Volume) before processing
+ All normalization via Take Volume only
+ AudioAccessor for accurate measurement
+
+--------------------------------------------------------------------
+
 v2.3 (February 2026)
 
 New Features:
@@ -7134,7 +9189,7 @@ For support or feature requests, check the REAPER forums.
         r.ImGui_End(ctx)
     end
     
-    if not open then showHelp = false end
+    if not open then uiFlags.help = false end
 end
 
 
@@ -7142,7 +9197,7 @@ end
 local function loop()
     apply_theme()
 
-    if not win_init_applied then
+    if not uiFlags.winInit then
         local x, y, w, h = loadWinGeom()
         if x and y and w and h then
             r.ImGui_SetNextWindowPos(ctx, x, y, r.ImGui_Cond_Once())
@@ -7150,7 +9205,7 @@ local function loop()
         else
             r.ImGui_SetNextWindowSize(ctx, 1200, 800, r.ImGui_Cond_FirstUseEver())
         end
-        win_init_applied = true
+        uiFlags.winInit = true
     end
 
     local visible, open = r.ImGui_Begin(ctx, WINDOW_TITLE, true, r.ImGui_WindowFlags_NoSavedSettings())
@@ -7178,7 +9233,7 @@ local function loop()
 
     pop_theme()
 
-    if should_close or (not open) then return end
+    if uiFlags.close or (not open) then return end
 
     r.defer(loop)
 end
