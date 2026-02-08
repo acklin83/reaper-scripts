@@ -1813,9 +1813,12 @@ local function extractTempoMap(rppText)
     local envexStart = rppText:find("<TEMPOENVEX\n")
     local envex = nil
     if envexStart then
-        local envexEnd = rppText:find("\n>", envexStart)
+        -- Match closing ">" with optional leading whitespace (RPP indents with 2 spaces per level)
+        local envexEnd = rppText:find("\n%s*>", envexStart)
         if envexEnd then
-            envex = rppText:sub(envexStart, envexEnd + 1)
+            -- Include the ">" itself: find the actual ">" position after the whitespace
+            local closePos = rppText:find(">", envexEnd + 1)
+            envex = rppText:sub(envexStart, closePos)
         end
     end
     if envex then
