@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="8faafe537d2035dcf128849095f65fb67008eaee">
+<index version="1" name="Frank Acklin Scripts" commit="436e8c11fa576f88d066e49c757f4174de67b3c6">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -15,7 +15,8 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import Mode (Multi-RPP)}: Import multiple RPP files into one template with merged tempo\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Normalize Mode}: Standalone LUFS normalization on existing tracks\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Drag & drop file import from OS file manager (NEW in v2.6)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Live template sync \u8212- track changes auto-detected (NEW in v2.6.1)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Drag & drop file import from OS file manager\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Multi-RPP import with merged tempo, regions, and markers\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Fuzzy matching with aliases for automatic track suggestions\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Multi-slot mapping with auto-duplicate for multiple sources\par}
@@ -64,6 +65,15 @@ Visual hover feedback (accent border) during drag
 Auto-matching triggers after import/drop (both single and multi-RPP)
 Fixed: multi-RPP auto-matching after import (was calling single-RPP matcher)]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/8faafe537d2035dcf128849095f65fb67008eaee/RAPID/RAPID.lua</source>
+      </version>
+      <version name="2.6.1" author="Frank Acklin" time="2026-02-09T19:09:34Z">
+        <changelog><![CDATA[Live Template Sync: auto-detect template track changes (add/remove/rename)
+Smart rebuild preserves all existing mappings via name-based matching
+Throttled fingerprint check (~2x/sec) with near-zero performance cost
+Multi-RPP UI: removed redundant Match All from table, toolbar buttons now mode-aware
+Multi-RPP: lock drag-to-paint and header toggle-all (matching single-RPP behavior)
+Fixed: drag-state reset was only running in single-RPP scope]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/436e8c11fa576f88d066e49c757f4174de67b3c6/RAPID/RAPID.lua</source>
       </version>
     </reapack>
   </category>
