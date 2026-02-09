@@ -1,28 +1,25 @@
 -- @description RAPID - Recording Auto-Placement & Intelligent Dynamics
 -- @author Frank Acklin
--- @version 2.5
+-- @version 2.6
 -- @changelog
---   Multi-RPP Import: import multiple RPP files into one template
---   Merged tempo/time-signatures with full API fidelity (no project reload)
---   Time-based offset system (seconds) for all positioning
---   Track consolidation with lane alignment and group flag copying
---   Column-based mapping UI with per-RPP dropdowns and drag-drop reordering
---   Editable template track names in both single and multi-RPP mode
+--   Drag & drop .rpp and audio files from OS file manager onto window
+--   Auto-classification: .rpp files go to import, audio files added as sources
+--   Multiple .rpp files auto-switch to Multi-RPP mode
+--   Visual hover feedback (accent border) during drag
+--   Auto-matching triggers after import/drop (both single and multi-RPP)
+--   Fixed: multi-RPP auto-matching after import (was calling single-RPP matcher)
 -- @about
 --   # RAPID
---
---   Professional workflow automation for REAPER that automates track mapping,
---   media import, and LUFS normalization.
+--   Professional workflow automation for REAPER that automates track mapping, media import, and LUFS normalization.
 --
 --   ## Four Workflows
---
 --   - **Full Workflow**: Import + mapping + normalization in one pass
 --   - **Import Mode (Single RPP)**: Map recording tracks to mix template (preserves FX, sends, routing)
 --   - **Import Mode (Multi-RPP)**: Import multiple RPP files into one template with merged tempo
 --   - **Normalize Mode**: Standalone LUFS normalization on existing tracks
 --
 --   ## Features
---
+--   - Drag & drop file import from OS file manager (NEW in v2.6)
 --   - Multi-RPP import with merged tempo, regions, and markers
 --   - Fuzzy matching with aliases for automatic track suggestions
 --   - Multi-slot mapping with auto-duplicate for multiple sources
@@ -32,16 +29,12 @@
 --   - MixnoteStyle dark theme
 --
 --   ## Requirements
---
 --   - REAPER 6.0+
 --   - ReaImGui (required)
 --   - SWS Extension (required)
 --   - JS_ReaScriptAPI (optional, for multi-file dialogs)
 -- @link GitHub https://github.com/acklin83/RAPID
--- @provides
---   [main] .
---
--- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.5
+-- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.6
 --
 -- Unified version combining RAPID (Import & Mapping) with Little Joe (Normalize-Only)
 --
@@ -52,6 +45,14 @@
 -- [ ] Import  [x] Normalize = Little Joe mode (normalize existing tracks)
 --
 -- See Project Notes for full documentation
+--
+-- NEW in v2.6:
+-- - Drag & drop .rpp and audio files from OS file manager onto window
+-- - Auto-classification: .rpp → import, audio → add as source
+-- - Multiple .rpp files auto-switch to Multi-RPP mode
+-- - Visual hover feedback (accent border) during drag
+-- - Auto-matching triggers after import/drop (both single and multi-RPP)
+-- - Fixed: multi-RPP auto-matching after import (was calling single-RPP matcher)
 --
 -- NEW in v2.5:
 -- - Multi-RPP Import: Import multiple RPP files into the same template
@@ -81,7 +82,7 @@
 local r = reaper
 
 -- ===== VERSION =====
-local VERSION = "2.5"
+local VERSION = "2.6"
 local WINDOW_TITLE = "RAPID v" .. VERSION
 
 -- ===== Capability checks =====
@@ -138,6 +139,11 @@ local DEFAULT_PROFILES = {
     {name = "Guitar", offset = 8, defaultPeak = -12},
     {name = "Vocal", offset = 10, defaultPeak = -10},
     {name = "Room", offset = 6, defaultPeak = -12}
+}
+
+local AUDIO_EXTENSIONS = {
+    wav=true, aif=true, aiff=true, mp3=true, flac=true,
+    ogg=true, opus=true, wma=true, m4a=true
 }
 
 local DEFAULT_BUS_KEYWORDS = {"MIXES", "FX", "Sidechains", "BUS", "Ref", "ANALOGUE"}
@@ -6166,8 +6172,8 @@ local function drawUI_body()
                         loadRppToQueue(p)
                     end
                     applyLastMap()
-                    if settings.autoMatchTracksOnImport then autosuggest() end
-                    if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfiles() end
+                    if settings.autoMatchTracksOnImport then multiRppAutoMatchAll() end
+                    if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfilesMulti() end
                 end
             else
                 -- Fallback: single file dialog
@@ -6175,8 +6181,8 @@ local function drawUI_body()
                 if ok then
                     loadRppToQueue(p)
                     applyLastMap()
-                    if settings.autoMatchTracksOnImport then autosuggest() end
-                    if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfiles() end
+                    if settings.autoMatchTracksOnImport then multiRppAutoMatchAll() end
+                    if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfilesMulti() end
                 end
             end
         end
@@ -6262,10 +6268,17 @@ local function drawUI_body()
         if recPath.rpp then
             r.ImGui_SameLine(ctx)
             r.ImGui_TextColored(ctx, theme.text_dim, "  RPP: " .. recPath.rpp)
+        elseif #recSources == 0 then
+            r.ImGui_SameLine(ctx)
+            r.ImGui_TextColored(ctx, theme.text_muted, "  or drag & drop .rpp / audio files here")
         end
     else
         r.ImGui_SameLine(ctx)
-        r.ImGui_TextColored(ctx, theme.text_dim, string.format("  %d RPPs queued", #rppQueue))
+        if #rppQueue > 0 then
+            r.ImGui_TextColored(ctx, theme.text_dim, string.format("  %d RPPs queued", #rppQueue))
+        else
+            r.ImGui_TextColored(ctx, theme.text_muted, "  drag & drop .rpp files here or use Add .RPP")
+        end
     end
 
     r.ImGui_Separator(ctx)
@@ -7035,7 +7048,7 @@ local function drawUI_body()
                 -- Column 4: Recording Sources
                 r.ImGui_TableSetColumnIndex(ctx, 4)
                 if #recSources == 0 then
-                    r.ImGui_Text(ctx, "(load .RPP or files)")
+                    r.ImGui_TextColored(ctx, theme.text_muted, "(load or drop .rpp / audio files)")
                 else
                     local current = slots[s] or 0
                     local preview = (current > 0 and recSources[current] and recSources[current].name) or "<none>"
@@ -8116,7 +8129,7 @@ local function drawHelpWindow()
             -- ===== TAB: OVERVIEW =====
             if r.ImGui_BeginTabItem(ctx, "Overview") then
                 r.ImGui_TextWrapped(ctx, [[
-RAPID v2.5 - Recording Auto-Placement & Intelligent Dynamics
+RAPID v2.6 - Recording Auto-Placement & Intelligent Dynamics
 
 A professional workflow tool for REAPER that combines automated track
 mapping with intelligent LUFS-based normalization.
@@ -8130,7 +8143,7 @@ FOUR WORKFLOWS IN ONE:
    -> Preserves all FX, sends, routing, automation
    -> Perfect for recurring workflows (podcasts, live recordings, etc.)
 
-2. MULTI-RPP IMPORT (NEW in v2.5)
+2. MULTI-RPP IMPORT
    -> Import multiple RPP session files into the same template
    -> Automatic regions, merged tempo/markers, configurable gap
    -> Drag-and-drop reorder, column-based mapping UI
@@ -8168,7 +8181,13 @@ KEY FEATURES:
   - Custom aliases for your workflow
   - Exact, contains, and similarity-based matching
 
- Multi-RPP Import (NEW in v2.5)
+ Drag & Drop (NEW in v2.6)
+  - Drag .rpp files from file manager onto window to load
+  - Drag audio files (.wav, .aif, .mp3, .flac, ...) as sources
+  - Multiple .rpp files auto-switch to Multi-RPP mode
+  - Auto-matching triggers after drop
+
+ Multi-RPP Import
   - Import multiple RPP files into one template project
   - Automatic regions per RPP (named from filename)
   - Full tempo/time-signature merging (time-based)
@@ -8241,12 +8260,14 @@ STEP-BY-STEP WORKFLOW:
    - Enable Normalize Mode too if you want automatic gain staging
 
 3. IMPORT RECORDINGS
-   - Click "Load .RPP" to import from a recording session project
+   - Drag & drop .rpp or audio files onto the window (easiest!)
+   - OR click "Load .RPP" to import from a recording session project
    - OR click "Load audio files" to import individual audio files
    - Recording track list appears in the table
+   - Auto-matching runs automatically after import/drop
 
-4. AUTO-MATCH TRACKS
-   - Click "Auto-match Tracks" button
+4. AUTO-MATCH TRACKS (manual)
+   - Click "Auto-match Tracks" to re-run matching
    - RAPID suggests the best template match for each recording
    - Review and adjust matches in the dropdown menus
 
@@ -8360,7 +8381,7 @@ Reopen RAPID after import completes.
 
 --------------------------------------------------------------------
 
-MULTI-RPP IMPORT (NEW in v2.5):
+MULTI-RPP IMPORT:
 
 Import multiple RPP recording sessions into the same template.
 Each RPP gets its own region, with tempo and markers merged correctly.
@@ -8372,14 +8393,14 @@ Each RPP gets its own region, with tempo and markers merged correctly.
 
  Step-by-Step Workflow
   1. Enable "Multi-RPP" checkbox in toolbar
-  2. Click "Add .RPP" to load multiple session files
-     (or use multi-file dialog with JS_ReaScriptAPI)
+  2. Drag & drop multiple .rpp files onto the window (easiest!)
+     OR click "Add .RPP" / use multi-file dialog
   3. Reorder RPPs via drag-and-drop in the queue
   4. Set gap between RPPs (default: 2 measures)
   5. Map tracks: one dropdown column per RPP
-  6. Use "Auto-match All" for automatic mapping
-  7. Assign normalization profiles if needed
-  8. Click "Commit" to execute
+     (auto-matching runs automatically after import/drop)
+  6. Assign normalization profiles if needed
+  7. Click "Commit" to execute
 
  What Happens On Commit
   - Tempo/time-signatures from all RPPs merged
@@ -9216,11 +9237,89 @@ local function loop()
 
     if visible then
         local ok, err = xpcall(function()
-            drawUI_body()
+            -- Wrap content in child so entire area is a file drop target
+            local ww, wh = r.ImGui_GetContentRegionAvail(ctx)
+            r.ImGui_PushStyleVar(ctx, r.ImGui_StyleVar_WindowPadding(), 0, 0)
+            if r.ImGui_BeginChild(ctx, "##dropzone", ww, wh) then
+                r.ImGui_PopStyleVar(ctx)
+                drawUI_body()
+                r.ImGui_EndChild(ctx)
+            else
+                r.ImGui_PopStyleVar(ctx)
+            end
+
+            -- File drop target on the child (covers entire window content area)
+            if r.ImGui_BeginDragDropTarget(ctx) then
+                local dl = r.ImGui_GetForegroundDrawList(ctx)
+                local wx, wy = r.ImGui_GetWindowPos(ctx)
+                local wsz_w, wsz_h = r.ImGui_GetWindowSize(ctx)
+                r.ImGui_DrawList_AddRect(dl, wx, wy, wx + wsz_w, wy + wsz_h, theme.accent, 6, 0, 2)
+
+                local rv, count = r.ImGui_AcceptDragDropPayloadFiles(ctx)
+                if rv then
+                    -- Classify and collect dropped files
+                    local rpps, audios = {}, {}
+                    for i = 0, count - 1 do
+                        local fok, fn = r.ImGui_GetDragDropPayloadFile(ctx, i)
+                        if fok then
+                            local ext = fn:match("%.([^%.]+)$")
+                            ext = ext and ext:lower() or ""
+                            if ext == "rpp" then rpps[#rpps + 1] = fn
+                            elseif AUDIO_EXTENSIONS[ext] then audios[#audios + 1] = fn end
+                        end
+                    end
+
+                    -- RPP handling
+                    if #rpps > 0 then
+                        if multiRppSettings.enabled then
+                            for _, p in ipairs(rpps) do loadRppToQueue(p) end
+                        elseif #rpps == 1 then
+                            recSources = {}
+                            loadRecRPP(rpps[1])
+                        else
+                            -- Multiple RPPs in single mode: auto-switch to multi
+                            multiRppSettings.enabled = true
+                            if recPath.rpp and recPath.rpp ~= "" then
+                                rppQueue = {}
+                                multiMap = {}
+                                multiNormMap = {}
+                                loadRppToQueue(recPath.rpp)
+                            end
+                            for _, p in ipairs(rpps) do loadRppToQueue(p) end
+                        end
+                    end
+
+                    -- Audio handling (single-RPP mode only)
+                    if #audios > 0 and not multiRppSettings.enabled then
+                        for _, f in ipairs(audios) do
+                            recSources[#recSources + 1] = {
+                                src = "file",
+                                name = (f:match("([^/\\]+)$") or f):gsub("%.[%w%d_-]+$", ""),
+                                file = f
+                            }
+                        end
+                        _G.__recSources = recSources
+                    end
+
+                    -- Post-load: same logic as existing Load buttons
+                    if #rpps > 0 or #audios > 0 then
+                        applyLastMap()
+                        if multiRppSettings.enabled then
+                            if settings.autoMatchTracksOnImport then multiRppAutoMatchAll() end
+                            if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfilesMulti() end
+                        else
+                            if settings.autoMatchTracksOnImport then autosuggest() end
+                            if settings.autoMatchProfilesOnImport and normalizeMode then autoMatchProfiles() end
+                        end
+                    end
+                end
+                r.ImGui_EndDragDropTarget(ctx)
+            end
+
             local wx, wy = r.ImGui_GetWindowPos(ctx)
-            local ww, wh = r.ImGui_GetWindowSize(ctx)
-            if wx and wy and ww and wh then
-                saveWinGeom(math.floor(wx + 0.5), math.floor(wy + 0.5), math.floor(ww + 0.5), math.floor(wh + 0.5))
+            local wsz_w, wsz_h = r.ImGui_GetWindowSize(ctx)
+            if wx and wy and wsz_w and wsz_h then
+                saveWinGeom(math.floor(wx + 0.5), math.floor(wy + 0.5), math.floor(wsz_w + 0.5), math.floor(wsz_h + 0.5))
             end
         end, debug.traceback)
 
