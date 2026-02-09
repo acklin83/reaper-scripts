@@ -1,13 +1,13 @@
 -- @description RAPID - Recording Auto-Placement & Intelligent Dynamics
 -- @author Frank Acklin
--- @version 2.6
+-- @version 2.6.1
 -- @changelog
---   Drag & drop .rpp and audio files from OS file manager onto window
---   Auto-classification: .rpp files go to import, audio files added as sources
---   Multiple .rpp files auto-switch to Multi-RPP mode
---   Visual hover feedback (accent border) during drag
---   Auto-matching triggers after import/drop (both single and multi-RPP)
---   Fixed: multi-RPP auto-matching after import (was calling single-RPP matcher)
+--   Live Template Sync: auto-detect template track changes (add/remove/rename)
+--   Smart rebuild preserves all existing mappings via name-based matching
+--   Throttled fingerprint check (~2x/sec) with near-zero performance cost
+--   Multi-RPP UI: removed redundant Match All from table, toolbar buttons now mode-aware
+--   Multi-RPP: lock drag-to-paint and header toggle-all (matching single-RPP behavior)
+--   Fixed: drag-state reset was only running in single-RPP scope
 -- @about
 --   # RAPID
 --   Professional workflow automation for REAPER that automates track mapping, media import, and LUFS normalization.
@@ -19,7 +19,8 @@
 --   - **Normalize Mode**: Standalone LUFS normalization on existing tracks
 --
 --   ## Features
---   - Drag & drop file import from OS file manager (NEW in v2.6)
+--   - Live template sync — track changes auto-detected (NEW in v2.6.1)
+--   - Drag & drop file import from OS file manager
 --   - Multi-RPP import with merged tempo, regions, and markers
 --   - Fuzzy matching with aliases for automatic track suggestions
 --   - Multi-slot mapping with auto-duplicate for multiple sources
@@ -34,7 +35,7 @@
 --   - SWS Extension (required)
 --   - JS_ReaScriptAPI (optional, for multi-file dialogs)
 -- @link GitHub https://github.com/acklin83/RAPID
--- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.6
+-- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.6.1
 --
 -- Unified version combining RAPID (Import & Mapping) with Little Joe (Normalize-Only)
 --
@@ -82,7 +83,7 @@
 local r = reaper
 
 -- ===== VERSION =====
-local VERSION = "2.6"
+local VERSION = "2.6.1"
 local WINDOW_TITLE = "RAPID v" .. VERSION
 
 -- ===== Capability checks =====
@@ -381,6 +382,9 @@ local nameCache = setmetatable({}, {__mode="k"})
 local trackCache = {
     kids = setmetatable({}, {__mode="k"}),   -- was hasKids
     color = setmetatable({}, {__mode="k"}),  -- was effColorCache
+    lastCount = -1,         -- track count for change detection
+    lastFingerprint = "",   -- track names fingerprint for change detection
+    fpFrame = 0,            -- frame counter for throttled fingerprint check
 }
 
 _G.__mr_offset = 0.0
@@ -6101,6 +6105,9 @@ local function drawUI_body()
             rebuildMixTargets()
             map = {}
             normMap = {}
+            -- Initialize change detection baseline
+            trackCache.lastCount = r.CountTracks(0)
+            trackCache.lastFingerprint = trackCache.buildFingerprint()
         end
     end
 
@@ -6246,13 +6253,21 @@ local function drawUI_body()
     r.ImGui_SameLine(ctx)
 
     if sec_button("Auto-match Tracks##import") then
-        autosuggest()
+        if multiRppSettings.enabled then
+            multiRppAutoMatchAll()
+        else
+            autosuggest()
+        end
     end
 
     if normalizeMode then
         r.ImGui_SameLine(ctx)
         if sec_button("Auto-match Profiles##import") then
-            autoMatchProfiles()
+            if multiRppSettings.enabled then
+                autoMatchProfilesMulti()
+            else
+                autoMatchProfiles()
+            end
         end
     end
 
@@ -6416,10 +6431,11 @@ local function drawUI_body()
     -- ===== MULTI-RPP COLUMN MAPPING TABLE =====
     if multiRppSettings.enabled and #rppQueue > 0 then
 
-    -- Columns: [Lock] [Template] [RPP1] [RPP2] ... [RPPn] [Normalize?] [Peak?]
+    -- Columns: [Lock] [Color] [Template] [RPP1] ... [RPPn] [Normalize?] [Peak?]
     local numRpps = #rppQueue
     local numColumns = 3 + numRpps  -- Lock + Color + Template + RPP columns
     if normalizeMode then numColumns = numColumns + 2 end  -- + Normalize + Peak
+    local normColBase = 2 + numRpps  -- Normalize = normColBase+1, Peak = normColBase+2
 
     local scrollFlags = flags | r.ImGui_TableFlags_ScrollX()
 
@@ -6440,16 +6456,44 @@ local function drawUI_body()
         end
 
         r.ImGui_TableSetupScrollFreeze(ctx, 3, 1)  -- Freeze Lock + Color + Template columns
-        r.ImGui_TableHeadersRow(ctx)
+        -- Custom header row (for lock toggle-all click)
+        r.ImGui_TableNextRow(ctx, r.ImGui_TableRowFlags_Headers())
 
-        -- Auto-match button row
+        -- Lock header: click to toggle all
+        r.ImGui_TableSetColumnIndex(ctx, 0)
+        if r.ImGui_Selectable(ctx, "##lockheader_multi", false) then
+            local anyProtected = false
+            for _, mtr in ipairs(mixTargets) do
+                local nm = nameCache[mtr] or trName(mtr)
+                if protectedSet[nm] then anyProtected = true; break end
+            end
+            local newState = not anyProtected
+            for _, mtr in ipairs(mixTargets) do
+                local nm = nameCache[mtr] or trName(mtr)
+                protectedSet[nm] = newState or nil
+            end
+            saveProtected()
+        end
+
+        -- Remaining headers rendered normally
+        r.ImGui_TableSetColumnIndex(ctx, 1)
+        r.ImGui_TableHeader(ctx, "##color")
+        r.ImGui_TableSetColumnIndex(ctx, 2)
+        r.ImGui_TableHeader(ctx, "Template")
+        for rppIdx, rpp in ipairs(rppQueue) do
+            r.ImGui_TableSetColumnIndex(ctx, 2 + rppIdx)
+            r.ImGui_TableHeader(ctx, rpp.name)
+        end
+        if normalizeMode then
+            r.ImGui_TableSetColumnIndex(ctx, normColBase + 1)
+            r.ImGui_TableHeader(ctx, "Normalize")
+            r.ImGui_TableSetColumnIndex(ctx, normColBase + 2)
+            r.ImGui_TableHeader(ctx, "Peak dB")
+        end
+
+        -- Auto-match button row (per-RPP match buttons)
         r.ImGui_TableNextRow(ctx)
         r.ImGui_TableSetColumnIndex(ctx, 0)
-        r.ImGui_TableSetColumnIndex(ctx, 2)
-        if sec_button("Match All##multi") then
-            multiRppAutoMatchAll()
-            if normalizeMode then autoMatchProfilesMulti() end
-        end
 
         for rppIdx = 1, numRpps do
             r.ImGui_TableSetColumnIndex(ctx, 2 + rppIdx)
@@ -6459,7 +6503,7 @@ local function drawUI_body()
         end
 
         if normalizeMode then
-            r.ImGui_TableSetColumnIndex(ctx, 2 + numRpps + 1)
+            r.ImGui_TableSetColumnIndex(ctx, normColBase + 1)
             if sec_button("Match##multinorm") then
                 autoMatchProfilesMulti()
             end
@@ -6488,10 +6532,21 @@ local function drawUI_body()
 
             r.ImGui_TableNextRow(ctx)
 
-            -- Lock column
+            -- Lock column (with drag-to-paint)
             r.ImGui_TableSetColumnIndex(ctx, 0)
             local lockChanged, lockVal = r.ImGui_Checkbox(ctx, "##lock_" .. i, isLocked)
-            if lockChanged then
+
+            -- Drag-to-paint for lock checkbox
+            if r.ImGui_IsItemHovered(ctx, r.ImGui_HoveredFlags_AllowWhenBlockedByActiveItem()) then
+                if dragState.lock == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
+                    dragState.lock = not isLocked
+                    protectedSet[trackName] = dragState.lock or nil
+                elseif dragState.lock ~= nil and dragState.lock ~= isLocked then
+                    protectedSet[trackName] = dragState.lock or nil
+                end
+            end
+
+            if lockChanged and dragState.lock == nil then
                 protectedSet[trackName] = lockVal or nil
                 saveProtected()
             end
@@ -6614,7 +6669,7 @@ local function drawUI_body()
                 multiNormMap[i] = multiNormMap[i] or {profile = "-", targetPeak = -6}
 
                 -- Profile dropdown
-                r.ImGui_TableSetColumnIndex(ctx, 2 + numRpps + 1)
+                r.ImGui_TableSetColumnIndex(ctx, normColBase + 1)
                 r.ImGui_SetNextItemWidth(ctx, -1)
                 local currentProfile = multiNormMap[i].profile
 
@@ -6634,7 +6689,7 @@ local function drawUI_body()
                 end
 
                 -- Peak dB input
-                r.ImGui_TableSetColumnIndex(ctx, 2 + numRpps + 2)
+                r.ImGui_TableSetColumnIndex(ctx, normColBase + 2)
                 r.ImGui_SetNextItemWidth(ctx, -1)
                 local peakChanged, peakVal = r.ImGui_InputInt(ctx, "##peak_" .. i, multiNormMap[i].targetPeak)
                 if peakChanged then
@@ -7320,18 +7375,18 @@ local function drawUI_body()
         r.ImGui_EndTable(ctx)
     end
     
-    -- Clear drag states when mouse is released (drag complete)
+    end  -- end of if multiRppSettings.enabled ... else (single-RPP table)
+
+    -- Clear drag states when mouse is released (drag complete) — runs in BOTH modes
     if r.ImGui_IsMouseReleased(ctx, r.ImGui_MouseButton_Left()) then
         if dragState.sel ~= nil then dragState.sel = nil end
-        if dragState.lock ~= nil then 
-            dragState.lock = nil 
+        if dragState.lock ~= nil then
+            dragState.lock = nil
             saveProtected()  -- Save when drag ends
         end
         if dragState.keepName ~= nil then dragState.keepName = nil end
         if dragState.keepFX ~= nil then dragState.keepFX = nil end
     end
-
-    end  -- end of if multiRppSettings.enabled ... else (single-RPP table)
 
     r.ImGui_Separator(ctx)
 
@@ -9218,8 +9273,127 @@ For support or feature requests, check the REAPER forums.
 end
 
 
+-- ===== TEMPLATE CHANGE DETECTION =====
+-- Stored in trackCache to avoid consuming top-level local slots (Lua 200 limit).
+
+-- Builds a fingerprint string from track count + all track names.
+-- Cheap enough to run every ~60 frames (~2x/sec).
+trackCache.buildFingerprint = function()
+    local N = r.CountTracks(0)
+    local parts = {tostring(N)}
+    for i = 0, N - 1 do
+        local tr = r.GetTrack(0, i)
+        if tr then
+            local _, nm = r.GetSetMediaTrackInfo_String(tr, "P_NAME", "", false)
+            parts[#parts + 1] = nm or ""
+        end
+    end
+    return table.concat(parts, "|")
+end
+
+-- Rebuilds mixTargets and remaps all existing mappings by track name.
+-- Called automatically when template tracks change.
+trackCache.smartRebuild = function()
+    if not importMode or #mixTargets == 0 then return end
+
+    -- Snapshot old index->name mapping
+    local oldNames = {}
+    for i, tr in ipairs(mixTargets) do
+        oldNames[i] = nameCache[tr] or trName(tr)
+    end
+
+    -- Snapshot old mappings keyed by template track NAME
+    local oldMap, oldNormMap, oldKeepMap, oldFxMap = {}, {}, {}, {}
+    local oldMultiMap, oldMultiNormMap = {}, {}
+    for i = 1, #mixTargets do
+        local nm = oldNames[i]
+        if nm and nm ~= "" then
+            oldMap[nm] = map[i]
+            oldNormMap[nm] = normMap[i]
+            oldKeepMap[nm] = keepMap[i]
+            oldFxMap[nm] = fxMap[i]
+            if multiRppSettings.enabled then
+                oldMultiMap[nm] = multiMap[i]
+                oldMultiNormMap[nm] = multiNormMap[i]
+            end
+        end
+    end
+
+    -- Rebuild
+    rebuildMixTargets()
+
+    -- Re-initialize maps for new size
+    local M = #mixTargets
+    map = {}
+    normMap = {}
+    keepMap = {}
+    fxMap = {}
+    if multiRppSettings.enabled then
+        multiMap = {}
+        multiNormMap = {}
+    end
+
+    -- Restore mappings by name match
+    for i = 1, M do
+        local nm = nameCache[mixTargets[i]] or trName(mixTargets[i])
+        if nm and nm ~= "" and oldMap[nm] then
+            map[i] = oldMap[nm]
+            normMap[i] = oldNormMap[nm]
+            keepMap[i] = oldKeepMap[nm]
+            fxMap[i] = oldFxMap[nm]
+            if multiRppSettings.enabled then
+                multiMap[i] = oldMultiMap[nm]
+                multiNormMap[i] = oldMultiNormMap[nm]
+            end
+        else
+            map[i] = {0}
+            normMap[i] = {}
+            normMap[i][1] = {profile = "-", targetPeak = -6}
+            keepMap[i] = {}
+            fxMap[i] = {}
+        end
+    end
+
+    _G.__mixTargets = mixTargets
+    _G.__map = map
+    log("Template tracks changed — rebuilt with mapping preservation\n")
+end
+
 -- ===== MAIN LOOP =====
 local function loop()
+    -- Track change detection (runs before rendering)
+    if importMode and #mixTargets > 0 then
+        local n = r.CountTracks(0)
+        local changed = false
+
+        -- Cheap check every frame: track count
+        if n ~= trackCache.lastCount then
+            trackCache.lastCount = n
+            changed = true
+        end
+
+        -- Throttled check every ~60 frames: name fingerprint
+        trackCache.fpFrame = trackCache.fpFrame + 1
+        if not changed and trackCache.fpFrame >= 60 then
+            trackCache.fpFrame = 0
+            local fp = trackCache.buildFingerprint()
+            if fp ~= trackCache.lastFingerprint then
+                trackCache.lastFingerprint = fp
+                changed = true
+            end
+        end
+
+        if changed then
+            local fp = trackCache.buildFingerprint()
+            if fp ~= trackCache.lastFingerprint then
+                trackCache.lastFingerprint = fp
+                trackCache.smartRebuild()
+            else
+                trackCache.lastFingerprint = fp
+            end
+        end
+    end
+
     apply_theme()
 
     if not uiFlags.winInit then
@@ -9379,6 +9553,10 @@ do
         protectedSet = loadProtected()
         keepSet = loadKeep()
         applyLastMap()
+
+        -- Initialize change detection baseline
+        trackCache.lastCount = r.CountTracks(0)
+        trackCache.lastFingerprint = trackCache.buildFingerprint()
     end
     
     if normalizeMode and not importMode then
