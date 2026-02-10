@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="436e8c11fa576f88d066e49c757f4174de67b3c6">
+<index version="1" name="Frank Acklin Scripts" commit="3e73d6f18b6d58ee5af3afab1a1e27d8c9f2dec3">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -15,7 +15,7 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import Mode (Multi-RPP)}: Import multiple RPP files into one template with merged tempo\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Normalize Mode}: Standalone LUFS normalization on existing tracks\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Live template sync \u8212- track changes auto-detected (NEW in v2.6.1)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Live template sync \u8212- track changes auto-detected\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Drag & drop file import from OS file manager\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Multi-RPP import with merged tempo, regions, and markers\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Fuzzy matching with aliases for automatic track suggestions\par}
@@ -74,6 +74,13 @@ Multi-RPP UI: removed redundant Match All from table, toolbar buttons now mode-a
 Multi-RPP: lock drag-to-paint and header toggle-all (matching single-RPP behavior)
 Fixed: drag-state reset was only running in single-RPP scope]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/436e8c11fa576f88d066e49c757f4174de67b3c6/RAPID/RAPID.lua</source>
+      </version>
+      <version name="2.6.2" author="Frank Acklin" time="2026-02-10T19:47:24Z">
+        <changelog><![CDATA[Single-RPP: "Import Markers/Tempomap" checkbox (auto-imports on commit)
+Fixed: nameless regions from source RPP not imported (pairing assumed non-empty names)
+Fixed: multi-RPP track automation only imported from first RPP (chunk-based envelope merge)
+Envelope merge rewritten: collected from prepared chunks, applied as final write after all API ops]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/3e73d6f18b6d58ee5af3afab1a1e27d8c9f2dec3/RAPID/RAPID.lua</source>
       </version>
     </reapack>
   </category>
