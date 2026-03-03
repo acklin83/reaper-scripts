@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="3e73d6f18b6d58ee5af3afab1a1e27d8c9f2dec3">
+<index version="1" name="Frank Acklin Scripts" commit="1e17ea59a374b090ca561f6da124802d788382ed">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -25,13 +25,9 @@
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Offline media auto-relinking via progressive path suffix matching\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab MixnoteStyle dark theme\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6.0+\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui (required)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab SWS Extension (required)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab JS_ReaScriptAPI (optional, for multi-file dialogs)\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6.0+\sa180\par}
 }
 ]]></description>
-        <link rel="website" href="https://github.com/acklin83/RAPID">GitHub</link>
       </metadata>
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
         <changelog><![CDATA[LUFS Calibration System: Create/update profiles from reference tracks
@@ -81,6 +77,17 @@ Fixed: nameless regions from source RPP not imported (pairing assumed non-empty 
 Fixed: multi-RPP track automation only imported from first RPP (chunk-based envelope merge)
 Envelope merge rewritten: collected from prepared chunks, applied as final write after all API ops]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/3e73d6f18b6d58ee5af3afab1a1e27d8c9f2dec3/RAPID/RAPID.lua</source>
+      </version>
+      <version name="2.7" author="Frank Acklin" time="2026-03-03T15:13:34Z">
+        <changelog><![CDATA[Sel column in Normalize-only mode (multi-select, drag-to-paint, Shift-range)
+"Set all to" bulk action bar in all modes (applies to selected or all)
+"Calibrate" button in header when Normalize is active
+Multi-select profile/peak changes apply to all selected rows
+Settings: UI + Save/Load merged into "General" tab
+Consistent footer layout across all modes
+Keep Name / Keep FX columns narrower
+Removed Little Joe profile sync]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/1e17ea59a374b090ca561f6da124802d788382ed/RAPID/RAPID.lua</source>
       </version>
     </reapack>
   </category>
