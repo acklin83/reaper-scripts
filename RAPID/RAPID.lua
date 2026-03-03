@@ -1,11 +1,15 @@
 -- @description RAPID - Recording Auto-Placement & Intelligent Dynamics
 -- @author Frank Acklin
--- @version 2.6.2
+-- @version 2.7
 -- @changelog
---   Single-RPP: "Import Markers/Tempomap" checkbox (auto-imports on commit)
---   Fixed: nameless regions from source RPP not imported (pairing assumed non-empty names)
---   Fixed: multi-RPP track automation only imported from first RPP (chunk-based envelope merge)
---   Envelope merge rewritten: collected from prepared chunks, applied as final write after all API ops
+--   Sel column in Normalize-only mode (multi-select, drag-to-paint, Shift-range)
+--   "Set all to" bulk action bar in all modes (applies to selected or all)
+--   "Calibrate" button in header when Normalize is active
+--   Multi-select profile/peak changes apply to all selected rows
+--   Settings: UI + Save/Load merged into "General" tab
+--   Consistent footer layout across all modes
+--   Keep Name / Keep FX columns narrower
+--   Removed Little Joe profile sync
 -- @about
 --   # RAPID
 --   Professional workflow automation for REAPER that automates track mapping, media import, and LUFS normalization.
@@ -29,11 +33,7 @@
 --
 --   ## Requirements
 --   - REAPER 6.0+
---   - ReaImGui (required)
---   - SWS Extension (required)
---   - JS_ReaScriptAPI (optional, for multi-file dialogs)
--- @link GitHub https://github.com/acklin83/RAPID
--- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.6.2
+-- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.7
 --
 -- Unified version combining RAPID (Import & Mapping) with Little Joe (Normalize-Only)
 --
@@ -41,22 +41,17 @@
 -- ------
 -- [x] Import  [x] Normalize = Full RAPID workflow (import + map + normalize)
 -- [x] Import  [ ] Normalize = Import & map only (no normalization)
--- [ ] Import  [x] Normalize = Little Joe mode (normalize existing tracks)
+-- [ ] Import  [x] Normalize = Normalize-only mode (normalize existing tracks)
 --
 -- See Project Notes for full documentation
 --
--- NEW in v2.6.2:
--- - Single-RPP: "Import Markers/Tempomap" checkbox (imports markers/regions/tempo on commit)
--- - Fixed: nameless regions from source RPP not imported (pairing logic assumed non-empty names)
--- - Fixed: multi-RPP track automation only imported from first RPP (chunk-based envelope merge)
---
--- NEW in v2.6:
--- - Drag & drop .rpp and audio files from OS file manager onto window
--- - Auto-classification: .rpp → import, audio → add as source
--- - Multiple .rpp files auto-switch to Multi-RPP mode
--- - Visual hover feedback (accent border) during drag
--- - Auto-matching triggers after import/drop (both single and multi-RPP)
--- - Fixed: multi-RPP auto-matching after import (was calling single-RPP matcher)
+-- NEW in v2.7:
+-- - Sel column in Normalize-only mode (multi-select, drag-to-paint, shift-range)
+-- - "Set all to" bulk action bar in all modes (applies to selected or all)
+-- - "Calibrate" button in header when Normalize is active
+-- - Multi-select profile/peak changes apply to all selected rows
+-- - Settings: UI + Save/Load merged into "General" tab
+-- - Keep Name / Keep FX columns narrower
 --
 -- NEW in v2.5:
 -- - Multi-RPP Import: Import multiple RPP files into the same template
@@ -86,7 +81,7 @@
 local r = reaper
 
 -- ===== VERSION =====
-local VERSION = "2.6.2"
+local VERSION = "2.7"
 local WINDOW_TITLE = "RAPID v" .. VERSION
 
 -- ===== Capability checks =====
@@ -6241,8 +6236,21 @@ local function drawUI_body()
         return
     end
 
-    -- Settings/Help right-aligned in header
-    r.ImGui_SameLine(ctx, r.ImGui_GetWindowWidth(ctx) - 120)
+    -- Right-aligned header buttons — Settings/Help always at same position
+    local framePad = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_FramePadding())
+    local itemSpc = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_ItemSpacing())
+    local winPad = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_WindowPadding())
+    local settingsW = r.ImGui_CalcTextSize(ctx, "Settings") + framePad * 2
+    local helpW = r.ImGui_CalcTextSize(ctx, "Help") + framePad * 2
+    local calibrateW = normalizeMode and (r.ImGui_CalcTextSize(ctx, "Calibrate") + framePad * 2 + itemSpc) or 0
+    local settingsX = r.ImGui_GetWindowWidth(ctx) - settingsW - itemSpc - helpW - winPad
+    r.ImGui_SameLine(ctx, settingsX - calibrateW)
+    if normalizeMode then
+        if sec_button("Calibrate##header") then
+            openCalibrationWindow()
+        end
+        r.ImGui_SameLine(ctx)
+    end
     if sec_button("Settings##header") then
         uiFlags.settings = true
     end
@@ -6523,6 +6531,77 @@ local function drawUI_body()
         end
 
         r.ImGui_Separator(ctx)
+    end
+
+    -- Bulk normalize section (Import or Import+Normalize)
+    if normalizeMode then
+        if r.ImGui_BeginChild(ctx, "import_norm_bulk", 0, 30, r.ImGui_WindowFlags_None()) then
+            r.ImGui_Text(ctx, "Set all to:")
+            r.ImGui_SameLine(ctx)
+
+            local allProfiles = {"-"}
+            for _, p in ipairs(normProfiles) do
+                allProfiles[#allProfiles + 1] = p.name
+            end
+
+            r.ImGui_SetNextItemWidth(ctx, 150)
+            local bulkProfile = settings.lastBulkProfile or "-"
+
+            if r.ImGui_BeginCombo(ctx, "##import_bulk_profile", bulkProfile) then
+                for _, profileName in ipairs(allProfiles) do
+                    if r.ImGui_Selectable(ctx, profileName, bulkProfile == profileName) then
+                        bulkProfile = profileName
+                        settings.lastBulkProfile = bulkProfile
+                        if profileName ~= "-" then
+                            local profile = getProfileByName(profileName)
+                            if profile and profile.defaultPeak then
+                                settings.lastBulkPeak = profile.defaultPeak
+                            end
+                        end
+                    end
+                end
+                r.ImGui_EndCombo(ctx)
+            end
+
+            r.ImGui_SameLine(ctx)
+            r.ImGui_SetNextItemWidth(ctx, 80)
+            local bulkPeak = settings.lastBulkPeak or -6
+            local bpChanged, bpVal = r.ImGui_InputInt(ctx, "##import_bulk_peak", bulkPeak)
+            if bpChanged then
+                bulkPeak = bpVal
+                settings.lastBulkPeak = bulkPeak
+            end
+
+            r.ImGui_SameLine(ctx)
+            r.ImGui_Text(ctx, "dB")
+
+            r.ImGui_SameLine(ctx)
+            -- Check if any rows selected for targeted apply
+            local hasImportSel = false
+            for _ in pairs(selectedRows) do hasImportSel = true; break end
+            local bulkLabel = hasImportSel and "Apply to selected##import_bulk" or "Apply to all##import_bulk"
+            if r.ImGui_Button(ctx, bulkLabel) then
+                if multiRppSettings.enabled then
+                    for i = 1, #mixTargets do
+                        if not hasImportSel or selectedRows[string.format("%d_%d", i, 1)] then
+                            multiNormMap[i] = {profile = bulkProfile, targetPeak = bulkPeak}
+                        end
+                    end
+                else
+                    for i = 1, #mixTargets do
+                        local slots = map[i] or {0}
+                        for s = 1, math.max(1, #slots) do
+                            if not hasImportSel or selectedRows[string.format("%d_%d", i, s)] then
+                                normMap[i] = normMap[i] or {}
+                                normMap[i][s] = {profile = bulkProfile, targetPeak = bulkPeak}
+                            end
+                        end
+                    end
+                end
+            end
+
+            r.ImGui_EndChild(ctx)
+        end
     end
 
     -- Calculate available height for scrollable table
@@ -6813,7 +6892,7 @@ local function drawUI_body()
     else
 
     -- Dynamic column count based on auto-normalize setting
-    -- Columns: [Sel] [Color] [Lock] [Template Destinations] [Rec Sources] [Keep name] [Keep FX] [Normalize?] [Peak?] [x]
+    -- Columns: [Sel] [Color] [Lock] [Template Destinations] [Rec Sources] [Keep Name] [Keep FX] [Normalize?] [Peak?] [x]
     local numColumns = normalizeMode and 10 or 8
 
     if r.ImGui_BeginTable(ctx, "maptable", numColumns, flags, 0, table_height) then
@@ -6823,8 +6902,8 @@ local function drawUI_body()
         r.ImGui_TableSetupColumn(ctx, "##lock", COLFIX, 25.0)  -- Lock column (drawn icon)
         r.ImGui_TableSetupColumn(ctx, "Template Destinations")  -- Mix tracks
         r.ImGui_TableSetupColumn(ctx, "Recording Sources")
-        r.ImGui_TableSetupColumn(ctx, "Keep name", COLFIX, 80.0)
-        r.ImGui_TableSetupColumn(ctx, "Keep FX", COLFIX, 80.0)
+        r.ImGui_TableSetupColumn(ctx, "Keep Name", COLFIX, 62.0)
+        r.ImGui_TableSetupColumn(ctx, "Keep FX", COLFIX, 55.0)
         
         -- Only show normalize columns if auto-normalize is enabled
         if normalizeMode then
@@ -6918,7 +6997,7 @@ local function drawUI_body()
 
         -- Column 5: Keep Name (clickable to toggle all)
         r.ImGui_TableSetColumnIndex(ctx, 5)
-        if r.ImGui_Selectable(ctx, "Keep name##header", false) then
+        if r.ImGui_Selectable(ctx, "Keep Name##header", false) then
             -- Check if any Keep Name are checked (check keepMap per slot)
             local anyChecked = false
             for i, tr in ipairs(mixTargets) do
@@ -7496,20 +7575,19 @@ local function drawUI_body()
 
     r.ImGui_Separator(ctx)
 
-    -- Options row 1: Delete unused + Copy media
+    -- Options row: Delete unused + Copy media + Normalization options (all on one line)
     local delChanged, delVal = r.ImGui_Checkbox(ctx, "Delete unused", settings.deleteUnused)
     if delChanged then
         settings.deleteUnused = delVal
         saveIni()
     end
     r.ImGui_SameLine(ctx)
-    r.ImGui_Dummy(ctx, 12, 0)
-    r.ImGui_SameLine(ctx)
     local _, cmc = r.ImGui_Checkbox(ctx, "Copy media", settings.copyMedia)
     settings.copyMedia = cmc
-
-    -- Options row 2: Normalization options (horizontal)
     if normalizeMode then
+        r.ImGui_SameLine(ctx)
+        r.ImGui_Dummy(ctx, 8, 0)
+        r.ImGui_SameLine(ctx)
         changed, val = r.ImGui_Checkbox(ctx, "Import to new lane", settings.createNewLane)
         if changed then
             settings.createNewLane = val
@@ -7549,12 +7627,13 @@ local function drawUI_body()
     end
     r.ImGui_TextColored(ctx, theme.text_dim, string.format("%d tracks", processCount))
 
-    local win_w = r.ImGui_GetContentRegionAvail(ctx)
-    local commitW = r.ImGui_CalcTextSize(ctx, "Commit") + 16
-    local closeW = r.ImGui_CalcTextSize(ctx, "Close") + 16
-    local padding = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_ItemSpacing())
-    r.ImGui_SameLine(ctx, r.ImGui_GetWindowWidth(ctx) - commitW - closeW - padding - r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_WindowPadding()))
-    if r.ImGui_Button(ctx, "Commit##import") then
+    local fp = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_FramePadding())
+    local isp = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_ItemSpacing())
+    local wp = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_WindowPadding())
+    local actionW = r.ImGui_CalcTextSize(ctx, "Normalize") + fp * 2  -- use widest label
+    local clW = r.ImGui_CalcTextSize(ctx, "Close") + fp * 2
+    r.ImGui_SameLine(ctx, r.ImGui_GetWindowWidth(ctx) - actionW - clW - isp - wp)
+    if r.ImGui_Button(ctx, "Commit##import", actionW) then
         if multiRppSettings.enabled and #rppQueue > 0 then
             commitMultiRpp()
         else
@@ -7570,25 +7649,14 @@ local function drawUI_body()
     
     -- ===== NORMALIZE-ONLY MODE UI =====
     elseif normalizeMode then
-        r.ImGui_Text(ctx, "Normalize Mode")
-        r.ImGui_SameLine(ctx)
-        
-        if r.ImGui_Button(ctx, "Reload Tracks") then
-            loadTracksWithItems()
-            if settings.autoMatchProfilesOnImport then
-                autoMatchProfilesDirect()
-            end
-        end
-        
-        r.ImGui_SameLine(ctx)
-        if r.ImGui_Button(ctx, "Auto-match Profiles##norm") then
+        if sec_button("Auto-match Profiles##norm") then
             autoMatchProfilesDirect()
         end
 
         r.ImGui_Separator(ctx)
         
         -- Bulk action section (Normalize-Only Mode)
-        if r.ImGui_BeginChild(ctx, "norm_bulk", 0, 40, r.ImGui_WindowFlags_None()) then
+        if r.ImGui_BeginChild(ctx, "norm_bulk", 0, 30, r.ImGui_WindowFlags_None()) then
             r.ImGui_Text(ctx, "Set all to:")
             r.ImGui_SameLine(ctx)
             
@@ -7630,9 +7698,17 @@ local function drawUI_body()
             r.ImGui_Text(ctx, "dB")
             
             r.ImGui_SameLine(ctx)
-            if r.ImGui_Button(ctx, "Apply to all##norm_bulk") then
+            -- Check if any rows are selected for targeted apply
+            local hasNormSel = false
+            for i = 1, #tracks do
+                if selectedRows[string.format("n%d", i)] then hasNormSel = true; break end
+            end
+            local applyLabel = hasNormSel and "Apply to selected##norm_bulk" or "Apply to all##norm_bulk"
+            if r.ImGui_Button(ctx, applyLabel) then
                 for i = 1, #tracks do
-                    normMapDirect[i] = {profile = bulkProfile, targetPeak = bulkPeak}
+                    if not hasNormSel or selectedRows[string.format("n%d", i)] then
+                        normMapDirect[i] = {profile = bulkProfile, targetPeak = bulkPeak}
+                    end
                 end
             end
             
@@ -7648,22 +7724,69 @@ local function drawUI_body()
         local flags = r.ImGui_TableFlags_Borders() | r.ImGui_TableFlags_RowBg() | 
                       r.ImGui_TableFlags_Resizable() | r.ImGui_TableFlags_ScrollY()
         
-        if r.ImGui_BeginTable(ctx, "tracktable", 4, flags, 0, table_height) then
-            r.ImGui_TableSetupColumn(ctx, "Track Name")
+        if r.ImGui_BeginTable(ctx, "tracktable", 5, flags, 0, table_height) then
             local COLFIX = r.ImGui_TableColumnFlags_WidthFixed()
+            r.ImGui_TableSetupColumn(ctx, "Sel", COLFIX, 25.0)
+            r.ImGui_TableSetupColumn(ctx, "Track Name")
             r.ImGui_TableSetupColumn(ctx, "Profile", COLFIX, 120.0)
             r.ImGui_TableSetupColumn(ctx, "Peak dB", COLFIX, 80.0)
             r.ImGui_TableSetupColumn(ctx, "x", COLFIX, 40.0)
             r.ImGui_TableSetupScrollFreeze(ctx, 0, 1)
             r.ImGui_TableHeadersRow(ctx)
+
+            -- Sel header: toggle all
+            r.ImGui_TableSetColumnIndex(ctx, 0)
+            if r.ImGui_Selectable(ctx, "Sel##norm_header", false) then
+                local anySelected = false
+                for i = 1, #tracks do
+                    if selectedRows[string.format("n%d", i)] then anySelected = true; break end
+                end
+                if anySelected then
+                    for i = 1, #tracks do selectedRows[string.format("n%d", i)] = nil end
+                else
+                    for i = 1, #tracks do selectedRows[string.format("n%d", i)] = true end
+                end
+            end
             
             local toRemove = nil
             
             for i, trackData in ipairs(tracks) do
                 r.ImGui_TableNextRow(ctx)
-                
+
+                -- Column 0: Sel checkbox
                 r.ImGui_TableSetColumnIndex(ctx, 0)
-                
+                local rowID = string.format("n%d", i)
+                local isSelected = selectedRows[rowID] or false
+                local selChanged, selVal = r.ImGui_Checkbox(ctx, "##nsel_" .. i, isSelected)
+
+                if r.ImGui_IsItemHovered(ctx, r.ImGui_HoveredFlags_AllowWhenBlockedByActiveItem()) then
+                    if dragState.sel == nil and r.ImGui_IsMouseClicked(ctx, r.ImGui_MouseButton_Left()) then
+                        dragState.sel = not isSelected
+                        selectedRows[rowID] = dragState.sel or nil
+                        dragState.lastClicked = rowID
+                    elseif dragState.sel ~= nil and dragState.sel ~= isSelected then
+                        selectedRows[rowID] = dragState.sel or nil
+                    end
+                end
+
+                if selChanged then
+                    local shiftDown = r.ImGui_IsKeyDown(ctx, r.ImGui_Key_LeftShift()) or r.ImGui_IsKeyDown(ctx, r.ImGui_Key_RightShift())
+                    if shiftDown and dragState.lastClicked and dragState.lastClicked ~= rowID then
+                        local lastIdx = tonumber(dragState.lastClicked:match("n(%d+)"))
+                        if lastIdx then
+                            local from = math.min(lastIdx, i)
+                            local to = math.max(lastIdx, i)
+                            for idx = from, to do selectedRows[string.format("n%d", idx)] = true end
+                        end
+                    else
+                        if dragState.sel == nil then selectedRows[rowID] = selVal or nil end
+                    end
+                    dragState.lastClicked = rowID
+                end
+
+                -- Column 1: Track Name + color swatch
+                r.ImGui_TableSetColumnIndex(ctx, 1)
+
                 -- Color swatch
                 do
                     local rgb = effective_rgb24(trackData.track)
@@ -7676,13 +7799,13 @@ local function drawUI_body()
                     r.ImGui_Dummy(ctx, swh + 8, swh + 2)
                     r.ImGui_SameLine(ctx, 0)
                 end
-                
+
                 r.ImGui_Text(ctx, trackData.name)
-                if r.ImGui_IsItemHovered(ctx) then 
-                    r.ImGui_SetTooltip(ctx, trackData.name) 
+                if r.ImGui_IsItemHovered(ctx) then
+                    r.ImGui_SetTooltip(ctx, trackData.name)
                 end
-                
-                r.ImGui_TableSetColumnIndex(ctx, 1)
+
+                r.ImGui_TableSetColumnIndex(ctx, 2)
                 normMapDirect[i] = normMapDirect[i] or {profile = "-", targetPeak = -6}
                 
                 local allProfilesTable = {"-"}
@@ -7694,26 +7817,56 @@ local function drawUI_body()
                 if r.ImGui_BeginCombo(ctx, "##norm_profile_" .. i, normMapDirect[i].profile) then
                     for _, profileName in ipairs(allProfilesTable) do
                         if r.ImGui_Selectable(ctx, profileName, normMapDirect[i].profile == profileName) then
-                            normMapDirect[i].profile = profileName
-                            if profileName ~= "-" then
-                                local profile = getProfileByName(profileName)
-                                if profile and profile.defaultPeak then
-                                    normMapDirect[i].targetPeak = profile.defaultPeak
+                            -- Apply to all selected rows if multi-select active
+                            local hasMulti = false
+                            for _ in pairs(selectedRows) do hasMulti = true; break end
+                            if hasMulti and selectedRows[rowID] then
+                                for si = 1, #tracks do
+                                    if selectedRows[string.format("n%d", si)] then
+                                        normMapDirect[si] = normMapDirect[si] or {profile = "-", targetPeak = -6}
+                                        normMapDirect[si].profile = profileName
+                                        if profileName ~= "-" then
+                                            local profile = getProfileByName(profileName)
+                                            if profile and profile.defaultPeak then
+                                                normMapDirect[si].targetPeak = profile.defaultPeak
+                                            end
+                                        end
+                                    end
+                                end
+                            else
+                                normMapDirect[i].profile = profileName
+                                if profileName ~= "-" then
+                                    local profile = getProfileByName(profileName)
+                                    if profile and profile.defaultPeak then
+                                        normMapDirect[i].targetPeak = profile.defaultPeak
+                                    end
                                 end
                             end
                         end
                     end
                     r.ImGui_EndCombo(ctx)
                 end
-                
-                r.ImGui_TableSetColumnIndex(ctx, 2)
+
+                r.ImGui_TableSetColumnIndex(ctx, 3)
                 r.ImGui_SetNextItemWidth(ctx, -1)
                 local peakChanged, peakVal = r.ImGui_InputInt(ctx, "##norm_peak_" .. i, normMapDirect[i].targetPeak)
                 if peakChanged then
-                    normMapDirect[i].targetPeak = peakVal
+                    -- Apply peak to all selected if multi-select active
+                    local hasMulti = false
+                    for _ in pairs(selectedRows) do hasMulti = true; break end
+                    if hasMulti and selectedRows[rowID] then
+                        for si = 1, #tracks do
+                            if selectedRows[string.format("n%d", si)] then
+                                normMapDirect[si] = normMapDirect[si] or {profile = "-", targetPeak = -6}
+                                normMapDirect[si].targetPeak = peakVal
+                            end
+                        end
+                    else
+                        normMapDirect[i].targetPeak = peakVal
+                    end
                 end
-                
-                r.ImGui_TableSetColumnIndex(ctx, 3)
+
+                r.ImGui_TableSetColumnIndex(ctx, 4)
                 if r.ImGui_Button(ctx, "X##norm_" .. i) then
                     toRemove = i
                 end
@@ -7726,17 +7879,22 @@ local function drawUI_body()
                 table.remove(normMapDirect, toRemove)
             end
         end
-        
+
+        -- Clear drag state when mouse released (same pattern as Import mode)
+        if r.ImGui_IsMouseReleased(ctx, r.ImGui_MouseButton_Left()) then
+            if dragState.sel ~= nil then dragState.sel = nil end
+        end
+
         r.ImGui_Separator(ctx)
 
-        -- Normalization options (horizontal)
-        local changed, val = r.ImGui_Checkbox(ctx, "New lane", settings.createNewLane)
+        -- Normalization options (same labels as Import+Normalize mode)
+        local changed, val = r.ImGui_Checkbox(ctx, "Import to new lane", settings.createNewLane)
         if changed then
             settings.createNewLane = val
             saveIni()
         end
         r.ImGui_SameLine(ctx)
-        changed, val = r.ImGui_Checkbox(ctx, "Per region", settings.processPerRegion)
+        changed, val = r.ImGui_Checkbox(ctx, "Normalize per region", settings.processPerRegion)
         if changed then
             settings.processPerRegion = val
             saveIni()
@@ -7764,9 +7922,13 @@ local function drawUI_body()
         end
         r.ImGui_TextColored(ctx, theme.text_dim, string.format("%d tracks | %d to normalize", #tracks, normCount))
 
-        local win_w = r.ImGui_GetWindowWidth(ctx)
-        r.ImGui_SameLine(ctx, win_w - 170)
-        if r.ImGui_Button(ctx, "Normalize##norm") then
+        local fp = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_FramePadding())
+        local isp = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_ItemSpacing())
+        local wp = r.ImGui_GetStyleVar(ctx, r.ImGui_StyleVar_WindowPadding())
+        local actionW = r.ImGui_CalcTextSize(ctx, "Normalize") + fp * 2
+        local clW = r.ImGui_CalcTextSize(ctx, "Close") + fp * 2
+        r.ImGui_SameLine(ctx, r.ImGui_GetWindowWidth(ctx) - actionW - clW - isp - wp)
+        if r.ImGui_Button(ctx, "Normalize##norm", actionW) then
             doNormalizeDirectly()
         end
         r.ImGui_SameLine(ctx)
@@ -8192,52 +8354,33 @@ local function drawSettingsWindow()
             end
             
             -- TAB: UI Settings
-            if r.ImGui_BeginTabItem(ctx, "UI") then
-                r.ImGui_TextWrapped(ctx, "Customize UI appearance.")
+            if r.ImGui_BeginTabItem(ctx, "General") then
+                -- UI section
+                r.ImGui_Text(ctx, "UI:")
                 r.ImGui_Separator(ctx)
-                
+
                 local changed, newSize = r.ImGui_SliderInt(ctx, "Swatch Size", settings.swatch_size, 8, 24)
                 if changed then
                     settings.swatch_size = newSize
                     saveIni()
                 end
-                
+
                 r.ImGui_Spacing(ctx)
-                r.ImGui_Separator(ctx)
-                r.ImGui_Text(ctx, "Debugging:")
-                
                 local ch, val = r.ImGui_Checkbox(ctx, "Enable console logging", settings.enableConsoleLogging)
                 if ch then
                     settings.enableConsoleLogging = val
                     saveIni()
                 end
-                
                 if settings.enableConsoleLogging then
                     r.ImGui_SameLine(ctx)
                     r.ImGui_TextDisabled(ctx, "(Shows detailed output in REAPER console)")
                 end
-                
-                r.ImGui_EndTabItem(ctx)
-            end
-            
-            -- TAB: Save/Load
-            if r.ImGui_BeginTabItem(ctx, "Save/Load") then
-                r.ImGui_TextWrapped(ctx, "Manage presets and session data.")
+
+                r.ImGui_Spacing(ctx)
+
+                -- Save/Load section
+                r.ImGui_Text(ctx, "Preset Management:")
                 r.ImGui_Separator(ctx)
-                
-                r.ImGui_Text(ctx, "Profile Sync:")
-                if r.ImGui_Button(ctx, "Copy Profiles from Little Joe") then
-                    copyProfilesFromLittleJoe()
-                end
-                if r.ImGui_IsItemHovered(ctx) then
-                    r.ImGui_SetTooltip(ctx, 
-                        "Imports Profiles + Profile Aliases from\n" ..
-                        "Little_Joe.ini"
-                    )
-                end
-                
-                r.ImGui_Separator(ctx)
-                r.ImGui_Text(ctx, "Preset Management (.ini file):")
                 if r.ImGui_Button(ctx, "Export Settings.ini") then
                     exportIni()
                 end
@@ -8245,10 +8388,11 @@ local function drawSettingsWindow()
                 if r.ImGui_Button(ctx, "Import Settings.ini") then
                     importIni()
                 end
-                
-                r.ImGui_Separator(ctx)
+
+                r.ImGui_Spacing(ctx)
                 r.ImGui_Text(ctx, "Session Data (ExtState):")
-                
+                r.ImGui_Separator(ctx)
+
                 if r.ImGui_Button(ctx, "Save protected locks") then
                     saveProtected()
                 end
@@ -8260,10 +8404,10 @@ local function drawSettingsWindow()
                 if r.ImGui_Button(ctx, "Save Keep-name set") then
                     saveKeep()
                 end
-                
-                r.ImGui_Separator(ctx)
-                r.ImGui_Text(ctx, "Current .ini: " .. getIniPath())
-                
+
+                r.ImGui_Spacing(ctx)
+                r.ImGui_TextDisabled(ctx, "INI: " .. getIniPath())
+
                 r.ImGui_EndTabItem(ctx)
             end
             
@@ -9202,6 +9346,47 @@ Mix and match for your workflow:
             if r.ImGui_BeginTabItem(ctx, "Changelog") then
                 r.ImGui_TextWrapped(ctx, [[
 VERSION HISTORY
+
+--------------------------------------------------------------------
+
+v2.7 (March 2026)
+
+UI:
+ Sel column in Normalize-only mode (multi-select, drag-to-paint, Shift-range)
+ "Set all to" bulk action bar in all modes (applies to selected or all)
+ "Calibrate" button in header bar when Normalize is active
+ Multi-select profile/peak changes apply to all selected rows
+ Settings tabs consolidated: UI + Save/Load merged into "General"
+ Keep Name / Keep FX columns narrower
+ Removed "Reload Tracks" button from Normalize-only mode
+ Auto-match Profiles button styled consistently across modes
+ Consistent footer layout across all modes (same button positions)
+ Normalize options use same labels in all modes
+ Footer options on single line (Delete unused, Copy media, Normalize options)
+ Removed Little Joe profile sync from Settings
+
+--------------------------------------------------------------------
+
+v2.6 (February 2026)
+
+Drag & Drop:
+ Drag .rpp and audio files from OS file manager onto main window
+ Auto-classification by file extension
+ Visual hover feedback (indigo accent border)
+ Auto-match on drop
+ Multiple .rpp files auto-switch to Multi-RPP mode
+
+Live Template Sync:
+ Auto-detect template track changes (add/remove/rename)
+ Smart rebuild preserving all existing mappings
+ Throttled fingerprint check (~2x/sec)
+
+Single-RPP Markers/Tempo:
+ Import markers/regions/tempo from source RPP via checkbox on commit
+
+Bug Fixes:
+ Fixed nameless region import (position-based pairing)
+ Fixed multi-RPP automation merge (chunk-based envelope extraction)
 
 --------------------------------------------------------------------
 
