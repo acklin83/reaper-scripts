@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="1e17ea59a374b090ca561f6da124802d788382ed">
+<index version="1" name="Frank Acklin Scripts" commit="0b1f9e29424573218501692a51e15113e8807824">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -88,6 +88,44 @@ Consistent footer layout across all modes
 Keep Name / Keep FX columns narrower
 Removed Little Joe profile sync]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/1e17ea59a374b090ca561f6da124802d788382ed/RAPID/RAPID.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="TotalReaper">
+    <reapack name="TotalReaper.ext" type="extension" desc="TotalReaper">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 TotalReaper\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 REAPER \u8596 ? RME TotalMix FX Global OSC bridge. Turns RME interfaces (UFX+ family) into a fully DAW-controlled hardware console \u8212- mic gain, 48V phantom, pad, phase, submix sends, all driven from REAPER tracks via TotalMix FX 2.1's Global OSC protocol.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\i In Erinnerung an ASIO Direct Monitoring in Samplitude.}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 What it does\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Routing mirror}: REAPER track volume / mute / pan \u8594 ? TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Per-track preamp control} as REAPER actions: gain \u177 ?1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert. Multi-select.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Stereo input handling}: stereo-linked TotalMix pairs and 2-mono splits both work correctly \u8212- TotalMix's own balance handling is preserved.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6 or later (tested through 7.71)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings \u8594 ? OSC \u8594 ? Compatibility Mode \u8594 ? Global OSC)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab RME interface that supports Global OSC (UFX+, UCX II, etc.)\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Out of scope\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 TotalMix-internal effects (channel EQ, dynamics, room EQ, FX send/return) \u8212- those stay in TotalMix.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 After install\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Find all actions in REAPER's Action List by typing "TotalReaper". Run {\b TotalReaper: Toggle Routing Mirror} to engage.\par}
+}
+]]></description>
+        <link rel="website" href="https://github.com/acklin83/totalreaper">GitHub</link>
+        <link rel="website" href="https://github.com/acklin83/totalreaper/issues">Issue tracker</link>
+      </metadata>
+      <version name="0.1.4" author="Frank Acklin" time="2026-05-06T17:28:11Z">
+        <changelog><![CDATA[Use REAPERAPI_MINIMAL so the plugin loads on REAPER older than the SDK pin
+Static-link the MSVC runtime on Windows (no VC++ Redistributable required)
+Pin macOS deployment target to 11.0 (Big Sur) for arm64 + older Intel coverage
+Fix stereo monitoring: skip balpan on stereo inputs, enforce B_MAINSEND every tick]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.4/reaper_totalreaper-arm64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.4/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
