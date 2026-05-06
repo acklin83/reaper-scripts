@@ -1,0 +1,41 @@
+@description TotalReaper
+@author Frank Acklin
+@version 0.1.4
+@changelog
+  Use REAPERAPI_MINIMAL so the plugin loads on REAPER older than the SDK pin
+  Static-link the MSVC runtime on Windows (no VC++ Redistributable required)
+  Pin macOS deployment target to 11.0 (Big Sur) for arm64 + older Intel coverage
+  Fix stereo monitoring: skip balpan on stereo inputs, enforce B_MAINSEND every tick
+@provides
+  [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
+  [win64] reaper_totalreaper.dll https://github.com/acklin83/totalreaper/releases/download/v$version/$path
+@link
+  GitHub https://github.com/acklin83/totalreaper
+  Issue tracker https://github.com/acklin83/totalreaper/issues
+@about
+  # TotalReaper
+
+  REAPER ↔ RME TotalMix FX Global OSC bridge. Turns RME interfaces (UFX+ family) into a fully DAW-controlled hardware console — mic gain, 48V phantom, pad, phase, submix sends, all driven from REAPER tracks via TotalMix FX 2.1's Global OSC protocol.
+
+  *In Erinnerung an ASIO Direct Monitoring in Samplitude.*
+
+  ## What it does
+
+  - **Routing mirror**: REAPER track volume / mute / pan → TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.
+  - **Track-to-track sends** are walked recursively and projected onto TotalMix routings on every hardware-output destination — cue mixes, headphone sends, etc.
+  - **Per-track preamp control** as REAPER actions: gain ±1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert. Multi-select.
+  - **Stereo input handling**: stereo-linked TotalMix pairs and 2-mono splits both work correctly — TotalMix's own balance handling is preserved.
+
+  ## Requirements
+
+  - REAPER 6 or later (tested through 7.71)
+  - TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings → OSC → Compatibility Mode → Global OSC)
+  - RME interface that supports Global OSC (UFX+, UCX II, etc.)
+
+  ## Out of scope
+
+  TotalMix-internal effects (channel EQ, dynamics, room EQ, FX send/return) — those stay in TotalMix.
+
+  ## After install
+
+  Find all actions in REAPER's Action List by typing "TotalReaper". Run **TotalReaper: Toggle Routing Mirror** to engage.
