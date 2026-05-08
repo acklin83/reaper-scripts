@@ -16,6 +16,8 @@ ReaPack repository for REAPER scripts by Frank Acklin.
 ### RAPID
 Recording Auto-Placement & Intelligent Dynamics — automates track mapping, media import, and LUFS normalization.
 
+### TotalReaper
+Direct Hardware Monitoring for Reaper with RME Devices (needs at least TotalMix 2.10 Alpha 4 with Global OSC Support.
 
 ## License
 
