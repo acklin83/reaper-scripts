@@ -1,7 +1,10 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.6
+@version 0.1.7
 @changelog
+  Add Toggle Talkback action (drives /controlroom/talkback)
+  Add Toggle AutoLevel on selected tracks (TotalMix rides input gain automatically — useful for unattended sound-check gain-staging)
+  Add Save / Load TotalMix snapshot for current project (uses snapshot slot 8 by convention; slots 1-7 stay user-controlled)
   Seed TotalMix state cache on Routing Mirror enable (sends /sendall) so preamp gain ±1 dB actions work immediately on fresh tracks instead of needing a manual gain wiggle in TotalMix first
   Add macOS Intel (x86_64) build alongside Apple Silicon
   Use REAPERAPI_MINIMAL so the plugin loads on REAPER older than the SDK pin
