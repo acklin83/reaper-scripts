@@ -1,13 +1,16 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.4
+@version 0.1.6
 @changelog
+  Seed TotalMix state cache on Routing Mirror enable (sends /sendall) so preamp gain ±1 dB actions work immediately on fresh tracks instead of needing a manual gain wiggle in TotalMix first
+  Add macOS Intel (x86_64) build alongside Apple Silicon
   Use REAPERAPI_MINIMAL so the plugin loads on REAPER older than the SDK pin
   Static-link the MSVC runtime on Windows (no VC++ Redistributable required)
   Pin macOS deployment target to 11.0 (Big Sur) for arm64 + older Intel coverage
   Fix stereo monitoring: skip balpan on stereo inputs, enforce B_MAINSEND every tick
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
+  [darwin-x86_64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [win64] reaper_totalreaper.dll https://github.com/acklin83/totalreaper/releases/download/v$version/$path
 @link
   GitHub https://github.com/acklin83/totalreaper
