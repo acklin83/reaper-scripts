@@ -127,6 +127,12 @@ Fix stereo monitoring: skip balpan on stereo inputs, enforce B_MAINSEND every ti
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.4/reaper_totalreaper-arm64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.4/reaper_totalreaper.dll</source>
       </version>
+      <version name="0.1.5" author="Frank Acklin" time="2026-05-08T07:38:54Z">
+        <changelog><![CDATA[Add darwin-x86_64 build]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.5/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin-x86_64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.5/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.5/reaper_totalreaper.dll</source>
+      </version>
     </reapack>
   </category>
 </index>
