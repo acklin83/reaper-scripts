@@ -1,11 +1,8 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.8
+@version 0.1.9
 @changelog
-  Add Toggle 2-Way Control — TotalMix fader/balpan moves now drive the matching REAPER track volume/pan (and direct send vol/pan) when enabled alongside the Routing Mirror. Echo-suppression keeps the loop stable.
-  Add Toggle Auto-Talkback on Stop — drives /controlroom/talkback from REAPER's transport: stop/pause opens talkback, play/record closes it. Toggling on while stopped opens immediately; toggling off closes it.
-  Replace single-slot snapshot save/load with one action per TotalMix snapshot slot (Save/Load TotalMix Snapshot Slot 1…8) so each slot can have its own keybinding.
-  Remove Send Test Mute Input 1 (superseded by Toggle OSC Dump for sanity checking)
+  Fix 2-Way Control snapping REAPER faders to -inf when Routing Mirror is toggled on. /sendall was firing before the REAPER→TotalMix push completed, so the empty TotalMix state came back and 2-Way wrote it into REAPER. Push now happens first; a brief priming window after push absorbs /sendall echoes without disturbing track state.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
