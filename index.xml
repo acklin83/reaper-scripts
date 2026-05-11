@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="5e99ceeb2ebeb9f7f0c72535e5c9951ed3adec40">
+<index version="1" name="Frank Acklin Scripts" commit="756a4f3e092b8234a430ff85718126f5ca146bfc">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -137,6 +137,12 @@ Remove Send Test Mute Input 1 (superseded by Toggle OSC Dump for sanity checking
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.8/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.8/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.8/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.1.9" author="Frank Acklin" time="2026-05-11T12:26:56Z">
+        <changelog><![CDATA[Fix 2-Way Control snapping REAPER faders to -inf when Routing Mirror is toggled on. /sendall was firing before the REAPER→TotalMix push completed, so the empty TotalMix state came back and 2-Way wrote it into REAPER. Push now happens first; a brief priming window after push absorbs /sendall echoes without disturbing track state.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.9/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.9/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.9/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
