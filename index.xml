@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="0b1f9e29424573218501692a51e15113e8807824">
+<index version="1" name="Frank Acklin Scripts" commit="5e99ceeb2ebeb9f7f0c72535e5c9951ed3adec40">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -103,8 +103,10 @@ Removed Little Joe profile sync]]></changelog>
 {\pard \ql \f0 \sa180 \li0 \fi0 {\i In Erinnerung an ASIO Direct Monitoring in Samplitude.}\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 What it does\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Routing mirror}: REAPER track volume / mute / pan \u8594 ? TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b 2-Way Control}: optional reverse direction \u8212- TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Per-track preamp control} as REAPER actions: gain \u177 ?1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert. Multi-select.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Per-track preamp control} as REAPER actions: gain \u177 ?1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Studio actions}: Toggle Talkback, Toggle Auto-Talkback on Stop (drives talkback from REAPER's transport state), Save/Load TotalMix Snapshot Slot 1\u8230 ?8.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Stereo input handling}: stereo-linked TotalMix pairs and 2-mono splits both work correctly \u8212- TotalMix's own balance handling is preserved.\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6 or later (tested through 7.71)\par}
@@ -126,6 +128,15 @@ Pin macOS deployment target to 11.0 (Big Sur) for arm64 + older Intel coverage
 Fix stereo monitoring: skip balpan on stereo inputs, enforce B_MAINSEND every tick]]></changelog>
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.4/reaper_totalreaper-arm64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.4/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.1.8" author="Frank Acklin" time="2026-05-11T12:02:28Z">
+        <changelog><![CDATA[Add Toggle 2-Way Control — TotalMix fader/balpan moves now drive the matching REAPER track volume/pan (and direct send vol/pan) when enabled alongside the Routing Mirror. Echo-suppression keeps the loop stable.
+Add Toggle Auto-Talkback on Stop — drives /controlroom/talkback from REAPER's transport: stop/pause opens talkback, play/record closes it. Toggling on while stopped opens immediately; toggling off closes it.
+Replace single-slot snapshot save/load with one action per TotalMix snapshot slot (Save/Load TotalMix Snapshot Slot 1…8) so each slot can have its own keybinding.
+Remove Send Test Mute Input 1 (superseded by Toggle OSC Dump for sanity checking)]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.8/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.8/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.8/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
