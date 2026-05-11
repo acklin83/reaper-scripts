@@ -1,16 +1,11 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.7
+@version 0.1.8
 @changelog
-  Add Toggle Talkback action (drives /controlroom/talkback)
-  Add Toggle AutoLevel on selected tracks (TotalMix rides input gain automatically — useful for unattended sound-check gain-staging)
-  Add Save / Load TotalMix snapshot for current project (uses snapshot slot 8 by convention; slots 1-7 stay user-controlled)
-  Seed TotalMix state cache on Routing Mirror enable (sends /sendall) so preamp gain ±1 dB actions work immediately on fresh tracks instead of needing a manual gain wiggle in TotalMix first
-  Add macOS Intel (x86_64) build alongside Apple Silicon
-  Use REAPERAPI_MINIMAL so the plugin loads on REAPER older than the SDK pin
-  Static-link the MSVC runtime on Windows (no VC++ Redistributable required)
-  Pin macOS deployment target to 11.0 (Big Sur) for arm64 + older Intel coverage
-  Fix stereo monitoring: skip balpan on stereo inputs, enforce B_MAINSEND every tick
+  Add Toggle 2-Way Control — TotalMix fader/balpan moves now drive the matching REAPER track volume/pan (and direct send vol/pan) when enabled alongside the Routing Mirror. Echo-suppression keeps the loop stable.
+  Add Toggle Auto-Talkback on Stop — drives /controlroom/talkback from REAPER's transport: stop/pause opens talkback, play/record closes it. Toggling on while stopped opens immediately; toggling off closes it.
+  Replace single-slot snapshot save/load with one action per TotalMix snapshot slot (Save/Load TotalMix Snapshot Slot 1…8) so each slot can have its own keybinding.
+  Remove Send Test Mute Input 1 (superseded by Toggle OSC Dump for sanity checking)
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin-x86_64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
@@ -28,8 +23,10 @@
   ## What it does
 
   - **Routing mirror**: REAPER track volume / mute / pan → TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.
+  - **2-Way Control**: optional reverse direction — TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.
   - **Track-to-track sends** are walked recursively and projected onto TotalMix routings on every hardware-output destination — cue mixes, headphone sends, etc.
-  - **Per-track preamp control** as REAPER actions: gain ±1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert. Multi-select.
+  - **Per-track preamp control** as REAPER actions: gain ±1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.
+  - **Studio actions**: Toggle Talkback, Toggle Auto-Talkback on Stop (drives talkback from REAPER's transport state), Save/Load TotalMix Snapshot Slot 1…8.
   - **Stereo input handling**: stereo-linked TotalMix pairs and 2-mono splits both work correctly — TotalMix's own balance handling is preserved.
 
   ## Requirements
