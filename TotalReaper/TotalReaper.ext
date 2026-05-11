@@ -8,7 +8,7 @@
   Remove Send Test Mute Input 1 (superseded by Toggle OSC Dump for sanity checking)
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
-  [darwin-x86_64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
+  [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [win64] reaper_totalreaper.dll https://github.com/acklin83/totalreaper/releases/download/v$version/$path
 @link
   GitHub https://github.com/acklin83/totalreaper
