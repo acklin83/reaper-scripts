@@ -1,8 +1,10 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.9
+@version 0.1.10
 @changelog
-  Fix 2-Way Control snapping REAPER faders to -inf when Routing Mirror is toggled on. /sendall was firing before the REAPER→TotalMix push completed, so the empty TotalMix state came back and 2-Way wrote it into REAPER. Push now happens first; a brief priming window after push absorbs /sendall echoes without disturbing track state.
+  2-way mirror /input/<n>/{48v,pad,phase,gain} into track P_EXT (P_EXT:totalreaper_48v / pad / phase / gain) so any control surface or ReaScript watching the cache reflects direct changes the user makes in TotalMix's UI within one tick, not just after a REAPER-side action. Always-on regardless of 2-Way Control because preamp readbacks are metadata, not routing state.
+
+  DumpOsc toggle confirmation now logs to console in release builds — debugLog() was a no-op when NDEBUG is defined, so turning the dump on or off gave no visible feedback in shipped binaries.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
