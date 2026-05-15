@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="756a4f3e092b8234a430ff85718126f5ca146bfc">
+<index version="1" name="Frank Acklin Scripts" commit="8b497873a9ce49ba0ca335dd70242f4b6c81b23d">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -143,6 +143,14 @@ Remove Send Test Mute Input 1 (superseded by Toggle OSC Dump for sanity checking
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.9/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.9/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.9/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.1.10" author="Frank Acklin" time="2026-05-15T20:32:08Z">
+        <changelog><![CDATA[2-way mirror /input/<n>/{48v,pad,phase,gain} into track P_EXT (P_EXT:totalreaper_48v / pad / phase / gain) so any control surface or ReaScript watching the cache reflects direct changes the user makes in TotalMix's UI within one tick, not just after a REAPER-side action. Always-on regardless of 2-Way Control because preamp readbacks are metadata, not routing state.
+
+DumpOsc toggle confirmation now logs to console in release builds — debugLog() was a no-op when NDEBUG is defined, so turning the dump on or off gave no visible feedback in shipped binaries.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.10/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.10/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.10/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
