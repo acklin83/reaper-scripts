@@ -33,6 +33,7 @@
   - REAPER 6 or later (tested through 7.71)
   - TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings → OSC → Compatibility Mode → Global OSC)
   - RME interface that supports Global OSC (UFX+, UCX II, etc.)
+  - **TotalMix Settings → OSC → Details… → "Receive to hidden channels" must be checked.** Otherwise TotalMix silently drops fader writes for any input row or output column not in the current layout — the routing mirror appears dead even though TotalReaper is sending correctly. Some TotalMix versions default this OFF.
 
   ## Out of scope
 
