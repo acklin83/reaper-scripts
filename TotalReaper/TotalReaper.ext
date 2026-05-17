@@ -1,7 +1,15 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.11
+@version 0.1.12
 @changelog
+  Routing mirror: only one REAPER track per hardware input now drives the TotalMix matrix cells (the first rec-armed + monitoring track, falling back to the first monitor-only track). Previously every monitoring track that shared an input pushed its own gain values, producing visible fader jitter during slow send moves and breaking mute semantics: send-mute and channel-mute didn't reach TotalMix because other tracks' non-∞ writes overwrote the -∞ close-out within the same Run() tick.
+
+  Routing mirror: channel-mute (REAPER track B_MUTE) now drives the owned matrix cells to -∞ on every walked bus, matching the behaviour of monitor-off.
+
+  Routing mirror: tick-level TX dedupe — each Run() tick now emits at most one /mix/in/<hwIdx>/<bus>/fader and /balpan per cell. Fixes rapid-fire 4-5 writes per cell per tick that landed during fader moves with multiple tracks on the same input.
+
+  Toggle OSC Dump: now also logs outgoing (TX) messages, not just incoming (RX). Used to surface the duplicate-push pattern that motivated the dedupe and primary-owner fix.
+
   Routing mirror: the source track's REAPER pan is now composed into every walked HW-routed bus, not just the main monitor. Headphone cues and other downstream HW outs follow the REAPER pan instead of staying centred.
 
   Routing mirror: clear the per-bus send-routing cache when a track's I_RECINPUT is reassigned. Without the wipe, the new input's matrix cells on every walked bus stayed at -inf until something else perturbed the state — phones now follow input-channel changes immediately, no rec-arm toggle required.
