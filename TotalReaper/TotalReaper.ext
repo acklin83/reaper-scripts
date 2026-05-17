@@ -1,10 +1,12 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.10
+@version 0.1.11
 @changelog
-  2-way mirror /input/<n>/{48v,pad,phase,gain} into track P_EXT (P_EXT:totalreaper_48v / pad / phase / gain) so any control surface or ReaScript watching the cache reflects direct changes the user makes in TotalMix's UI within one tick, not just after a REAPER-side action. Always-on regardless of 2-Way Control because preamp readbacks are metadata, not routing state.
+  Routing mirror: the source track's REAPER pan is now composed into every walked HW-routed bus, not just the main monitor. Headphone cues and other downstream HW outs follow the REAPER pan instead of staying centred.
 
-  DumpOsc toggle confirmation now logs to console in release builds — debugLog() was a no-op when NDEBUG is defined, so turning the dump on or off gave no visible feedback in shipped binaries.
+  Routing mirror: clear the per-bus send-routing cache when a track's I_RECINPUT is reassigned. Without the wipe, the new input's matrix cells on every walked bus stayed at -inf until something else perturbed the state — phones now follow input-channel changes immediately, no rec-arm toggle required.
+
+  README: document the "Receive to hidden channels" requirement in TotalMix's OSC Details settings. Without it TotalMix silently drops `/mix/in/<n>/<bus>/fader` writes for any channel not in the current layout — the routing mirror appears completely dead even though TotalReaper is sending correctly.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
