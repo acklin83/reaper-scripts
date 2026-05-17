@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="03550afe6074f2d1552eb111728b896bdf769c6a">
+<index version="1" name="Frank Acklin Scripts" commit="e2e8cf8c02c8abd4800c585447237126d21835f3">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -162,6 +162,24 @@ README: document the "Receive to hidden channels" requirement in TotalMix's OSC 
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.11/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.11/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.11/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.1.12" author="Frank Acklin" time="2026-05-17T16:58:19Z">
+        <changelog><![CDATA[Routing mirror: only one REAPER track per hardware input now drives the TotalMix matrix cells (the first rec-armed + monitoring track, falling back to the first monitor-only track). Previously every monitoring track that shared an input pushed its own gain values, producing visible fader jitter during slow send moves and breaking mute semantics: send-mute and channel-mute didn't reach TotalMix because other tracks' non-∞ writes overwrote the -∞ close-out within the same Run() tick.
+
+Routing mirror: channel-mute (REAPER track B_MUTE) now drives the owned matrix cells to -∞ on every walked bus, matching the behaviour of monitor-off.
+
+Routing mirror: tick-level TX dedupe — each Run() tick now emits at most one /mix/in/<hwIdx>/<bus>/fader and /balpan per cell. Fixes rapid-fire 4-5 writes per cell per tick that landed during fader moves with multiple tracks on the same input.
+
+Toggle OSC Dump: now also logs outgoing (TX) messages, not just incoming (RX). Used to surface the duplicate-push pattern that motivated the dedupe and primary-owner fix.
+
+Routing mirror: the source track's REAPER pan is now composed into every walked HW-routed bus, not just the main monitor. Headphone cues and other downstream HW outs follow the REAPER pan instead of staying centred.
+
+Routing mirror: clear the per-bus send-routing cache when a track's I_RECINPUT is reassigned. Without the wipe, the new input's matrix cells on every walked bus stayed at -inf until something else perturbed the state — phones now follow input-channel changes immediately, no rec-arm toggle required.
+
+README: document the "Receive to hidden channels" requirement in TotalMix's OSC Details settings. Without it TotalMix silently drops `/mix/in/<n>/<bus>/fader` writes for any channel not in the current layout — the routing mirror appears completely dead even though TotalReaper is sending correctly.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.12/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.12/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.12/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
