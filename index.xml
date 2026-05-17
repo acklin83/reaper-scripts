@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="8b497873a9ce49ba0ca335dd70242f4b6c81b23d">
+<index version="1" name="Frank Acklin Scripts" commit="22a077179d1e833f05160066607d2cf6af8022cc">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -111,7 +111,8 @@ Removed Little Joe profile sync]]></changelog>
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6 or later (tested through 7.71)\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings \u8594 ? OSC \u8594 ? Compatibility Mode \u8594 ? Global OSC)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab RME interface that supports Global OSC (UFX+, UCX II, etc.)\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab RME interface that supports Global OSC (UFX+, UCX II, etc.)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b TotalMix Settings \u8594 ? OSC \u8594 ? Details\u8230 ? \u8594 ? "Receive to hidden channels" must be checked.} Otherwise TotalMix silently drops fader writes for any input row or output column not in the current layout \u8212- the routing mirror appears dead even though TotalReaper is sending correctly. Some TotalMix versions default this OFF.\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Out of scope\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 TotalMix-internal effects (channel EQ, dynamics, room EQ, FX send/return) \u8212- those stay in TotalMix.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 After install\par}
