@@ -1,0 +1,52 @@
+@description Rea-Sixty
+@author Frank Acklin
+@version 0.1.1
+@changelog
+  Windows: libusb + hidapi now live in UserPlugins alongside reaper_rea-sixty.dll (delay-load + AddDllDirectory). No more manual placement next to reaper.exe.
+  Linux: udev rule installer button in Settings -> About (one pkexec prompt, same UX as the Windows WinUSB-installer).
+  ReaPack support for all three platforms.
+@provides
+  [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [darwin-arm64] libhidapi.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [win64] reaper_rea-sixty.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [win64] libusb-1.0.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [win64] hidapi.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [linux64] reaper_rea-sixty.so https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+@link
+  GitHub https://github.com/acklin83/Rea-Sixty
+  Issue tracker https://github.com/acklin83/Rea-Sixty/issues
+  Release notes https://github.com/acklin83/Rea-Sixty/releases
+@about
+  # Rea-Sixty
+
+  REAPER extension that drives the SSL UF8 and UC1 control surfaces natively over their vendor-USB protocol. Replaces SSL 360° without requiring an SSL plug-in on every track.
+
+  ## What it does
+
+  - **DAW-layer track colours** on the UF8 scribble strips — every REAPER track shows its assigned colour, no per-track plug-in needed
+  - **Full 16-bit faders** with motor + touch
+  - **UC1 follows the focused REAPER track** and drives the SSL Channel Strip 2 / Bus Compressor 2 / 4K B/E/G / 360° Link plug-ins
+  - **UC1 GR meter** driven from the SSL plug-in itself via REAPER's PreSonus VST3 `GainReduction_dB` host extension
+  - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match — slot reorders are safe, renames break the binding)
+  - **REC + RME (TotalReaper) integration** — per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
+  - **Bindings system** — modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
+  - **Settings window** in a dockable ReaImGui context — seven tabs (Device, Bindings, Modes, FX Learn, Selection Sets, Parameter Groups, About) themed to REAPER's active theme
+
+  ## After install
+
+  Preferences -> Control/OSC/Web -> Add -> **Rea-Sixty**.
+
+  First-run setup buttons (Windows WinUSB driver + Linux udev rule) live in Settings -> About; macOS needs no extra setup.
+
+  Linux constraint: plug UF8 and UC1 into **separate** PC USB ports. Daisy-chaining (UC1 through UF8's downstream port) triggers `xhci_hcd` port-resets on Linux 6.17.
+
+  ## Requirements
+
+  - REAPER 6 or later
+  - **ReaImGui** (install separately via ReaPack) — without it the Settings window stays empty, hardware control still works
+  - SSL 360° **not running** (it claims the UF8/UC1 vendor interface exclusively)
+
+  ## Vendor relationship
+
+  Not affiliated with Solid State Logic. SSL ACP Support replied to the project author on 2026-05-18 confirming "no objections to the public, open source-project" but declined to share protocol documentation. Protocol stays self-decoded; firmware-update breakage is on the project to chase.
