@@ -1,22 +1,14 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.2
+@version 0.1.3
 @changelog
-  Device pane: three new toggles under Settings -> Device -- TCP follows UF8 selection, Show tracks hidden in TCP, Show tracks hidden in MCP (mirror REAPER's panel visibility), and Don't show offline FX (skipped by every cycle ring + the UF8 colour-bar default cursor).
+  Track-name abbreviation modes -- Settings -> Device -> Tracks adds a "Long track-name handling" combo. Default Truncate keeps the legacy 7-char cut. Smart abbreviate drops separators, then vowels after the first letter of each token, then collapses repeated consonants, then distributes the remaining char budget proportionally across tokens (short all-caps tokens like DI / FX / EQ survive). "Background Vocals" -> "BckgVcl", "Drums Bus" -> "DrmsBs". Mode switch repaints all 8 strips immediately.
 
-  SEL-Mode polish: leaving Auto SEL mode now scrolls the UF8 bank so the selected track is in view again, mirrored on Selection Set deactivation. Auto exit also reverts selset auto-arming back to Trim/Read when the Selection-Set auto-mode dropdown is engaged.
+  Reverse LED per Solo / Cut / Sel binding (FX Learn editor right-click) -- for plug-ins whose Cut/Bypass param reports 1 = inactive. Render layer XORs the LED on/off bit. Persisted per (fader-bank, strip, button).
 
-  Selset activation snaps the bank to the first channel of the set so larger sets start at strip 0.
+  Plugin Mode + This-Track Sends/Receives now keep all 8 strips addressable even when fewer than 8 REAPER tracks are visible. Strips past the bank-track count source content from the focused FX (PM) or route target (sends) instead of going blank.
 
-  Bug fix: FX/Instance Cycle dispatch swap in reasixty_dispatchSelModeCycle. With "UF8 Ch. Encoder drives Sel-Mode cycle" enabled, Instance Cycle was routing to the FX-Cycle handler and vice versa.
-
-  UF8 colour-bar follows the Channel-Encoder FX Cycle cursor through ReaEQ, ReaComp, etc. -- previously stayed pinned to the focused-domain Instance label on non-Instance landings.
-
-  UC1 carousel now shows the lone plug-in name when only one cycle target exists (or only one online target with hide-offline enabled).
-
-  Settings reorganisation: every Device control lives in the sidebar Device pane. The orphan "Device" sub-tab under Modes is gone -- its two checkboxes moved to the main Device pane. UC1 GR calibration relocated to the very bottom.
-
-  User-renamed FX instances now win over hardcoded displayShort everywhere -- primarily SSL 360 Link, where the "Link" / "L-BC" abbreviation hid what the wrapped plug-in actually was.
+  Fill sequential (right) in the FX Learn editor carries source-strip attributes onto every filled strip: faderInverted, V-Pot inverted/vpotMode/defaultNorm/stripColour, and Solo / Cut / Sel colour + Reverse LED flag. A CS-row fill no longer needs per-strip touch-ups.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
