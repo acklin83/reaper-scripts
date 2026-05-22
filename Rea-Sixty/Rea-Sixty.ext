@@ -1,12 +1,24 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.5
+@version 0.1.6
 @changelog
-  TCP / MCP follow radio (Settings -> Device -> Tracks "Surface mirrors:") replaces the three v0.1.4 visibility checkboxes (Show TCP hidden / Show MCP hidden / Hide tracks in collapsed folders). The new model defers to REAPER's IsTrackVisible(track, mixer), which folds per-track B_SHOWIN* AND ancestor folder-collapse state into one call. TCP mode (default) hides children of collapsed folders whenever REAPER's "Hide children of collapsed folders" preference is on; MCP mode mirrors the mixer's visibility. Existing v0.1.4 ExtState migrates automatically.
+  Plug-in name display unified across UF8 colour bar, UC1 central LCD, and the Toggle Plugin UI action: cycling through plug-ins on the focused strip now updates immediately with the cycle target's name, including unmapped (ReaEQ, third-party) and cross-domain plug-ins. The focused-strip cursor wins over the focused-domain Instance fallback so Encoder: cycle FX landing on a non-SSL FX displays correctly. Non-focused strips unaffected.
 
-  Channel encoders now respect the visibility filter. The v0.1.4 folder-collapse toggle only hid strips; both the UF8 ChannelEncoder and the UC1 CHANNEL encoder still scrolled past hidden tracks. v0.1.5 plumbs the filtered visible-track list into every track-step navigation path: UF8 ChannelEncoder (bindings ChSelect + Nav-mode SelectRelative), UC1 CHANNEL encoder, and the PendingInput drain branch.
+  Toggle Plugin UI is now a true toggle. Press while a window is owned closes that window regardless of where the cursor has moved between presses. Pressing Toggle UI while UF8 Plugin Mode (with GUI) OR SSL Strip Mode (with GUI) is active disengages the mode AND closes the window in one press -- previously needed two presses after track-change refocus.
 
-  Encoder dispatch action label shortened to "Encoder: dispatch by current mode" (was a wall of nine enumerated modes in the action picker).
+  Surface knob-touches now move the strip's FX cursor (any PluginMap match: SSL Instance, user CS/BC, UF8-only) so the colour bar and an open Toggle UI window both follow what the user is actively touching. Mantra: "was angezeigt wird = was beim Push aufgeht".
+
+  UC1 LCD says "REAPER" (renamed from "MAIN") when no plug-in is on the focused track. BC focus stays strict (BC anchor remains narrow scope).
+
+  Encoder 2 BC track-scroll now flips focus to BusComp so Toggle UI opens the BC instance on the new anchor track.
+
+  UC1 instance carousel no longer flashes the track name before the plug-in name on each detent. Hard-stop edge (CCW past first / CW past last) still shows the current plug-in name in the carousel.
+
+  SSL Strip Mode (with GUI) is CS-only -- removed the UF8-only fallback in its GUI drain. UF8 Plugin Mode is the path for UF8-only plug-ins.
+
+  Bank Left/Right and Bank-by-1 clamp at trackCount - 8 (not trackCount - 1) so a 3-track project can't be banked off-screen.
+
+  Host-keyboard Shift now counts for additive multi-select via successive SEL presses (Settings -> Modes -> Keyboard Options must be on). v0.1.5 only honoured the UF8 hardware Shift modifier here.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
