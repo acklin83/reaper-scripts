@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="e076ebbfd3d3a5a1bf776dcb450271d3d5ef4e98">
+<index version="1" name="Frank Acklin Scripts" commit="ab837686a3b17c0e8f73f3368d6c2fa951ccf695">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -196,6 +196,20 @@ Settings layout pass -- Selection Sets + Parameter Groups rebuilt as fixed-width
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.5" author="Frank Acklin" time="2026-05-22T17:54:59Z">
+        <changelog><![CDATA[TCP / MCP follow radio (Settings -> Device -> Tracks "Surface mirrors:") replaces the three v0.1.4 visibility checkboxes (Show TCP hidden / Show MCP hidden / Hide tracks in collapsed folders). The new model defers to REAPER's IsTrackVisible(track, mixer), which folds per-track B_SHOWIN* AND ancestor folder-collapse state into one call. TCP mode (default) hides children of collapsed folders whenever REAPER's "Hide children of collapsed folders" preference is on; MCP mode mirrors the mixer's visibility. Existing v0.1.4 ExtState migrates automatically.
+
+Channel encoders now respect the visibility filter. The v0.1.4 folder-collapse toggle only hid strips; both the UF8 ChannelEncoder and the UC1 CHANNEL encoder still scrolled past hidden tracks. v0.1.5 plumbs the filtered visible-track list into every track-step navigation path: UF8 ChannelEncoder (bindings ChSelect + Nav-mode SelectRelative), UC1 CHANNEL encoder, and the PendingInput drain branch.
+
+Encoder dispatch action label shortened to "Encoder: dispatch by current mode" (was a wall of nine enumerated modes in the action picker).]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.5/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.5/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.5/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.5/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.5/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.5/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.5/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
