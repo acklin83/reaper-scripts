@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="4cc0a116cb33c773ae3f1aac2ace85ef0000da8b">
+<index version="1" name="Frank Acklin Scripts" commit="e076ebbfd3d3a5a1bf776dcb450271d3d5ef4e98">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -176,6 +176,26 @@ Fill sequential (right) in the FX Learn editor carries source-strip attributes o
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.3/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.3/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.3/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.4" author="Frank Acklin" time="2026-05-22T15:01:22Z">
+        <changelog><![CDATA[Appearance tab (Settings -> Appearance): Dark / Light theme picker plus Small / Medium / Large font-size picker. Re-themes every Settings panel + the FX Learn schematic; hardware-face colours stay constant.
+
+Keyboard Cmd / Ctrl as Shift-style modifiers (Settings -> Modes -> Keyboard Options) — three independent checkboxes that promote the host keyboard's Shift / Cmd / Ctrl into the same Plain / Shift / Cmd / Ctrl modifier slots the UF8 modifier keys feed.
+
+Wrap Plugin Cycle toggle (Settings -> Device -> Plug-ins). Default on. When off, both ends of the FX chain hard-stop on every cycle path (Channel-Encoder FX/Instance Cycle, per-strip V-Pot FX/Instance Cycle) and the UC1 carousel shows no neighbour name past the first/last FX.
+
+Hide tracks in collapsed folders (Settings -> Device -> Tracks). Independent surface-side mirror of REAPER's hide-children-of-collapsed-folders preference -- when on, any track whose ancestor folder is fully collapsed (I_FOLDERCOMPACT == 2) drops from the UF8 strip list. Default off; follows live folder-state changes.
+
+UC1 Encoder 2 push actions unified -- Plain / Shift / Long-press all pick from the same 7-option enum (Jump+Drill, Jump only, Drill only, Back, Toggle View, Add marker at playhead, Disabled) via dropdown. View-locks now suppress Drill only; other actions fire regardless. Defaults match prior behaviour (Plain=Jump+Drill, Shift=Drill, Long=Back); any custom Shift / Long config is reset on upgrade since the old 0/1/2 stored values mapped to different actions.
+
+Settings layout pass -- Selection Sets + Parameter Groups rebuilt as fixed-width tables; UF8 / UC1 mockup labels locked to 10 px and centred over button blocks; LED override colour swatch + brightness radios moved inline next to the Override Active / Inactive checkboxes; Nav-cross down arrow aligned with FOOT 1/2 bottom; pagination hints on Nav-Mode strips 0/7 removed.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.4/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
