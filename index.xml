@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="673e7a61f0e0c61990f6430ed87fca0ae7265800">
+<index version="1" name="Frank Acklin Scripts" commit="2476c47028aee82c02539171dd4772bc3f894934">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -237,8 +237,20 @@ Host-keyboard Shift now counts for additive multi-select via successive SEL pres
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.6/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.6/reaper_rea-sixty.so</source>
       </version>
-      <version name="0.1.7" author="Frank Acklin" time="2026-05-25T16:02:14Z">
-        <changelog><![CDATA[UC1 encoder calibration: CHANNEL ticksPerStep 4->3, BC ticksPerStep 3->2. The encoders fire 3 or 4 (CHANNEL) / 2 or 3 (BC) ticks per physical detent depending on rotation speed; the previous calibration ate the shorter-tick clicks.
+      <version name="0.1.7" author="Frank Acklin" time="2026-05-25T16:28:08Z">
+        <changelog><![CDATA[AutoLearn: new matching engine + Preview UI in the FX Learn Editor. Takes a plug-in's parameter list, suggests UC1 slot + UF8 V-Pot bank assignments via two-layer dictionary (SSL seeds + user-map patterns) with three-pass matching (exact / substring / token) and confidence scoring. Preview modal shows every topology slot with editable customLabel, Param dropdown + filter, conflict highlighting; accept / reject individual rows before applying. Pre-flight Setup modal asks domain (CS / BC / UF8-only) + UF8 V-Pot bank + UF8 Strip targets. Strict-keyword guard for Bypass / Pan so "Bypass" no longer steals "Meter Scale" and "Out Trim" no longer steals "Output Pan"; CH-N params route to UF8 strips / channel-positioned V-Pots instead of generic banks.
+
+FX Learn Editor overhaul: editor is the only landing page (no more master-view). Map picker combo + Default / Short / + New / Delete / Export / Import all live in the editor header. Last-edited map persists via ExtState. + New popup adapts: Create + AutoLearn when the FX isn't in the session, Insert + AutoLearn when it is. GR-meter VST3-param picker dropped (runtime uses PreSonus GainReduction_dB host extension now). All modals centred on the parent host window via new centerNextPopupOnDisplay_ helper -- wide popups no longer slam top-left.
+
+Per-slot custom display labels: new customLabel field on user-mapped slots. Right-click any slot in the FX Learn Editor -> Edit display label -> short string that overrides the parameter's default name on UF8 / UC1 scribble strips. Canonical name shows as placeholder. Empty = fall back to parameter name. JSON-persisted as additive field, backward-compatible with v0.1.6 maps.
+
+Per-fader scribble label: new faderLabel field on UserUf8StripBinding. UF8 plug-in mode reads it when the V-Pot bank slot for that strip is unmapped -- lets a fader controlling a custom parameter have its own scribble independent of the V-Pot row.
+
+Shift activates Fine mode: new Settings -> Modes toggle. Keyboard Shift OR UF8 Shift button momentarily engages Fine mode (0.25x step) on every V-Pot and UC1 encoder. Releases on release. Faders unaffected. Works alongside the existing UC1 Fine button toggle -- Shift wins while held.
+
+USB driver uninstall buttons: Settings -> About gains Uninstall buttons next to Install. Windows removes WinUSB driver + signing cert via PowerShell (UAC); Linux removes /etc/udev/rules.d/99-rea-sixty.rules via pkexec. For switching back to SSL 360 temporarily or clean uninstall.
+
+UC1 encoder calibration: CHANNEL ticksPerStep 4->3, BC ticksPerStep 3->2. The encoders fire 3 or 4 (CHANNEL) / 2 or 3 (BC) ticks per physical detent depending on rotation speed; the previous calibration ate the shorter-tick clicks.
 
 Smart Abbreviate now lives in a single TrackName helper shared between UF8 (7-char scribble), UC1 carousels (CS=12, BC=14), and the REC-mode V-Pot label (7-char). Trailing 2+ digit runs are reserved as identity-like, so "MPEQ Main 2 M32" abbreviates to "MPM2M32" instead of "MPEM2M3". Repeated digits no longer collapse ("M33" stays "M33").
 
