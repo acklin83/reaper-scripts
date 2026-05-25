@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="18148953723efd98c959cab948c79575a8b5939a">
+<index version="1" name="Frank Acklin Scripts" commit="673e7a61f0e0c61990f6430ed87fca0ae7265800">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -236,6 +236,36 @@ Host-keyboard Shift now counts for additive multi-select via successive SEL pres
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.6/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.6/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.6/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.7" author="Frank Acklin" time="2026-05-25T16:02:14Z">
+        <changelog><![CDATA[UC1 encoder calibration: CHANNEL ticksPerStep 4->3, BC ticksPerStep 3->2. The encoders fire 3 or 4 (CHANNEL) / 2 or 3 (BC) ticks per physical detent depending on rotation speed; the previous calibration ate the shorter-tick clicks.
+
+Smart Abbreviate now lives in a single TrackName helper shared between UF8 (7-char scribble), UC1 carousels (CS=12, BC=14), and the REC-mode V-Pot label (7-char). Trailing 2+ digit runs are reserved as identity-like, so "MPEQ Main 2 M32" abbreviates to "MPM2M32" instead of "MPEM2M3". Repeated digits no longer collapse ("M33" stays "M33").
+
+Nav Mode UF8 symmetry: UF8 channel-encoder now mirrors UC1 Encoder 2. Rotation moves the drill cursor one step per detent (vs. paging 8) when "UF8 encoder takes over in Nav" is on. Push fires the same plain / shift / long action picker as UC1. New "Keep track colour" radio in the colour-bar source picker -- LCD bar follows the track colour while top-soft-key LEDs keep the marker/region colour. New "Show UF8 Nav overlay" toggle for independent rendering.
+
+Nav LED dedup fix: channel-encoder-mode LEDs (Nav / Nudge / Focus) refresh on per-cell state change, not on encoder-mode change. Previously a binding whose stateOf depended on something other than encoder mode (e.g. marker_overlay_toggle on Nav) never re-triggered the refresh and the LED froze.
+
+Encoder Mode now exits Nav Mode automatically: any user-initiated encoder-mode switch (Nav / Nudge / Mousewheel / Markers / BankBy1 / LastParam / Instance / FxCycle / SelsetCycle) exits Nav Mode in one move. Project-load and setup-bundle paths bypass this so saved state survives.
+
+Palette quantizer fixes: pink (hue ~330 deg, e.g. FF0080) now lands on 0x0B light violet (LCD renders as lilac/pink) instead of red. Magenta (hue ~300 deg, e.g. FB02FF) stays on 0x06 deep violet, so pink and magenta now render as visually distinct cells -- the SEL LEDs already differentiated; the LCD now matches. Dark greys (e.g. 4C4C4C) short-circuit to 0x00 OFF instead of 0x01 light violet, which was making dark grey tracks look "white" because the LCD lights every quantised cell at constant brightness.
+
+UF8 channel-number digit (the tiny digit top-left of each strip's colour bar) and the "CH N" track-name fallback now read IP_TRACKNUMBER -- REAPER's 1-based actual track number, identical to REAPER's track headers and UC1's 7-segment indicator. Folder-collapsed sessions no longer show a confusing visible-slot index that diverges from REAPER's track list.
+
+Pinned tracks (B_TCPPIN, "pin to top of arrange view") now anchor to the leftmost strips on the surface when Surface mirrors TCP, mirroring how REAPER's TCP renders them. Banking only moves the non-pinned strips. New checkbox "Pinned tracks survive banking" (default on, under the TCP/MCP Surface mirrors radio). Sticky auto-disables when >=8 tracks are pinned -- pinned still sort first in the visible list and spill across banks. MCP-mode is unaffected (MCP has no pin concept in REAPER).
+
+REC V-Pot keyboard-shift modifier: Shift+V-Pot for input-channel selection now honours keyboard Shift (gated by Settings -> Modes -> Keyboard Options -> "Use keyboard Shift as modifier"). Previously only the UF8 hardware Shift button worked.
+
+Instance Cycle stale cursor + blank label for plug-in-less tracks: UF8 csType falls back to the focused-Instance label when the raw cursor points at an unmapped FX (stale from prior FxCycle). Tracks with zero plug-ins now render a blank slot on both UF8 and UC1 (was "REAPER" or "MAIN") -- clearer "nothing here" cue.
+
+Appearance -> Spelling radio: flips user-facing strings between "Colour"/"Grey" (British, SSL house style) and "Color"/"Gray" (American). Identifiers in code stay color regardless. Pure decoration.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.7/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.7/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.7/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.7/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.7/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.7/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.7/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
