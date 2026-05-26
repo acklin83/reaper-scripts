@@ -1,28 +1,17 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.8
+@version 0.1.9
 @changelog
-  Per-slot knob travel: every user-learned FX Learn slot gains Min / Max range clamp, encoder-delta sensitivity (0.1x..4x), and a per-slot response curve. Right-click any slot in the FX Learn schematic for inline Min / Max sliders + "Advanced..." -- opens a curve editor with draggable breakpoints + Linear / Log / Exp / Reset presets. Defaults (Min=0, Max=1, sensitivity=1, no curve) make the maths byte-identical to the previous linear path; v0.1.7 maps load unchanged. JSON storage is additive. Customised slots show two radial ticks at the Min / Max angles + a centre dot when a curve is set on the on-screen knob.
-
-  Knob travel now works on UC1 too. The UC1 channel-strip / bus-comp knobs and the EXT_FUNCS encoder honour the same per-slot range / curve / sensitivity as the UF8 V-Pots. A UC1 knob and a UF8 V-Pot bound to the same parameter stay in lock-step. Built-in SSL CS/BC slots untouched -- knob travel only kicks in when a user-learned slot is present for the focused plug-in.
-
-  UF8 V-Pots in Plugin Mode (user-map) get the same Min / Max / Advanced... controls on right-click as the FX Learn schematic. Range and curve are stored per-binding (faderBank, vpotBank, strip) -- different V-Pots can drive the same parameter with different feels. Fill Sequential copies travel verbatim alongside the existing inverted / vpotMode / colour fields. The LED ring on the LCD V-Pot bar follows the encoder's t-space (inverse-curved) so a tight range no longer compresses the ring into a sliver of its sweep. UF8 faders intentionally exclude knob travel -- absolute-position + motor-feedback creates round-trip races with plug-in quantisation.
-
-  V-Pot polarity: new Unipolar / Bipolar toggle per V-Pot binding. Bipolar (opt-in per binding -- default Unipolar) makes Pan-like parameters render centre-out on the LCD ring (mode register 0x08, same as SSL Pan slots) instead of L->R sweep, and the Log / Exp curve presets produce shapes that mirror around 0.5. Push-reset slider shows a non-binding hint with a 0.5 quick-set button when not already at centre. Polarity re-read on every preset click so flipping it in the parent menu takes effect without re-opening the editor.
-
-  Curve editor canvas: Linear preset is now a clean 45-degree diagonal regardless of how Min / Max are trimmed. Y-axis normalised within [rangeMin..rangeMax] -- top edge is rangeMax, bottom is rangeMin. Click / drag maps canvas Y back to absolute parameter space so storage semantics are unchanged.
-
-  Curve editor is target-driven: the same modal now serves FX Learn slots and UF8 V-Pot bindings, parameterised by a small read + four-setter callback set. Sensitivity row hides when the target doesn't support it.
-
-  fx_param_inc / fx_param_dec: two new builtin actions in the Bindings action picker. Step the same FX Learn slot a V-Pot is bound to from a button -- configurable step size + wrap, respects the slot's range / curve / sensitivity. Useful for one-shot "+1 dB" or "next preset value" buttons.
-
-  GR meter override: small "GR" button next to AutoLearn in the FX Learn editor opens a compact popup to designate a VST3 parameter as the GR readout, for plug-ins where the PreSonus GainReduction_dB host extension doesn't reach. Flows through to the UC1 BC VU motor calibration tables and the DYN GR LED strip. Defaults to "use host extension" -- opt-in per learned plug-in.
-
-  Settings -> About now shows a Version line above Build, sourced from git describe --tags --always --dirty via the existing commit_count.h header generator. On a release tag: v0.1.8. Between tags: v0.1.8-N-g<sha>. Dirty working tree: trailing -dirty.
-
-  Bug fixes:
-    - FX Learn schematic knob ticks: the range arc was previously starting at 10:30 and sweeping through 3 o'clock (off-centre). Now a 300-degree sweep from 7 o'clock to 5 o'clock with the dead-zone at the bottom where the physical knob's gap is.
-    - UC1 knobs were silently ignoring user-set range / curve / sensitivity in v0.1.7 -- the data was wired through to UF8 dispatch but UC1Surface was missed. Now resolved.
+  - Knob travel works on stepped params now (UF8 V-Pots Plugin Mode + focused CS/BC, UC1 CS/BC knobs, UC1 EXT_FUNCS). Sensitivity = "Detent speed": 1.0x = 2 detents per step, 2.0x = 1 per detent, 4.0x = 2 steps per detent. Shift = Fine quarters on top.
+  - Stepped params: Min/Max snap to step grid; push reset snaps to nearest step; curve editor swaps to info line when bound param is stepped.
+  - New "Set" button next to Min/Max in the curve editor right-click menu: snaps that range edge to the plug-in's current parameter value. Dial the FX to where you want the bound, click Set.
+  - Curve editor right-click Min/Max rows now align pixel-perfect (4-col table: label / slider / input / Set).
+  - Sensitivity row in curve editor popup: single-row layout (label above, slider + input + 1x reset below).
+  - UC1 Encoder 2: ticksPerStep 2 -> 3, fixes double-stepping on fast turns.
+  - UC1 track delete: focus snaps to the track directly above the deleted one (not project track 1). Carousel + zone 0x02 refresh immediately.
+  - Instance Cycle: focused slotIdx preserved when target instance has the same LinkSlot. No more reset to slot 0 / Bypass on every cycle step.
+  - tickStepped sens floor 0.1 -> 0.001 so Shift-Fine at slider min still slows further.
+  - Curve editor popup 380 -> 390 px height.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
