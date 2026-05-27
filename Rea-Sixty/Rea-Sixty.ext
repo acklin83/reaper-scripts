@@ -1,15 +1,10 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.10
+@version 0.1.11
 @changelog
-  - Codename: Prettyyyyy... Prettyyyyy... Pretty Good!
-  - Folder Mode learns nested folders: long-press SEL spills the full ancestor chain, collapse keeps descendant spill state so re-spilling the top instantly restores the drill-down.
-  - New Temporary Selection Set parallel to the 8 named slots — built-ins temp_selset_add / _remove / _recall / _scroll. Mutually exclusive with the 1..8 slot recall.
-  - UC1 Encoder 1 (CHANNEL) now fully bindable like Encoder 2. Default Plain = new built-in track_scroll (visible-track scroll + select + UC1 focus follow). Shift = instance_cycle.
-  - New built-in bc_track_scroll_select: same scroll as bc_track_scroll but also pulls REAPER selection + UF8 bank to the new BC anchor. Original bc_track_scroll unchanged.
-  - FX Learn user fader label now appears on the UF8 scribble's upper line, not just in the value-line fallback.
-  - Release codenames: extension/version-names.tsv maps each tag to a codename, shown on the About tab below the version line.
-  - Persistence rebuilt: Selection Set slots + Temp set saved into the project RPP via the official projectconfig SDK hook. Old SetProjExtState path was silently dropping writes on some REAPER builds.
+  - Codename: Even Prettier
+  - Strip Mode: focused param slot no longer snaps to Bypass when scrolling tracks with a plug-in window open. Chase path now applies the same slot-sticky rule as v0.1.9's Instance Cycle fix — preserves slot when target FX exposes the same LinkSlot, resets only on cross-domain or unmapped slots.
+  - Temp Selection Set now participates in Selection-Set Auto-Mode (Settings -> Modes -> AUTO). Recalling in AUTO mode arms its members to the configured automation mode; deactivating reverts to Trim/Read. Mutual-exclusion handoff slot <-> temp also reverts the outgoing set.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
