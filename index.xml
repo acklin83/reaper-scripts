@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="b6392fec8c9c7ba44cfec49317f7eb4e62e48988">
+<index version="1" name="Frank Acklin Scripts" commit="2c4e5e9a72943133a6522580dc3e37ad15fe3886">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -344,6 +344,18 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.11" author="Frank Acklin" time="2026-05-27T13:15:04Z">
+        <changelog><![CDATA[- Codename: Even Prettier
+- Strip Mode: focused param slot no longer snaps to Bypass when scrolling tracks with a plug-in window open. Chase path now applies the same slot-sticky rule as v0.1.9's Instance Cycle fix — preserves slot when target FX exposes the same LinkSlot, resets only on cross-domain or unmapped slots.
+- Temp Selection Set now participates in Selection-Set Auto-Mode (Settings -> Modes -> AUTO). Recalling in AUTO mode arms its members to the configured automation mode; deactivating reverts to Trim/Read. Mutual-exclusion handoff slot <-> temp also reverts the outgoing set.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
