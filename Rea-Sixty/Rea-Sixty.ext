@@ -1,17 +1,15 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.9
+@version 0.1.10
 @changelog
-  - Knob travel works on stepped params now (UF8 V-Pots Plugin Mode + focused CS/BC, UC1 CS/BC knobs, UC1 EXT_FUNCS). Sensitivity = "Detent speed": 1.0x = 2 detents per step, 2.0x = 1 per detent, 4.0x = 2 steps per detent. Shift = Fine quarters on top.
-  - Stepped params: Min/Max snap to step grid; push reset snaps to nearest step; curve editor swaps to info line when bound param is stepped.
-  - New "Set" button next to Min/Max in the curve editor right-click menu: snaps that range edge to the plug-in's current parameter value. Dial the FX to where you want the bound, click Set.
-  - Curve editor right-click Min/Max rows now align pixel-perfect (4-col table: label / slider / input / Set).
-  - Sensitivity row in curve editor popup: single-row layout (label above, slider + input + 1x reset below).
-  - UC1 Encoder 2: ticksPerStep 2 -> 3, fixes double-stepping on fast turns.
-  - UC1 track delete: focus snaps to the track directly above the deleted one (not project track 1). Carousel + zone 0x02 refresh immediately.
-  - Instance Cycle: focused slotIdx preserved when target instance has the same LinkSlot. No more reset to slot 0 / Bypass on every cycle step.
-  - tickStepped sens floor 0.1 -> 0.001 so Shift-Fine at slider min still slows further.
-  - Curve editor popup 380 -> 390 px height.
+  - Codename: Prettyyyyy... Prettyyyyy... Pretty Good!
+  - Folder Mode learns nested folders: long-press SEL spills the full ancestor chain, collapse keeps descendant spill state so re-spilling the top instantly restores the drill-down.
+  - New Temporary Selection Set parallel to the 8 named slots — built-ins temp_selset_add / _remove / _recall / _scroll. Mutually exclusive with the 1..8 slot recall.
+  - UC1 Encoder 1 (CHANNEL) now fully bindable like Encoder 2. Default Plain = new built-in track_scroll (visible-track scroll + select + UC1 focus follow). Shift = instance_cycle.
+  - New built-in bc_track_scroll_select: same scroll as bc_track_scroll but also pulls REAPER selection + UF8 bank to the new BC anchor. Original bc_track_scroll unchanged.
+  - FX Learn user fader label now appears on the UF8 scribble's upper line, not just in the value-line fallback.
+  - Release codenames: extension/version-names.tsv maps each tag to a codename, shown on the About tab below the version line.
+  - Persistence rebuilt: Selection Set slots + Temp set saved into the project RPP via the official projectconfig SDK hook. Old SetProjExtState path was silently dropping writes on some REAPER builds.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
