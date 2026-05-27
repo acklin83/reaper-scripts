@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="01ab4fc76a526aa3fcc3b93137ef10e7d694bfd4">
+<index version="1" name="Frank Acklin Scripts" commit="b6392fec8c9c7ba44cfec49317f7eb4e62e48988">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -327,6 +327,23 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.9/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.9/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.9/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.10" author="Frank Acklin" time="2026-05-27T12:43:26Z">
+        <changelog><![CDATA[- Codename: Prettyyyyy... Prettyyyyy... Pretty Good!
+- Folder Mode learns nested folders: long-press SEL spills the full ancestor chain, collapse keeps descendant spill state so re-spilling the top instantly restores the drill-down.
+- New Temporary Selection Set parallel to the 8 named slots — built-ins temp_selset_add / _remove / _recall / _scroll. Mutually exclusive with the 1..8 slot recall.
+- UC1 Encoder 1 (CHANNEL) now fully bindable like Encoder 2. Default Plain = new built-in track_scroll (visible-track scroll + select + UC1 focus follow). Shift = instance_cycle.
+- New built-in bc_track_scroll_select: same scroll as bc_track_scroll but also pulls REAPER selection + UF8 bank to the new BC anchor. Original bc_track_scroll unchanged.
+- FX Learn user fader label now appears on the UF8 scribble's upper line, not just in the value-line fallback.
+- Release codenames: extension/version-names.tsv maps each tag to a codename, shown on the About tab below the version line.
+- Persistence rebuilt: Selection Set slots + Temp set saved into the project RPP via the official projectconfig SDK hook. Old SetProjExtState path was silently dropping writes on some REAPER builds.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.10/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
