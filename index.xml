@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="2c4e5e9a72943133a6522580dc3e37ad15fe3886">
+<index version="1" name="Frank Acklin Scripts" commit="31878fa3890b86216322afafdeaa5e4144fa599e">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -356,6 +356,22 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.11/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.12" author="Frank Acklin" time="2026-05-28T15:24:52Z">
+        <changelog><![CDATA[- Codename: Bizarre Gardening Accident
+- UC1 gets full REC + RME (TotalReaper) integration on its focused-track surface. Encoder 2 rotation steps preamp gain +/-1 dB; Fine (or keyboard Shift) + rotation cycles the track's hardware input channel. Out of the box: 48V on Enc2 Push, Pad on Cut, Phase Invert on Polarity (all reassignable in Settings -> Modes -> REC). CS readout zone shows live "48V Pd Ph + gain" while in REC mode; brief flash to channel name on input-channel changes.
+- Fine button is momentary while REC / RecMon is the selection mode (was toggle); doubles as the Shift modifier for the Enc2 input-channel cycle. No more "Fine On / Off" readout flash in REC.
+- CS-scroll channel-name carousel suppressed entirely in REC + RME so the live preamp readout keeps updating during Encoder 1 channel changes. Carousel timeout elsewhere drops from 3 s to 1 s.
+- Nav Mode is rebuilt as a per-surface matrix (UF8 + UC1 each pick Regions or Markers independently; UC1 additionally has "Mirror UF8" = v0.1.11 behaviour, default). When one surface is in Regions and the other in Markers, the Markers surface auto-scopes to the Regions surface's currently-selected region — cursor move on one snaps the other to the first marker of the new scope.
+- UF8 region-press drill is suppressed when UC1 is in an independent Mode (would break the cross-coupling); jump still fires.
+- Settings -> Modes -> NAV is reorganised as a UF8 / UC1 column matrix. Legacy 4-state "Default view on entry" radio removed (UF8 Mode picker now is both entry default + live state). Push-action picker correctly labelled as shared between UC1 Encoder 2 and the UF8 Channel encoder.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
