@@ -1,14 +1,19 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.12
+@version 0.1.13
 @changelog
-  - Codename: Bizarre Gardening Accident
-  - UC1 gets full REC + RME (TotalReaper) integration on its focused-track surface. Encoder 2 rotation steps preamp gain +/-1 dB; Fine (or keyboard Shift) + rotation cycles the track's hardware input channel. Out of the box: 48V on Enc2 Push, Pad on Cut, Phase Invert on Polarity (all reassignable in Settings -> Modes -> REC). CS readout zone shows live "48V Pd Ph + gain" while in REC mode; brief flash to channel name on input-channel changes.
-  - Fine button is momentary while REC / RecMon is the selection mode (was toggle); doubles as the Shift modifier for the Enc2 input-channel cycle. No more "Fine On / Off" readout flash in REC.
-  - CS-scroll channel-name carousel suppressed entirely in REC + RME so the live preamp readout keeps updating during Encoder 1 channel changes. Carousel timeout elsewhere drops from 3 s to 1 s.
-  - Nav Mode is rebuilt as a per-surface matrix (UF8 + UC1 each pick Regions or Markers independently; UC1 additionally has "Mirror UF8" = v0.1.11 behaviour, default). When one surface is in Regions and the other in Markers, the Markers surface auto-scopes to the Regions surface's currently-selected region — cursor move on one snaps the other to the first marker of the new scope.
-  - UF8 region-press drill is suppressed when UC1 is in an independent Mode (would break the cross-coupling); jump still fires.
-  - Settings -> Modes -> NAV is reorganised as a UF8 / UC1 column matrix. Legacy 4-state "Default view on entry" radio removed (UF8 Mode picker now is both entry default + live state). Push-action picker correctly labelled as shared between UC1 Encoder 2 and the UF8 Channel encoder.
+  - Codename: Monday is my favorite time of year
+  - Quick Learn: guided FX mapping that sweeps the project (or a single track) for unmapped plug-ins and walks you through learning each one, instead of opening the editor per plug-in by hand. Project + Track scopes, each as a REAPER action, a bindable native action, and a button in the FX-Learn pane. No-op when there's nothing left to learn.
+  - AutoLearn can now map all of a plug-in's parameters 1:1 onto the UF8 faders (category-sorted), so a plug-in maps onto the surface even with the V-Pot target off. New Setup checkbox, default on when V-Pots are off.
+  - AutoLearn preview: consistent Param dropdown + per-row Learn column across all preview tables. REAPER's injected MIDI-learn params ("MIDI CC 0|0", "MIDI Pitch", ...) are filtered out of the param picker.
+  - UC1 Fine now also applies to UF8 V-Pot rotation. V-Pot push-reset safety net: rotation on a strip is swallowed for 250 ms after a push so a twist-on-press can't bump the parameter back off the value you just reset.
+  - Configurable encoder nudge step (unit + amount) in Settings -> Modes -> Nudge (was a hardcoded 1 s per detent).
+  - Fix: a V-Pot turn could crash REAPER (a self-recursion in the Fine-mode check was lowered to a hard trap and fired on every V-Pot move). Fixed.
+  - Fix: AutoLearn matched Bus-Comp params to the wrong slot (e.g. a plug-in's "Release" landing on the "Input" slot). The generic-naming dictionary no longer leaks Channel-Strip slot indices into the Bus-Comp namespace.
+  - Fix: the UC1 routing diagram now paints the moment you press the Routing button, instead of staying blank until the first encoder turn.
+  - Fix: developer-grouping vendor fallback now resolves for non-SSL maps too.
+  - Fix: V-Pot stale-track-pointer crash guards in the input drain + plug-in lookup; swapped SEL-LED magenta/pink colours corrected.
+  - Fix: Acustica Audio (Acqua) plug-ins are no longer host-polled for gain reduction and their GUIs are never auto-opened, removing the crash path their threading model triggered.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
