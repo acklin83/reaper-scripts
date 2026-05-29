@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="31878fa3890b86216322afafdeaa5e4144fa599e">
+<index version="1" name="Frank Acklin Scripts" commit="bf2fa9e18121ab512a97e3041e3c10e4f30defb9">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -372,6 +372,27 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.12/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.13" author="Frank Acklin" time="2026-05-29T15:26:26Z">
+        <changelog><![CDATA[- Codename: Monday is my favorite time of year
+- Quick Learn: guided FX mapping that sweeps the project (or a single track) for unmapped plug-ins and walks you through learning each one, instead of opening the editor per plug-in by hand. Project + Track scopes, each as a REAPER action, a bindable native action, and a button in the FX-Learn pane. No-op when there's nothing left to learn.
+- AutoLearn can now map all of a plug-in's parameters 1:1 onto the UF8 faders (category-sorted), so a plug-in maps onto the surface even with the V-Pot target off. New Setup checkbox, default on when V-Pots are off.
+- AutoLearn preview: consistent Param dropdown + per-row Learn column across all preview tables. REAPER's injected MIDI-learn params ("MIDI CC 0|0", "MIDI Pitch", ...) are filtered out of the param picker.
+- UC1 Fine now also applies to UF8 V-Pot rotation. V-Pot push-reset safety net: rotation on a strip is swallowed for 250 ms after a push so a twist-on-press can't bump the parameter back off the value you just reset.
+- Configurable encoder nudge step (unit + amount) in Settings -> Modes -> Nudge (was a hardcoded 1 s per detent).
+- Fix: a V-Pot turn could crash REAPER (a self-recursion in the Fine-mode check was lowered to a hard trap and fired on every V-Pot move). Fixed.
+- Fix: AutoLearn matched Bus-Comp params to the wrong slot (e.g. a plug-in's "Release" landing on the "Input" slot). The generic-naming dictionary no longer leaks Channel-Strip slot indices into the Bus-Comp namespace.
+- Fix: the UC1 routing diagram now paints the moment you press the Routing button, instead of staying blank until the first encoder turn.
+- Fix: developer-grouping vendor fallback now resolves for non-SSL maps too.
+- Fix: V-Pot stale-track-pointer crash guards in the input drain + plug-in lookup; swapped SEL-LED magenta/pink colours corrected.
+- Fix: Acustica Audio (Acqua) plug-ins are no longer host-polled for gain reduction and their GUIs are never auto-opened, removing the crash path their threading model triggered.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
