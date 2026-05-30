@@ -1,19 +1,9 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.13
+@version 0.1.14
 @changelog
-  - Codename: Monday is my favorite time of year
-  - Quick Learn: guided FX mapping that sweeps the project (or a single track) for unmapped plug-ins and walks you through learning each one, instead of opening the editor per plug-in by hand. Project + Track scopes, each as a REAPER action, a bindable native action, and a button in the FX-Learn pane. No-op when there's nothing left to learn.
-  - AutoLearn can now map all of a plug-in's parameters 1:1 onto the UF8 faders (category-sorted), so a plug-in maps onto the surface even with the V-Pot target off. New Setup checkbox, default on when V-Pots are off.
-  - AutoLearn preview: consistent Param dropdown + per-row Learn column across all preview tables. REAPER's injected MIDI-learn params ("MIDI CC 0|0", "MIDI Pitch", ...) are filtered out of the param picker.
-  - UC1 Fine now also applies to UF8 V-Pot rotation. V-Pot push-reset safety net: rotation on a strip is swallowed for 250 ms after a push so a twist-on-press can't bump the parameter back off the value you just reset.
-  - Configurable encoder nudge step (unit + amount) in Settings -> Modes -> Nudge (was a hardcoded 1 s per detent).
-  - Fix: a V-Pot turn could crash REAPER (a self-recursion in the Fine-mode check was lowered to a hard trap and fired on every V-Pot move). Fixed.
-  - Fix: AutoLearn matched Bus-Comp params to the wrong slot (e.g. a plug-in's "Release" landing on the "Input" slot). The generic-naming dictionary no longer leaks Channel-Strip slot indices into the Bus-Comp namespace.
-  - Fix: the UC1 routing diagram now paints the moment you press the Routing button, instead of staying blank until the first encoder turn.
-  - Fix: developer-grouping vendor fallback now resolves for non-SSL maps too.
-  - Fix: V-Pot stale-track-pointer crash guards in the input drain + plug-in lookup; swapped SEL-LED magenta/pink colours corrected.
-  - Fix: Acustica Audio (Acqua) plug-ins are no longer host-polled for gain reduction and their GUIs are never auto-opened, removing the crash path their threading model triggered.
+  - Codename: Dancing in the Dark
+  - Fix (Windows): Rea-Sixty no longer changes the process-wide DLL search at load. To find its own bundled libusb / hidapi it used to alter the default search for the whole process, which permanently dropped "search the loading DLL's own folder" for every plug-in. Plug-ins that load helper DLLs from their own folder (Acustica/Acqua: Tiger, Tiger Mix, ...) then couldn't find them and crashed with an access violation on open. Rea-Sixty now pre-loads its own dependencies by full path and leaves the process DLL search untouched. This is the real cause behind the Acustica crash the v0.1.13 gain-reduction guard did not resolve.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
