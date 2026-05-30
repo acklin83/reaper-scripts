@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="bf2fa9e18121ab512a97e3041e3c10e4f30defb9">
+<index version="1" name="Frank Acklin Scripts" commit="43f95c31761dd5b78310bdb1a2b6194243dd8dd0">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -393,6 +393,17 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.13/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.14" author="Frank Acklin" time="2026-05-30T15:06:21Z">
+        <changelog><![CDATA[- Codename: Dancing in the Dark
+- Fix (Windows): Rea-Sixty no longer changes the process-wide DLL search at load. To find its own bundled libusb / hidapi it used to alter the default search for the whole process, which permanently dropped "search the loading DLL's own folder" for every plug-in. Plug-ins that load helper DLLs from their own folder (Acustica/Acqua: Tiger, Tiger Mix, ...) then couldn't find them and crashed with an access violation on open. Rea-Sixty now pre-loads its own dependencies by full path and leaves the process DLL search untouched. This is the real cause behind the Acustica crash the v0.1.13 gain-reduction guard did not resolve.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
