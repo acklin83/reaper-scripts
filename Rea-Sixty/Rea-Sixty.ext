@@ -1,9 +1,14 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.14
+@version 0.1.15
 @changelog
-  - Codename: Dancing in the Dark
-  - Fix (Windows): Rea-Sixty no longer changes the process-wide DLL search at load. To find its own bundled libusb / hidapi it used to alter the default search for the whole process, which permanently dropped "search the loading DLL's own folder" for every plug-in. Plug-ins that load helper DLLs from their own folder (Acustica/Acqua: Tiger, Tiger Mix, ...) then couldn't find them and crashed with an access violation on open. Rea-Sixty now pre-loads its own dependencies by full path and leaves the process DLL search untouched. This is the real cause behind the Acustica crash the v0.1.13 gain-reduction guard did not resolve.
+  - Codename: My Blood is too thick for Nevada
+  - New: "Rea-Sixty Input Level" JSFX probe gives the UC1 a true input meter (live even while stopped); drop it anywhere in a track's FX chain
+  - Fix: UC1 I/O meter LEDs now light at their labelled dB (e.g. -18 lights at -18, not -17.9)
+  - Fix: output meter no longer flickers on a steady level at a threshold
+  - Fix: input probe no longer under-reads transients (a -12 dB snare metered -15)
+  - New: FX-Learn "+New" plugin picker grouped by vendor
+  - New: UC1 EXT FUNCS hidden menu (CS mode) is now user-curatable per plug-in; SSL plug-ins keep their fixed list
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
