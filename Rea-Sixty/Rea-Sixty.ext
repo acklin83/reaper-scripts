@@ -1,14 +1,17 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.15
+@version 0.1.16
 @changelog
-  - Codename: My Blood is too thick for Nevada
-  - New: "Rea-Sixty Input Level" JSFX probe gives the UC1 a true input meter (live even while stopped); drop it anywhere in a track's FX chain
-  - Fix: UC1 I/O meter LEDs now light at their labelled dB (e.g. -18 lights at -18, not -17.9)
-  - Fix: output meter no longer flickers on a steady level at a threshold
-  - Fix: input probe no longer under-reads transients (a -12 dB snare metered -15)
-  - New: FX-Learn "+New" plugin picker grouped by vendor
-  - New: UC1 EXT FUNCS hidden menu (CS mode) is now user-curatable per plug-in; SSL plug-ins keep their fixed list
+  - Codename: Boy, that escalated quickly!
+  - New: knob "feel" presets — save a knob's range/curve/sensitivity/polarity/push-reset into 5 named global slots and apply across knobs + V-Pots
+  - New: in-app user manual at Settings -> Manual
+  - Fix: UC1 IN button now maps to Bypass (was the confusing "Input Trim"); FX-Learn popup no longer errors or doubles its rows
+  - Fix: FX-Learn Inverted now works on param-toggle buttons (EQ In, Dyn In, Polarity, ...)
+  - Fix: custom display labels now stick on UC1 buttons, like knobs
+  - New: POL button can be FX-Learned to a plug-in param ("Reaper Track Polarity" checkbox, default on)
+  - Fix: UC1 I/O meter no longer goes dark when the Bus Compressor is bypassed
+  - Fix: re-binding a slot clears its now-stale custom label
+  - Fix: AutoLearn no longer lists the dead SSL "Quick 1-6" slots
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
