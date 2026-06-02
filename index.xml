@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="df22706caf5538c04049361c8b09608bad553825">
+<index version="1" name="Frank Acklin Scripts" commit="33b4acb7083a7869a4836b75bf2d2b8866876719">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -420,6 +420,25 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.16" author="Frank Acklin" time="2026-06-02T17:17:50Z">
+        <changelog><![CDATA[- Codename: Boy, that escalated quickly!
+- New: knob "feel" presets — save a knob's range/curve/sensitivity/polarity/push-reset into 5 named global slots and apply across knobs + V-Pots
+- New: in-app user manual at Settings -> Manual
+- Fix: UC1 IN button now maps to Bypass (was the confusing "Input Trim"); FX-Learn popup no longer errors or doubles its rows
+- Fix: FX-Learn Inverted now works on param-toggle buttons (EQ In, Dyn In, Polarity, ...)
+- Fix: custom display labels now stick on UC1 buttons, like knobs
+- New: POL button can be FX-Learned to a plug-in param ("Reaper Track Polarity" checkbox, default on)
+- Fix: UC1 I/O meter no longer goes dark when the Bus Compressor is bypassed
+- Fix: re-binding a slot clears its now-stale custom label
+- Fix: AutoLearn no longer lists the dead SSL "Quick 1-6" slots]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
