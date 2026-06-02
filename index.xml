@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="43f95c31761dd5b78310bdb1a2b6194243dd8dd0">
+<index version="1" name="Frank Acklin Scripts" commit="df22706caf5538c04049361c8b09608bad553825">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -404,6 +404,22 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.14/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.15" author="Frank Acklin" time="2026-06-02T06:58:19Z">
+        <changelog><![CDATA[- Codename: My Blood is too thick for Nevada
+- New: "Rea-Sixty Input Level" JSFX probe gives the UC1 a true input meter (live even while stopped); drop it anywhere in a track's FX chain
+- Fix: UC1 I/O meter LEDs now light at their labelled dB (e.g. -18 lights at -18, not -17.9)
+- Fix: output meter no longer flickers on a steady level at a threshold
+- Fix: input probe no longer under-reads transients (a -12 dB snare metered -15)
+- New: FX-Learn "+New" plugin picker grouped by vendor
+- New: UC1 EXT FUNCS hidden menu (CS mode) is now user-curatable per plug-in; SSL plug-ins keep their fixed list]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.15/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
