@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="14cc080897bd69ea382f4e089b2317a137d10a01">
+<index version="1" name="Frank Acklin Scripts" commit="8cddf117f79fbe2e2061b97ff21434e690c0c3e9">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -445,6 +445,22 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.16/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.17" author="Frank Acklin" time="2026-06-03T14:20:35Z">
+        <changelog><![CDATA[- Codename: Off on the Charabanc!
+- New: per-meter peak fall rate (Settings -> Device -> Metering); all meters peak-hold, UC1 input now decays in lock-step with output (Peak/VU/RMS selector removed)
+- Fix: output meter under-read — a -6 dB signal used to light only to -9
+- New: UC1 Out Gain knob can flip to drive REAPER track volume instead of the SSL Fader Level param (Hardware Modes builtin + REAPER action); works even with no channel strip on the track
+- Fix: FX-Learn parameter search is now case-insensitive ("out" finds "Output Gain")
+- Fix: FX-Learn dropdowns no longer shrink as the search narrows the list
+- Fix: an inverted EQ-IN / DYN-IN button no longer dims the knob-ring cascade in reverse]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
