@@ -1,17 +1,14 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.16
+@version 0.1.17
 @changelog
-  - Codename: Boy, that escalated quickly!
-  - New: knob "feel" presets — save a knob's range/curve/sensitivity/polarity/push-reset into 5 named global slots and apply across knobs + V-Pots
-  - New: in-app user manual at Settings -> Manual
-  - Fix: UC1 IN button now maps to Bypass (was the confusing "Input Trim"); FX-Learn popup no longer errors or doubles its rows
-  - Fix: FX-Learn Inverted now works on param-toggle buttons (EQ In, Dyn In, Polarity, ...)
-  - Fix: custom display labels now stick on UC1 buttons, like knobs
-  - New: POL button can be FX-Learned to a plug-in param ("Reaper Track Polarity" checkbox, default on)
-  - Fix: UC1 I/O meter no longer goes dark when the Bus Compressor is bypassed
-  - Fix: re-binding a slot clears its now-stale custom label
-  - Fix: AutoLearn no longer lists the dead SSL "Quick 1-6" slots
+  - Codename: Off on the Charabanc!
+  - New: per-meter peak fall rate (Settings -> Device -> Metering); all meters peak-hold, UC1 input now decays in lock-step with output (Peak/VU/RMS selector removed)
+  - Fix: output meter under-read — a -6 dB signal used to light only to -9
+  - New: UC1 Out Gain knob can flip to drive REAPER track volume instead of the SSL Fader Level param (Hardware Modes builtin + REAPER action); works even with no channel strip on the track
+  - Fix: FX-Learn parameter search is now case-insensitive ("out" finds "Output Gain")
+  - Fix: FX-Learn dropdowns no longer shrink as the search narrows the list
+  - Fix: an inverted EQ-IN / DYN-IN button no longer dims the knob-ring cascade in reverse
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
