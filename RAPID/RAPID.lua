@@ -1,15 +1,10 @@
 -- @description RAPID - Recording Auto-Placement & Intelligent Dynamics
 -- @author Frank Acklin
--- @version 2.7
+-- @version 2.7.1
 -- @changelog
---   Sel column in Normalize-only mode (multi-select, drag-to-paint, Shift-range)
---   "Set all to" bulk action bar in all modes (applies to selected or all)
---   "Calibrate" button in header when Normalize is active
---   Multi-select profile/peak changes apply to all selected rows
---   Settings: UI + Save/Load merged into "General" tab
---   Consistent footer layout across all modes
---   Keep Name / Keep FX columns narrower
---   Removed Little Joe profile sync
+--   Fixed Windows multi-file audio import: bare filenames now joined with their directory (no more "audio files not found")
+--   Fixed destructive commit: a missing audio file no longer deletes its template track
+--   Commit now runs an atomic pre-flight — aborts and touches nothing if any mapped audio file is missing
 -- @about
 --   # RAPID
 --   Professional workflow automation for REAPER that automates track mapping, media import, and LUFS normalization.
@@ -33,7 +28,7 @@
 --
 --   ## Requirements
 --   - REAPER 6.0+
--- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.7
+-- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.7.1
 --
 -- Unified version combining RAPID (Import & Mapping) with Little Joe (Normalize-Only)
 --
@@ -81,7 +76,7 @@
 local r = reaper
 
 -- ===== VERSION =====
-local VERSION = "2.7"
+local VERSION = "2.7.1"
 local WINDOW_TITLE = "RAPID v" .. VERSION
 
 -- ===== Capability checks =====
@@ -1475,8 +1470,23 @@ local function parseSelectedFiles(s)
     if not s or s == "" then return out end
     
     if s:find("%z") then
+        local parts = {}
         for p in s:gmatch("([^%z]+)") do
-            if #p > 0 then out[#out + 1] = p end
+            if #p > 0 then parts[#parts + 1] = p end
+        end
+        -- Windows multi-select returns the directory as the first NUL token followed
+        -- by bare filenames; macOS returns a full path per token. Detect the Windows
+        -- shape (2+ tokens where the second has no path separator / drive letter) and
+        -- join dir + filename; otherwise pass each token through unchanged. Without
+        -- this, the bare filenames failed fileExists() ("audio files not found").
+        local secondBare = parts[2] and not (parts[2]:find("[/\\]") or parts[2]:match("^%a:"))
+        if #parts >= 2 and secondBare then
+            local dir = parts[1]
+            for i = 2, #parts do
+                out[#out + 1] = dir .. "/" .. parts[i]
+            end
+        else
+            for _, p in ipairs(parts) do out[#out + 1] = p end
         end
         return out
     end
@@ -5690,7 +5700,30 @@ local function commitMappings()
             end
         end
     end
-    
+
+    -- Pre-flight: verify all mapped audio files exist BEFORE any mutation.
+    -- A missing file used to leave the template track deleted with no replacement
+    -- (replaceMixWithSourceAtSamePosition returned nil but DeleteTrack still ran).
+    -- Abort the whole commit atomically so nothing is touched if a file is missing.
+    local missingFiles = {}
+    for _, op in ipairs(ops) do
+        for _, ri in ipairs(op.recIdxs) do
+            local entry = recSources[ri]
+            if entry and entry.src == "file" and not fileExists(entry.file) then
+                missingFiles[#missingFiles + 1] = entry.file or "(unknown)"
+            end
+        end
+    end
+    if #missingFiles > 0 then
+        r.PreventUIRefresh(-1)
+        r.Undo_EndBlock("RAPID: Commit aborted (missing audio files)", -1)
+        local msg = "Cannot commit — these audio files could not be found:\n\n"
+        for _, f in ipairs(missingFiles) do msg = msg .. f .. "\n" end
+        msg = msg .. "\nNo tracks were changed. Please re-add the missing files and try again."
+        showError(msg)
+        return
+    end
+
     -- Phase 1: Map tracks
     for _, op in ipairs(ops) do
         local mixTr = op.mixTr
@@ -5747,10 +5780,14 @@ local function commitMappings()
             rewireReceives(mixTr, firstNew)
             created[#created + 1] = firstNew
         end
-        
-        r.DeleteTrack(mixTr)
-        matchedSet[mixTr] = true
-        
+
+        -- Only retire the template track if a replacement was actually created.
+        -- Guards against losing template tracks when source creation fails for any reason.
+        if validTrack(firstNew) then
+            r.DeleteTrack(mixTr)
+            matchedSet[mixTr] = true
+        end
+
         -- Cache firstNew chunk once for all duplicates (avoid repeated expensive serialization)
         local firstNewChunk = nil
         if validTrack(firstNew) then
