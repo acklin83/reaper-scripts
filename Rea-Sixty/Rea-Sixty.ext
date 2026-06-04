@@ -1,14 +1,10 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.17
+@version 0.1.18
 @changelog
-  - Codename: Off on the Charabanc!
-  - New: per-meter peak fall rate (Settings -> Device -> Metering); all meters peak-hold, UC1 input now decays in lock-step with output (Peak/VU/RMS selector removed)
-  - Fix: output meter under-read — a -6 dB signal used to light only to -9
-  - New: UC1 Out Gain knob can flip to drive REAPER track volume instead of the SSL Fader Level param (Hardware Modes builtin + REAPER action); works even with no channel strip on the track
-  - Fix: FX-Learn parameter search is now case-insensitive ("out" finds "Output Gain")
-  - Fix: FX-Learn dropdowns no longer shrink as the search narrows the list
-  - Fix: an inverted EQ-IN / DYN-IN button no longer dims the knob-ring cascade in reverse
+  - Codename: That's not a knife... that's a knife!
+  - New: Shift + channel encoder = range-select across adjacent tracks, REAPER Shift+Arrow style — bindable encoder action "Encoder: extend track selection" (Cycle Actions); no default binding, Shift stays Instance-Cycle
+  - Change: the mixer now scrolls to the selected track only when it is off-screen (minimal, like a mouse click) instead of yanking it to the leftmost strip on every UF8/UC1 selection
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
