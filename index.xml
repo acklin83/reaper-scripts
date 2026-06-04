@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="8cddf117f79fbe2e2061b97ff21434e690c0c3e9">
+<index version="1" name="Frank Acklin Scripts" commit="7f4357cf2bde0559f03edc3b5742061a61319540">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -461,6 +461,18 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.17/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.18" author="Frank Acklin" time="2026-06-04T14:07:54Z">
+        <changelog><![CDATA[- Codename: That's not a knife... that's a knife!
+- New: Shift + channel encoder = range-select across adjacent tracks, REAPER Shift+Arrow style — bindable encoder action "Encoder: extend track selection" (Cycle Actions); no default binding, Shift stays Instance-Cycle
+- Change: the mixer now scrolls to the selected track only when it is off-screen (minimal, like a mouse click) instead of yanking it to the leftmost strip on every UF8/UC1 selection]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
