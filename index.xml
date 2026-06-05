@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="7f4357cf2bde0559f03edc3b5742061a61319540">
+<index version="1" name="Frank Acklin Scripts" commit="0f0350ddceac1ed3ff57141b1500e04e1fa7c018">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -473,6 +473,18 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.18/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.19" author="Frank Acklin" time="2026-06-05T09:44:09Z">
+        <changelog><![CDATA[- Codename: Anchors Aweigh
+- Fix: UF8 faders in Touch automation no longer nudge a track to ~-0.5 dB and seed the new envelope there on tracks with no volume automation — touches now anchor to the motor's true position and write only relative motion; 0 dB lands exactly on 0 dB
+- New: UC1 buttons bound to a multi-option plug-in param (e.g. SPL Iron's SC EQ, 6 settings) step through every option and wrap, instead of jumping first to last]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.19/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.19/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.19/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.19/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.19/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.19/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.19/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
