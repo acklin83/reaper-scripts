@@ -1,10 +1,12 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.19
+@version 0.1.20
 @changelog
-  - Codename: Anchors Aweigh
-  - Fix: UF8 faders in Touch automation no longer nudge a track to ~-0.5 dB and seed the new envelope there on tracks with no volume automation — touches now anchor to the motor's true position and write only relative motion; 0 dB lands exactly on 0 dB
-  - New: UC1 buttons bound to a multi-option plug-in param (e.g. SPL Iron's SC EQ, 6 settings) step through every option and wrap, instead of jumping first to last
+  - Codename: Behave!
+  - New: UC1 button push-cycle editor in FX Learn — pick exactly which options a discrete button (EQ Type, HF/LF Bell, Comp Fast Attack, Peak, Expand, Gate Attack) steps through; untick to exclude, options stay visible and in place
+  - New: drag the handle to reorder the cycle
+  - New: build a multi-parameter macro on an unmapped button via "+ Add step" — one button can walk several plug-in params (e.g. an SSL concept split across separate toggles on a third-party plug-in)
+  - Tick all options in natural order again and the button reverts to "cycle all"; built-in SSL plug-ins are unchanged
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
