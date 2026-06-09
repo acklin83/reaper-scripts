@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="e74c036b4270fc0cc370828587a442d01d93a26d">
+<index version="1" name="Frank Acklin Scripts" commit="00799438981bbebe57b8dc41dcffa343dafa3845">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <metadata>
@@ -499,6 +499,20 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.20/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.20/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.20/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.21" author="Frank Acklin" time="2026-06-09T12:07:47Z">
+        <changelog><![CDATA[- Codename: Stayin' Alive
+- Fix: multiple selected faders stay in sync — moving one no longer collapses the others onto its level; they move relative and keep their offsets
+- Fix: a fader you briefly touched now re-engages and follows REAPER again — external volume changes (routing dialog, automation, ganged moves) reach it instead of being ignored until you nudge it
+- Fix: Touch-mode volume envelopes seed at the value where you grabbed the fader, not a slightly-later moved value
+- Fix: uncoloured markers show REAPER's marker colour on the UF8 instead of grey]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.21/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.21/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.21/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.21/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.21/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.21/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.21/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
