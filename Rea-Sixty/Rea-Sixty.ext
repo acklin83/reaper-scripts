@@ -1,12 +1,12 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.20
+@version 0.1.21
 @changelog
-  - Codename: Behave!
-  - New: UC1 button push-cycle editor in FX Learn — pick exactly which options a discrete button (EQ Type, HF/LF Bell, Comp Fast Attack, Peak, Expand, Gate Attack) steps through; untick to exclude, options stay visible and in place
-  - New: drag the handle to reorder the cycle
-  - New: build a multi-parameter macro on an unmapped button via "+ Add step" — one button can walk several plug-in params (e.g. an SSL concept split across separate toggles on a third-party plug-in)
-  - Tick all options in natural order again and the button reverts to "cycle all"; built-in SSL plug-ins are unchanged
+  - Codename: Stayin' Alive
+  - Fix: multiple selected faders stay in sync — moving one no longer collapses the others onto its level; they move relative and keep their offsets
+  - Fix: a fader you briefly touched now re-engages and follows REAPER again — external volume changes (routing dialog, automation, ganged moves) reach it instead of being ignored until you nudge it
+  - Fix: Touch-mode volume envelopes seed at the value where you grabbed the fader, not a slightly-later moved value
+  - Fix: uncoloured markers show REAPER's marker colour on the UF8 instead of grey
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
