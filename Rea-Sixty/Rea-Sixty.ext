@@ -1,12 +1,9 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.21
+@version 0.1.22
 @changelog
-  - Codename: Stayin' Alive
-  - Fix: multiple selected faders stay in sync — moving one no longer collapses the others onto its level; they move relative and keep their offsets
-  - Fix: a fader you briefly touched now re-engages and follows REAPER again — external volume changes (routing dialog, automation, ganged moves) reach it instead of being ignored until you nudge it
-  - Fix: Touch-mode volume envelopes seed at the value where you grabbed the fader, not a slightly-later moved value
-  - Fix: uncoloured markers show REAPER's marker colour on the UF8 instead of grey
+  - Codename: It's Suntory Time
+  - Fix: marquee zoom no longer snaps the arrange view back to the selected track — view-follow now fires only on hardware selection (UF8/UC1 SEL, encoder, param-follow), not on mouse/marquee/actions
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
