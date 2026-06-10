@@ -1,34 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="00799438981bbebe57b8dc41dcffa343dafa3845">
+<index version="1" name="Frank Acklin Scripts" commit="eb1ff5be5cd09f62cfbddae7eb72caaf077d9bd0">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
-      <metadata>
-        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
-{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
-\widowctrl\hyphauto
-
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 RAPID\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Professional workflow automation for REAPER that automates track mapping, media import, and LUFS normalization.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Four Workflows\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Full Workflow}: Import + mapping + normalization in one pass\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import Mode (Single RPP)}: Map recording tracks to mix template (preserves FX, sends, routing)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Import Mode (Multi-RPP)}: Import multiple RPP files into one template with merged tempo\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Normalize Mode}: Standalone LUFS normalization on existing tracks\sa180\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Features\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Live template sync \u8212- track changes auto-detected\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Drag & drop file import from OS file manager\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Multi-RPP import with merged tempo, regions, and markers\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Fuzzy matching with aliases for automatic track suggestions\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Multi-slot mapping with auto-duplicate for multiple sources\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab LUFS calibration system for creating custom normalization profiles\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Per-profile LUFS settings (segment size, percentile, threshold)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Offline media auto-relinking via progressive path suffix matching\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab MixnoteStyle dark theme\sa180\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6.0+\sa180\par}
-}
-]]></description>
-      </metadata>
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
         <changelog><![CDATA[LUFS Calibration System: Create/update profiles from reference tracks
 Per-profile LUFS measurement settings (segment size, percentile, threshold)
@@ -94,6 +67,13 @@ Removed Little Joe profile sync]]></changelog>
 Fixed destructive commit: a missing audio file no longer deletes its template track
 Commit now runs an atomic pre-flight — aborts and touches nothing if any mapped audio file is missing]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/14cc080897bd69ea382f4e089b2317a137d10a01/RAPID/RAPID.lua</source>
+      </version>
+      <version name="2.7.2" author="Frank Acklin" time="2026-06-10T07:27:00Z">
+        <changelog><![CDATA[Single-RPP "Import Markers/Tempomap": tempo applied BEFORE item import so beat-locked items stay on the grid
+Fixed items deleted / tracks appearing empty after import (SetTempoTimeSigMarker arg order + apply order)
+Lane-safe "Delete gaps between regions": no longer wipes the whole comp lane on comped multi-lane tracks
+Markers/regions created before normalization; source-RPP region count shown pre-commit]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/eb1ff5be5cd09f62cfbddae7eb72caaf077d9bd0/RAPID/RAPID.lua</source>
       </version>
     </reapack>
   </category>
