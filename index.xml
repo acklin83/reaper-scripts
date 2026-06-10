@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="eb1ff5be5cd09f62cfbddae7eb72caaf077d9bd0">
+<index version="1" name="Frank Acklin Scripts" commit="7fd7a999e1d772b34779c21f4e97c1881bfbb37c">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -512,11 +512,13 @@ Bug fixes:
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Per-track preamp control} as REAPER actions: gain \u177 ?1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Studio actions}: Toggle Talkback, Toggle Auto-Talkback on Stop (drives talkback from REAPER's transport state), Save/Load TotalMix Snapshot Slot 1\u8230 ?8.\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Stereo input handling}: stereo-linked TotalMix pairs and 2-mono splits both work correctly \u8212- TotalMix's own balance handling is preserved.\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Stereo input handling}: optionally link REAPER stereo inputs as TotalMix stereo pairs \u8212- pan/balance and stereo width round-trip both directions; unlinks automatically on stereo\u8594 ?mono. 2-mono splits still work too.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Settings window} (action "TotalReaper: Open Settings Window"): configurable OSC ports (applied live) and feature toggles, kept in sync with the matching actions. Needs ReaImGui.\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6 or later (tested through 7.71)\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings \u8594 ? OSC \u8594 ? Compatibility Mode \u8594 ? Global OSC)\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab RME interface that supports Global OSC (UFX+, UCX II, etc.)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui \u8212- only for the optional Settings window; install via ReaPack \u8594 ? Browse packages. Everything else works without it.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b TotalMix Settings \u8594 ? OSC \u8594 ? Details\u8230 ? \u8594 ? "Receive to hidden channels" must be checked.} Otherwise TotalMix silently drops fader writes for any input row or output column not in the current layout \u8212- the routing mirror appears dead even though TotalReaper is sending correctly. Some TotalMix versions default this OFF.\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Out of scope\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 TotalMix-internal effects (channel EQ, dynamics, room EQ, FX send/return) \u8212- those stay in TotalMix.\par}
@@ -585,6 +587,18 @@ README: document the "Receive to hidden channels" requirement in TotalMix's OSC 
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.12/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.1.12/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.1.12/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.0" author="Frank Acklin" time="2026-06-10T13:00:24Z">
+        <changelog><![CDATA[First Windows release (reaper_totalreaper.dll) alongside macOS arm64 / x86_64.
+
+Fixed: direct hardware-output sends are now mirrored. A track routed straight to a hardware output (e.g. the RME phones channels) now follows REAPER — previously only track → bus-track → hardware chains were picked up, so headphone aux levels didn't react. Works forward and via 2-Way Control.
+
+New: Settings window — action "TotalReaper: Open Settings Window" opens a panel for OSC ports (configurable, applied live) and toggles for Routing Mirror / 2-Way Control / Auto-Talkback / Stereo-Pair Link, kept in sync with the matching actions and toolbar icons. Requires ReaImGui (install via ReaPack → Browse packages); if it's missing the action just says so and everything else keeps working.
+
+New: Stereo-pair linking — optionally link REAPER stereo inputs as TotalMix stereo pairs; unlinks automatically when you switch back to mono and re-centers the freed partner channel. Pan/balance and stereo width round-trip both directions (REAPER ↔ TotalMix) with echo suppression so TotalMix's hard-L/R reset on link changes doesn't fight your settings.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.0/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.0/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.0/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
