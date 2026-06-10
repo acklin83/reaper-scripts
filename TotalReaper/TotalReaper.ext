@@ -1,20 +1,14 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.1.12
+@version 0.2.0
 @changelog
-  Routing mirror: only one REAPER track per hardware input now drives the TotalMix matrix cells (the first rec-armed + monitoring track, falling back to the first monitor-only track). Previously every monitoring track that shared an input pushed its own gain values, producing visible fader jitter during slow send moves and breaking mute semantics: send-mute and channel-mute didn't reach TotalMix because other tracks' non-∞ writes overwrote the -∞ close-out within the same Run() tick.
+  First Windows release (reaper_totalreaper.dll) alongside macOS arm64 / x86_64.
 
-  Routing mirror: channel-mute (REAPER track B_MUTE) now drives the owned matrix cells to -∞ on every walked bus, matching the behaviour of monitor-off.
+  Fixed: direct hardware-output sends are now mirrored. A track routed straight to a hardware output (e.g. the RME phones channels) now follows REAPER — previously only track → bus-track → hardware chains were picked up, so headphone aux levels didn't react. Works forward and via 2-Way Control.
 
-  Routing mirror: tick-level TX dedupe — each Run() tick now emits at most one /mix/in/<hwIdx>/<bus>/fader and /balpan per cell. Fixes rapid-fire 4-5 writes per cell per tick that landed during fader moves with multiple tracks on the same input.
+  New: Settings window — action "TotalReaper: Open Settings Window" opens a panel for OSC ports (configurable, applied live) and toggles for Routing Mirror / 2-Way Control / Auto-Talkback / Stereo-Pair Link, kept in sync with the matching actions and toolbar icons. Requires ReaImGui (install via ReaPack → Browse packages); if it's missing the action just says so and everything else keeps working.
 
-  Toggle OSC Dump: now also logs outgoing (TX) messages, not just incoming (RX). Used to surface the duplicate-push pattern that motivated the dedupe and primary-owner fix.
-
-  Routing mirror: the source track's REAPER pan is now composed into every walked HW-routed bus, not just the main monitor. Headphone cues and other downstream HW outs follow the REAPER pan instead of staying centred.
-
-  Routing mirror: clear the per-bus send-routing cache when a track's I_RECINPUT is reassigned. Without the wipe, the new input's matrix cells on every walked bus stayed at -inf until something else perturbed the state — phones now follow input-channel changes immediately, no rec-arm toggle required.
-
-  README: document the "Receive to hidden channels" requirement in TotalMix's OSC Details settings. Without it TotalMix silently drops `/mix/in/<n>/<bus>/fader` writes for any channel not in the current layout — the routing mirror appears completely dead even though TotalReaper is sending correctly.
+  New: Stereo-pair linking — optionally link REAPER stereo inputs as TotalMix stereo pairs; unlinks automatically when you switch back to mono and re-centers the freed partner channel. Pan/balance and stereo width round-trip both directions (REAPER ↔ TotalMix) with echo suppression so TotalMix's hard-L/R reset on link changes doesn't fight your settings.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
@@ -36,13 +30,15 @@
   - **Track-to-track sends** are walked recursively and projected onto TotalMix routings on every hardware-output destination — cue mixes, headphone sends, etc.
   - **Per-track preamp control** as REAPER actions: gain ±1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.
   - **Studio actions**: Toggle Talkback, Toggle Auto-Talkback on Stop (drives talkback from REAPER's transport state), Save/Load TotalMix Snapshot Slot 1…8.
-  - **Stereo input handling**: stereo-linked TotalMix pairs and 2-mono splits both work correctly — TotalMix's own balance handling is preserved.
+  - **Stereo input handling**: optionally link REAPER stereo inputs as TotalMix stereo pairs — pan/balance and stereo width round-trip both directions; unlinks automatically on stereo→mono. 2-mono splits still work too.
+  - **Settings window** (action "TotalReaper: Open Settings Window"): configurable OSC ports (applied live) and feature toggles, kept in sync with the matching actions. Needs ReaImGui.
 
   ## Requirements
 
   - REAPER 6 or later (tested through 7.71)
   - TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings → OSC → Compatibility Mode → Global OSC)
   - RME interface that supports Global OSC (UFX+, UCX II, etc.)
+  - ReaImGui — only for the optional Settings window; install via ReaPack → Browse packages. Everything else works without it.
   - **TotalMix Settings → OSC → Details… → "Receive to hidden channels" must be checked.** Otherwise TotalMix silently drops fader writes for any input row or output column not in the current layout — the routing mirror appears dead even though TotalReaper is sending correctly. Some TotalMix versions default this OFF.
 
   ## Out of scope
