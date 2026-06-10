@@ -1,10 +1,12 @@
 -- @description RAPID - Recording Auto-Placement & Intelligent Dynamics
 -- @author Frank Acklin
--- @version 2.7.1
+-- @version 2.7.2
 -- @changelog
---   Fixed Windows multi-file audio import: bare filenames now joined with their directory (no more "audio files not found")
---   Fixed destructive commit: a missing audio file no longer deletes its template track
---   Commit now runs an atomic pre-flight — aborts and touches nothing if any mapped audio file is missing
+--   Single-RPP "Import Markers/Tempomap": tempo applied BEFORE item import so beat-locked items stay on the grid
+--   Fixed items deleted / tracks appearing empty after import (SetTempoTimeSigMarker arg order + apply order)
+--   Lane-safe "Delete gaps between regions": no longer wipes the whole comp lane on comped multi-lane tracks
+--   Markers/regions created before normalization; source-RPP region count shown pre-commit
+
 -- @about
 --   # RAPID
 --   Professional workflow automation for REAPER that automates track mapping, media import, and LUFS normalization.
@@ -28,7 +30,7 @@
 --
 --   ## Requirements
 --   - REAPER 6.0+
--- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.7.1
+-- RAPID - Recording Auto-Placement & Intelligent Dynamics v2.7.2
 --
 -- Unified version combining RAPID (Import & Mapping) with Little Joe (Normalize-Only)
 --
@@ -76,7 +78,7 @@
 local r = reaper
 
 -- ===== VERSION =====
-local VERSION = "2.7.1"
+local VERSION = "2.7.2"
 local WINDOW_TITLE = "RAPID v" .. VERSION
 
 -- ===== Capability checks =====
@@ -272,7 +274,7 @@ local settings = {
     -- Normalize mode settings
     processPerRegion = true,
     createNewLane = true,
-    deleteBetweenRegions = true,
+    deleteBetweenRegions = false,  -- destructive: deletes items outside regions (off by default)
 
     -- Note: LUFS settings are now per-profile (see DEFAULT_LUFS_* constants for defaults)
 
@@ -782,7 +784,7 @@ local function loadIni()
     settings.normalizeMode = parseBool("NormalizeMode", true)
     settings.processPerRegion = parseBool("ProcessPerRegion", true)
     settings.createNewLane = parseBool("CreateNewLane", true)
-    settings.deleteBetweenRegions = parseBool("DeleteBetweenRegions", true)
+    settings.deleteBetweenRegions = parseBool("DeleteBetweenRegions", false)
     settings.enableConsoleLogging = parseBool("EnableConsoleLogging", false)
     settings.autoMatchTracksOnImport = parseBool("AutoMatchTracksOnImport", true)
     settings.autoMatchProfilesOnImport = parseBool("AutoMatchProfilesOnImport", true)
@@ -1617,27 +1619,24 @@ end
 
 -- ===== LOAD RECORDING RPP =====
 local function countRegionsInRPP(rppText)
+    -- MARKER format: MARKER idx pos "name" flags [0 colortype colorflag {GUID} 0]
+    -- Field after the name is a bitmask: bit 0 (flags % 2 == 1) = region. A region is written as
+    -- TWO MARKER lines sharing an idx (start + end), both with bit 0 set (e.g. flags 9 = 1001b for
+    -- a colored region, not plain 1). Count each region once via first occurrence per idx.
     local count = 0
-    -- MARKER format: MARKER index position "name" isrgn rgnend [color]
-    -- isrgn: 0 = marker, 1 = region
-    -- Example: MARKER 2 4.0 "Region 1" 1 8.0 0
+    local seen = {}
     for line in rppText:gmatch("[^\r\n]+") do
         if line:match("^%s*MARKER%s+") then
-            -- Parse: MARKER idx pos "name" isrgn ...
-            -- We need to check if the 4th parameter (after name) is 1
-            local idx, pos, rest = line:match("^%s*MARKER%s+(%S+)%s+(%S+)%s+(.+)")
-            if rest then
-                -- Extract name (quoted string) and following parameters
-                local name, after_name = rest:match('^"([^"]*)"(.*)')
-                if not name then
-                    -- Try unquoted name
-                    name, after_name = rest:match("^(%S+)(.*)")
+            local idx, _, rest = line:match("^%s*MARKER%s+(%S+)%s+(%S+)%s+(.+)")
+            if idx and rest then
+                local _, after_name = rest:match('^"([^"]*)"(.*)')
+                if not after_name then
+                    _, after_name = rest:match("^(%S+)(.*)")
                 end
-                
                 if after_name then
-                    -- First parameter after name is isrgn
-                    local isrgn = after_name:match("^%s*(%d+)")
-                    if isrgn == "1" then
+                    local flags = tonumber(after_name:match("^%s*(%-?%d+)")) or 0
+                    if flags % 2 == 1 and not seen[idx] then
+                        seen[idx] = true
                         count = count + 1
                     end
                 end
@@ -1889,17 +1888,27 @@ local function extractMarkersFromRpp(rppText)
     return markers
 end
 
--- ===== IMPORT MARKERS/REGIONS/TEMPO (POST-COMMIT) =====
--- Single-RPP: Import tempo, markers and regions from source RPP via API (no file-write or reload)
-local function importMarkersTempoPostCommit()
+-- ===== APPLY SOURCE TEMPO / MARKERS (single-RPP, via API, no file-write or reload) =====
+-- stage "tempo":   apply the source RPP's tempo map via API tempo markers. Called BEFORE track
+--                  import, because source items are beat-locked (TIMELOCKMODE 2): the tempo map
+--                  must be 100% final before items are placed, otherwise they recalculate their
+--                  second-positions when the tempo changes afterwards and drift off the grid.
+--                  That drift is what made normalize-per-region + "delete gaps" wipe the items:
+--                  the items landed outside the (correctly placed) regions and were deleted.
+--                  pt.pos is in SECONDS -> passed as timepos (3rd arg), measurepos/beatpos = -1.
+--                  Signature: SetTempoTimeSigMarker(proj, ptidx, timepos, measurepos, beatpos,
+--                  bpm, num, denom, linear) -- matches the proven multi-RPP setTempoViaAPI.
+--                  SetEnvelopeStateChunk is intentionally NOT used here (applying the envelope
+--                  chunk before track import corrupts internal state and aborts the import).
+-- stage "markers": create the source RPP's markers + regions via API. Called AFTER track import
+--                  but BEFORE normalization, so per-region normalization finds the regions and the
+--                  items (now correctly placed) line up inside them.
+local function applySourceTempoMarkers(stage)
     if not recPath.rpp or recPath.rpp == "" then
-        log("No recording RPP loaded, skipping marker import\n")
+        if stage == "tempo" then log("No recording RPP loaded, skipping tempo import\n") end
         return
     end
 
-    log("\n=== Importing Markers/Regions/Tempo ===\n")
-
-    -- Read source RPP
     local f = io.open(recPath.rpp, "rb")
     if not f then
         log("Cannot read source RPP\n")
@@ -1908,60 +1917,36 @@ local function importMarkersTempoPostCommit()
     local src_txt = f:read("*a"):gsub("^\239\187\191", ""):gsub("\r\n", "\n"):gsub("\r", "\n")
     f:close()
 
-    -- 1. Extract & apply tempo
-    local tempoMap, baseTempo = extractTempoMap(src_txt)
-
-    -- Set base tempo
-    r.SetCurrentBPM(0, baseTempo.bpm, true)
-
-    -- Delete existing tempo markers
-    for i = r.CountTempoTimeSigMarkers(0) - 1, 0, -1 do
-        r.DeleteTempoTimeSigMarker(0, i)
-    end
-
-    -- Set tempo markers via API (for correct positioning)
-    for _, pt in ipairs(tempoMap) do
-        r.SetTempoTimeSigMarker(0, -1, -1, -1, pt.pos,
-            pt.bpm, pt.num or 0, pt.denom or 0, pt.shape == 0)
-    end
-
-    -- Apply source RPP's envelope chunk directly (copies TEMPOENVEX verbatim for single-RPP)
-    if #tempoMap > 1 then
-        local envexStart = src_txt:find("<TEMPOENVEX\n")
-        if envexStart then
-            local envexEnd = src_txt:find("\n>", envexStart)
-            if envexEnd then
-                local envexChunk = src_txt:sub(envexStart, envexEnd + 1)
-                local masterTrack = r.GetMasterTrack(0)
-                local tempoEnv = masterTrack and r.GetTrackEnvelopeByName(masterTrack, "Tempo map")
-                if tempoEnv then
-                    local ok = r.SetEnvelopeStateChunk(tempoEnv, envexChunk, true)
-                    if ok then
-                        log("  Tempo envelope applied via chunk\n")
-                    else
-                        log("  WARNING: SetEnvelopeStateChunk failed, using API tempo only\n")
-                    end
-                end
+    if stage == "tempo" then
+        local tempoMap, baseTempo = extractTempoMap(src_txt)
+        r.SetCurrentBPM(0, baseTempo.bpm, true)
+        -- Delete existing tempo markers
+        for i = r.CountTempoTimeSigMarkers(0) - 1, 0, -1 do
+            r.DeleteTempoTimeSigMarker(0, i)
+        end
+        -- pt.pos = seconds -> timepos (3rd arg), measurepos/beatpos = -1
+        for _, pt in ipairs(tempoMap) do
+            r.SetTempoTimeSigMarker(0, -1, pt.pos, -1, -1,
+                pt.bpm, pt.num or 0, pt.denom or 0, pt.shape == 0)
+        end
+        r.UpdateTimeline()
+        log(string.format("Tempo applied from source (%d points)\n", #tempoMap))
+    elseif stage == "markers" then
+        local markers = extractMarkersFromRpp(src_txt)
+        local markerCount, regionCount = 0, 0
+        for _, m in ipairs(markers) do
+            if m.isRegion then
+                r.AddProjectMarker2(0, true, m.pos, m.rgnend, m.name, -1, m.color)
+                regionCount = regionCount + 1
+            else
+                r.AddProjectMarker2(0, false, m.pos, 0, m.name, -1, m.color)
+                markerCount = markerCount + 1
             end
         end
+        r.UpdateTimeline()
+        log(string.format("Markers/Regions imported! (%d markers, %d regions)\n",
+            markerCount, regionCount))
     end
-
-    -- 2. Import markers/regions via API
-    local markers = extractMarkersFromRpp(src_txt)
-    local markerCount, regionCount = 0, 0
-    for _, m in ipairs(markers) do
-        if m.isRegion then
-            r.AddProjectMarker2(0, true, m.pos, m.rgnend, m.name, -1, m.color)
-            regionCount = regionCount + 1
-        else
-            r.AddProjectMarker2(0, false, m.pos, 0, m.name, -1, m.color)
-            markerCount = markerCount + 1
-        end
-    end
-
-    r.UpdateTimeline()
-    log(string.format("Markers/Regions/Tempo imported! (%d markers, %d regions, %d tempo points)\n",
-        markerCount, regionCount, #tempoMap))
 end
 
 -- Calculate RPP length in measures (finds last item end, rounds up to complete measure)
@@ -5477,39 +5462,40 @@ normalizeTrack = function(track, normalizationType, targetValue, regions, target
             end
         end
         
-        -- Get Xenakios command
-        local cmd = r.NamedCommandLookup("_XENAKIOS_TSADEL")
-        if cmd == 0 then
-            log("  WARNING: _XENAKIOS_TSADEL command not found (SWS required)\n")
-        else
-            -- Unselect all items ONCE before processing gaps
-            r.Main_OnCommand(40289, 0) -- Unselect all items first
-            
-            -- For each gap, create time selection and delete items
-            for _, gap in ipairs(gaps) do
-                -- Set time selection to gap
-                r.GetSet_LoopTimeRange2(0, true, false, gap.start, gap.finish, false)
-                
-                -- Select only items on targetLane
-                local itemCount = r.CountTrackMediaItems(track)
-                for i = 0, itemCount - 1 do
+        -- Lane-safe gap deletion (see normalizeTrackDirect for the rationale): split this lane's
+        -- items at each gap edge, then delete ONLY the segments fully inside a gap. Never selects
+        -- the whole lane, so in-region items and the lane itself survive.
+        for _, gap in ipairs(gaps) do
+            for _, edge in ipairs({ gap.start, gap.finish }) do
+                local n = r.CountTrackMediaItems(track)
+                for i = 0, n - 1 do
                     local item = r.GetTrackMediaItem(track, i)
-                    local itemLane = r.GetMediaItemInfo_Value(item, "I_FIXEDLANE")
-                    if itemLane == targetLane then
-                        r.SetMediaItemSelected(item, true)
+                    if item and r.GetMediaItemInfo_Value(item, "I_FIXEDLANE") == targetLane then
+                        local pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
+                        local fin = pos + r.GetMediaItemInfo_Value(item, "D_LENGTH")
+                        if pos < edge - 1e-9 and fin > edge + 1e-9 then
+                            r.SplitMediaItem(item, edge)
+                        end
                     end
                 end
-                
-                -- Delete selected items in time selection
-                r.Main_OnCommand(cmd, 0)
-                log(string.format("    Deleted in gap %.2f-%.2f\n", gap.start, gap.finish))
             end
-            
-            -- Clear time selection and item selection
-            r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)
-            r.Main_OnCommand(40289, 0)
-            log(string.format("  Processed %d gaps between regions\n", #gaps))
         end
+        local di = r.CountTrackMediaItems(track) - 1
+        while di >= 0 do
+            local item = r.GetTrackMediaItem(track, di)
+            if item and r.GetMediaItemInfo_Value(item, "I_FIXEDLANE") == targetLane then
+                local pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
+                local fin = pos + r.GetMediaItemInfo_Value(item, "D_LENGTH")
+                for _, gap in ipairs(gaps) do
+                    if pos >= gap.start - 1e-6 and fin <= gap.finish + 1e-6 then
+                        r.DeleteTrackMediaItem(track, item)
+                        break
+                    end
+                end
+            end
+            di = di - 1
+        end
+        log(string.format("  Processed %d gaps between regions (lane-safe)\n", #gaps))
         
     end
 
@@ -5619,39 +5605,43 @@ normalizeTrackDirect = function(track, normalizationType, targetValue, regions, 
                 end
             end
             
-            -- Get Xenakios command
-            local cmd = r.NamedCommandLookup("_XENAKIOS_TSADEL")
-            if cmd == 0 then
-                log("  WARNING: _XENAKIOS_TSADEL command not found (SWS required)\n")
-                return
-            end
-            
-            -- For each gap, create time selection and delete items
+            -- Lane-safe gap deletion. The old code selected EVERY item on the active lane (no
+            -- position check) and relied on a time-selection delete command to limit the damage --
+            -- which instead wiped the entire comp lane. Now: split this lane's items exactly at the
+            -- gap edges, then delete ONLY the segments that lie fully inside a gap. Items inside the
+            -- regions are never touched, so the lane (and its play state) survives -- same result as
+            -- deleting the between-region bits by hand.
             for _, gap in ipairs(gaps) do
-                -- Set time selection to gap
-                r.GetSet_LoopTimeRange2(0, true, false, gap.start, gap.finish, false)
-                
-                -- Select only items on active lane
-                r.Main_OnCommand(40289, 0) -- Unselect all items first
-                local itemCount = r.CountTrackMediaItems(track)
-                for i = 0, itemCount - 1 do
-                    local item = r.GetTrackMediaItem(track, i)
-                    local itemLane = r.GetMediaItemInfo_Value(item, "I_FIXEDLANE")
-                    if itemLane == activeLane then
-                        r.SetMediaItemSelected(item, true)
+                for _, edge in ipairs({ gap.start, gap.finish }) do
+                    local n = r.CountTrackMediaItems(track)
+                    for i = 0, n - 1 do
+                        local item = r.GetTrackMediaItem(track, i)
+                        if item and r.GetMediaItemInfo_Value(item, "I_FIXEDLANE") == activeLane then
+                            local pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
+                            local fin = pos + r.GetMediaItemInfo_Value(item, "D_LENGTH")
+                            if pos < edge - 1e-9 and fin > edge + 1e-9 then
+                                r.SplitMediaItem(item, edge)
+                            end
+                        end
                     end
                 end
-                
-                -- Delete selected items in time selection
-                -- _XENAKIOS_TSADEL only deletes items that are within the time selection
-                r.Main_OnCommand(cmd, 0)
-                log(string.format("    Processed gap %.2f-%.2f\n", gap.start, gap.finish))
             end
-            
-            -- Clear time selection and item selection
-            r.GetSet_LoopTimeRange2(0, true, false, 0, 0, false)
-            r.Main_OnCommand(40289, 0) -- Unselect all items
-            log(string.format("  Processed %d gaps between regions\n", #gaps))
+            local di = r.CountTrackMediaItems(track) - 1
+            while di >= 0 do
+                local item = r.GetTrackMediaItem(track, di)
+                if item and r.GetMediaItemInfo_Value(item, "I_FIXEDLANE") == activeLane then
+                    local pos = r.GetMediaItemInfo_Value(item, "D_POSITION")
+                    local fin = pos + r.GetMediaItemInfo_Value(item, "D_LENGTH")
+                    for _, gap in ipairs(gaps) do
+                        if pos >= gap.start - 1e-6 and fin <= gap.finish + 1e-6 then
+                            r.DeleteTrackMediaItem(track, item)
+                            break
+                        end
+                    end
+                end
+                di = di - 1
+            end
+            log(string.format("  Processed %d gaps between regions (lane-safe)\n", #gaps))
         end
     else
         -- Normalize entire track (GROUP-BASED: all items get same gain)
@@ -5722,6 +5712,13 @@ local function commitMappings()
         msg = msg .. "\nNo tracks were changed. Please re-add the missing files and try again."
         showError(msg)
         return
+    end
+
+    -- Apply the source RPP's tempo map BEFORE importing items (if enabled). Source items are
+    -- beat-locked, so the tempo must be final first or they drift off the grid -- and normalize's
+    -- "delete gaps" would then wipe the drifted items as if they were between regions.
+    if multiRppSettings.singleImportMarkers then
+        applySourceTempoMarkers("tempo")
     end
 
     -- Phase 1: Map tracks
@@ -5960,6 +5957,13 @@ local function commitMappings()
         end
     end
     
+    -- Create source RPP markers/regions now: after track import (so it can't disturb track
+    -- creation) but BEFORE normalization, so per-region normalization finds the regions and the
+    -- correctly-placed items line up inside them (instead of being deleted as "gaps").
+    if multiRppSettings.singleImportMarkers then
+        applySourceTempoMarkers("markers")
+    end
+
     -- Phase 2: Normalize (if enabled)
     if normalizeMode then
         r.PreventUIRefresh(1)
@@ -6203,11 +6207,6 @@ local function commitMappings()
     end
     r.PreventUIRefresh(-1)
     r.TrackList_AdjustWindows(false)
-
-    -- Import markers/tempo from source RPP if checkbox is enabled (single-RPP only)
-    if multiRppSettings.singleImportMarkers then
-        importMarkersTempoPostCommit()
-    end
 
     r.Undo_EndBlock("RAPID v" .. VERSION .. ": Commit", -1)
 
@@ -7638,9 +7637,20 @@ local function drawUI_body()
         end
         if settings.processPerRegion then
             local regions = scanRegions()
+            local rcount = #regions
+            -- Pre-commit the project is still empty. If "Import Markers/Tempomap" is on, the source
+            -- RPP's regions WILL be created on commit (before normalization) -- preview that count
+            -- so the "Delete gaps" toggle below is reachable and the user can disable it.
+            local fromSource = false
+            if rcount == 0 and not multiRppSettings.enabled
+               and multiRppSettings.singleImportMarkers and (recPath.regionCount or 0) > 0 then
+                rcount = recPath.regionCount
+                fromSource = true
+            end
             r.ImGui_SameLine(ctx)
-            r.ImGui_TextColored(ctx, theme.text_dim, string.format("(%d regions)", #regions))
-            if #regions > 0 then
+            r.ImGui_TextColored(ctx, theme.text_dim,
+                string.format(fromSource and "(%d regions from source RPP)" or "(%d regions)", rcount))
+            if rcount > 0 then
                 r.ImGui_SameLine(ctx)
                 changed, val = r.ImGui_Checkbox(ctx, "Delete gaps", settings.deleteBetweenRegions)
                 if changed then
