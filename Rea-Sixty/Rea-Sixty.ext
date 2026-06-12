@@ -1,11 +1,13 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.24
+@version 0.1.25
 @changelog
-  - Codename: Scroll to Infinity and Beyond
-  - New: Cross-track FX / Instance scroll — encoder walks all FX on a track, then crosses to the next track (SSL 360°-native); available as Encoder Modes and as direct-bindable actions
-  - New: Right-click a control in the UF8/UC1 schematic → reset just that one binding to factory default
-  - Fix: Vertical zoom in / out actions were inverted
+  - Codename: Catch the Game Last Night?
+  - New: Master track on the surfaces — show Master as Track 0 on UC1, UC1 Out-Gain drives the Master fader, Bus Compressor on the Master shows in the BC carousel, and pin the Master to UF8 Strip 1 / 8 (Replace strip or Shift banking)
+  - New: Active CS / BC marker in REAPER's TCP/MCP Inserts list (opt-in, Settings → Device) — see at a glance which plug-in the surface is driving
+  - New: Encoder Mode → FX Move (in chain) + fx_move action to shuffle the active FX up / down in the focused track's chain
+  - New: Combine GR across plug-ins — optionally sum every compressor's gain reduction; separate UF8 / UC1 toggles
+  - Polish: Device pane tidied, searchable combo-popup width fix, "Plug-in" spelt consistently throughout
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
