@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="c852f50a6da3ef11632fbe89151d104982f253fa">
+<index version="1" name="Frank Acklin Scripts" commit="116c54e324655ad281030d02c0e79b2b15c0a131">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -529,6 +529,21 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.24/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.24/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.24/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.25" author="Frank Acklin" time="2026-06-12T18:08:44Z">
+        <changelog><![CDATA[- Codename: Catch the Game Last Night?
+- New: Master track on the surfaces — show Master as Track 0 on UC1, UC1 Out-Gain drives the Master fader, Bus Compressor on the Master shows in the BC carousel, and pin the Master to UF8 Strip 1 / 8 (Replace strip or Shift banking)
+- New: Active CS / BC marker in REAPER's TCP/MCP Inserts list (opt-in, Settings → Device) — see at a glance which plug-in the surface is driving
+- New: Encoder Mode → FX Move (in chain) + fx_move action to shuffle the active FX up / down in the focused track's chain
+- New: Combine GR across plug-ins — optionally sum every compressor's gain reduction; separate UF8 / UC1 toggles
+- Polish: Device pane tidied, searchable combo-popup width fix, "Plug-in" spelt consistently throughout]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
