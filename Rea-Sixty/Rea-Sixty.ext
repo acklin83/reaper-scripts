@@ -1,10 +1,11 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.23
+@version 0.1.24
 @changelog
-  - Codename: That's all he said?
-  - Fix: UC1 SSL CS EQ-gain knobs turn at the same rate as Freq/Q (were much finer); 0-dB centre still snaps reliably
-  - Fix: UF8 V-pots no longer lag or drop fast spins — removed a debug log that wrote to disk on every USB packet, plus a livelier per-detent step
+  - Codename: Scroll to Infinity and Beyond
+  - New: Cross-track FX / Instance scroll — encoder walks all FX on a track, then crosses to the next track (SSL 360°-native); available as Encoder Modes and as direct-bindable actions
+  - New: Right-click a control in the UF8/UC1 schematic → reset just that one binding to factory default
+  - Fix: Vertical zoom in / out actions were inverted
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
