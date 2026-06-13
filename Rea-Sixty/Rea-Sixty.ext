@@ -1,13 +1,14 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.25
+@version 0.1.26
 @changelog
-  - Codename: Catch the Game Last Night?
-  - New: Master track on the surfaces — show Master as Track 0 on UC1, UC1 Out-Gain drives the Master fader, Bus Compressor on the Master shows in the BC carousel, and pin the Master to UF8 Strip 1 / 8 (Replace strip or Shift banking)
-  - New: Active CS / BC marker in REAPER's TCP/MCP Inserts list (opt-in, Settings → Device) — see at a glance which plug-in the surface is driving
-  - New: Encoder Mode → FX Move (in chain) + fx_move action to shuffle the active FX up / down in the focused track's chain
-  - New: Combine GR across plug-ins — optionally sum every compressor's gain reduction; separate UF8 / UC1 toggles
-  - Polish: Device pane tidied, searchable combo-popup width fix, "Plug-in" spelt consistently throughout
+  - Codename: Pineapple Express
+  - New: Inserts marker is now a non-destructive on-screen overlay (JS_Composite) on REAPER's Mixer Inserts list — no FX rename, no dirty project; replaces the old renamed_name marker
+  - New: Overlay is design-able — CS / BC colour, fill + border opacity, row height + top offset (Settings → Device → Inserts)
+  - New: Optional dockable focused-track panel — shows the focused track's CS, the surface's BC (any track), and the last-changed parameter by its Rea-Sixty name; adjustable font, right-click to dock / undock
+  - New: Both the overlay and the docker are independent persistent toggles that come back automatically when REAPER opens; companion is baked into the extension with a Start/Stop button in Settings
+  - New: "None (disabled)" option in the Bindings action editor to explicitly unbind a slot
+  - Fix: overlay rescans are event-driven now (no typing lag)
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
