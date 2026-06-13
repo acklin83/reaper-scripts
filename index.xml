@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="116c54e324655ad281030d02c0e79b2b15c0a131">
+<index version="1" name="Frank Acklin Scripts" commit="4af11b0cb01abbde533bb022081a1f3d32504538">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -544,6 +544,22 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.25/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.26" author="Frank Acklin" time="2026-06-13T15:33:22Z">
+        <changelog><![CDATA[- Codename: Pineapple Express
+- New: Inserts marker is now a non-destructive on-screen overlay (JS_Composite) on REAPER's Mixer Inserts list — no FX rename, no dirty project; replaces the old renamed_name marker
+- New: Overlay is design-able — CS / BC colour, fill + border opacity, row height + top offset (Settings → Device → Inserts)
+- New: Optional dockable focused-track panel — shows the focused track's CS, the surface's BC (any track), and the last-changed parameter by its Rea-Sixty name; adjustable font, right-click to dock / undock
+- New: Both the overlay and the docker are independent persistent toggles that come back automatically when REAPER opens; companion is baked into the extension with a Start/Stop button in Settings
+- New: "None (disabled)" option in the Bindings action editor to explicitly unbind a slot
+- Fix: overlay rescans are event-driven now (no typing lag)]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
