@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="4af11b0cb01abbde533bb022081a1f3d32504538">
+<index version="1" name="Frank Acklin Scripts" commit="4ebdd180121ec267ba9f575b530e19d07f1d23d7">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -560,6 +560,24 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.26/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.27" author="Frank Acklin" time="2026-06-15T14:37:55Z">
+        <changelog><![CDATA[- Codename: Randy - I AM the Liquor!
+- New: Learn-HUD — dockable window listing the focused plug-in's UC1 control → parameter map; CS / BC tabs follow focus, NORM / OPT / CTRL layer badge, click-a-row + wiggle to learn. Toggle via the learn_hud_toggle built-in or the "Rea-Sixty: Toggle Learn-HUD" action (no Settings checkbox)
+- New: Learn-HUD right-click — text size + text colour (CS/BC or white); window size persists globally (default 500x500)
+- New: FX-Learn modifier layers (Normal / Option / Control) — a UC1 control carries three overlays (own param, invert, knob-travel, Display label); edit via the editor's layer tabs, use by holding Option / Control (enable in Settings → Device → Keyboard Options)
+- New: Focused-track panel "Use track colour" — draws the track name in its REAPER colour
+- Change: Inserts overlay now defaults to a clean outline — CS yellow, BC red, no fill
+- Fix: per-layer custom Display labels show correctly on the UC1 LCD, FX-Learn editor, Learn-HUD and focused-track panel — no more snap-back to the default name after a press / turn / release
+- Fix: modifier-layer mappings no longer lost when switching the FX-Learn edit domain (slot cache now stores overlays)
+- Fix: British / American spelling setting honoured in the focused-track panel menu]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
