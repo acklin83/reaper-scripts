@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="4ebdd180121ec267ba9f575b530e19d07f1d23d7">
+<index version="1" name="Frank Acklin Scripts" commit="e8ab9b0269dd4756efe6346386f06ac70458873d">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -578,6 +578,23 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.27/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.28" author="Frank Acklin" time="2026-06-16T14:45:35Z">
+        <changelog><![CDATA[- Codename: I like them teeny, and toasty.
+- New: Learn-HUD + focused-track panel rebuilt on ReaImGui — real windows, drag/dock anywhere (arrange, TCP, second monitor); the legacy gfx versions are retired
+- New: Learn-HUD List + hardware Mockup views; right-click a control → Learn / Invert / Rename / Unbind (acts on the active modifier layer; built-in SSL maps stay factory-fixed)
+- New: Shift+360 toggles the Learn-HUD (default binding, UF8 + UC1 360 button)
+- Change: Learn-HUD modifier layers show only the controls you actually overlaid on that layer (inherited ones read as unmapped); CS / BC never cross domains; the LCD name follows the focused domain
+- New: Focused-track panel — track name before/after the CS/BC tag, short FX names (SSL → CS2 / BC2), "Load on startup"
+- Change: FX-Learn UC1/UF8 mockups + EXT FUNCS grid scaled to 730px; right-click menus honour the Appearance font size
+- Fix (Windows): export "save dialog unavailable" now uses the native Save dialog; AltGr engages the FX-Learn Option layer]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
