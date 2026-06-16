@@ -1,16 +1,15 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.27
+@version 0.1.28
 @changelog
-  - Codename: Randy - I AM the Liquor!
-  - New: Learn-HUD — dockable window listing the focused plug-in's UC1 control → parameter map; CS / BC tabs follow focus, NORM / OPT / CTRL layer badge, click-a-row + wiggle to learn. Toggle via the learn_hud_toggle built-in or the "Rea-Sixty: Toggle Learn-HUD" action (no Settings checkbox)
-  - New: Learn-HUD right-click — text size + text colour (CS/BC or white); window size persists globally (default 500x500)
-  - New: FX-Learn modifier layers (Normal / Option / Control) — a UC1 control carries three overlays (own param, invert, knob-travel, Display label); edit via the editor's layer tabs, use by holding Option / Control (enable in Settings → Device → Keyboard Options)
-  - New: Focused-track panel "Use track colour" — draws the track name in its REAPER colour
-  - Change: Inserts overlay now defaults to a clean outline — CS yellow, BC red, no fill
-  - Fix: per-layer custom Display labels show correctly on the UC1 LCD, FX-Learn editor, Learn-HUD and focused-track panel — no more snap-back to the default name after a press / turn / release
-  - Fix: modifier-layer mappings no longer lost when switching the FX-Learn edit domain (slot cache now stores overlays)
-  - Fix: British / American spelling setting honoured in the focused-track panel menu
+  - Codename: I like them teeny, and toasty.
+  - New: Learn-HUD + focused-track panel rebuilt on ReaImGui — real windows, drag/dock anywhere (arrange, TCP, second monitor); the legacy gfx versions are retired
+  - New: Learn-HUD List + hardware Mockup views; right-click a control → Learn / Invert / Rename / Unbind (acts on the active modifier layer; built-in SSL maps stay factory-fixed)
+  - New: Shift+360 toggles the Learn-HUD (default binding, UF8 + UC1 360 button)
+  - Change: Learn-HUD modifier layers show only the controls you actually overlaid on that layer (inherited ones read as unmapped); CS / BC never cross domains; the LCD name follows the focused domain
+  - New: Focused-track panel — track name before/after the CS/BC tag, short FX names (SSL → CS2 / BC2), "Load on startup"
+  - Change: FX-Learn UC1/UF8 mockups + EXT FUNCS grid scaled to 730px; right-click menus honour the Appearance font size
+  - Fix (Windows): export "save dialog unavailable" now uses the native Save dialog; AltGr engages the FX-Learn Option layer
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
