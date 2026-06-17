@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="e8ab9b0269dd4756efe6346386f06ac70458873d">
+<index version="1" name="Frank Acklin Scripts" commit="79bb3660bd22aa68f4597d48b9b9c94f583c19ac">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -595,6 +595,27 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.28/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.29" author="Frank Acklin" time="2026-06-17T15:43:46Z">
+        <changelog><![CDATA[- Codename: Impossible to walk in this muck. No footing at all.
+- New: UF8 device tab in the Learn-HUD — interactive strip-grid (8 strips × V-Pot / Fader / Solo / Cut / Sel), bank-aware (Top-Soft-Keys pick the V-Pot bank); click a bank to switch it
+- New: UF8 Parameter List — open the drawer, type to filter, pick a parameter, click a cell to bind it (no wiggle); bound params show a green dot
+- New: UF8 Touch-to-Learn — arm a cell by moving its control on the hardware (touch a fader, turn a V-Pot, press Solo/Cut/Sel), then wiggle a plug-in parameter to bind
+- New: map an unmapped plug-in straight from the HUD (the first bind bootstraps a UF8-only map); right-click a cell for Invert / Fill sequential / Unbind / V-Pot value-toggle mode
+- New: UF8 hardware-mockup view (toggle List ↔ Mockup), faithful to the FX-Learn UF8 face; all learn / colour / bank interactions work in both views
+- New: V-Pot bank colours — right-click a bank → 10-swatch SSL palette sets its Top-Soft-Key LED colour; "Bar colour (all)" paints the active bank's display colour bars
+- New: UC1 Control+Option FX-Learn layer — a fourth modifier overlay, so one knob can carry up to four mappings
+- New: 10 knob feel-preset slots (was 5)
+- Fix: UC1 two-knob "fight for priority" — the input parser now walks every frame in a USB transfer; modifier-layer knob travel + focused readout fall back correctly
+- Fix: Esc cancels a HUD learn / assign even when the HUD isn't focused; the held modifier layer is latched at context-menu open; Esc also closes the FX-Learn curve editor popup
+- Fix: console spam gone (full ReaImGui header signature-drift audit)]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
