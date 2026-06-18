@@ -7,7 +7,7 @@
 Per-profile LUFS measurement settings (segment size, percentile, threshold)
 Normalization resets Item Gain and Take Volume before processing
 Fixed mode switching: tracks reload when toggling Import/Normalize]]></changelog>
-        <source main="main">https://github.com/acklin83/reaper-scripts/raw/741101328467b77bc3949aa05813c210b65a1618/RAPID/RAPID.lua</source>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/17c032fa5a7e2a8e6ba74c487e46583fd209f42c/RAPID/RAPID.lua</source>
       </version>
       <version name="2.4.1" author="Frank Acklin" time="2026-02-03T18:42:03Z">
         <changelog><![CDATA[Fixed ReaPack metadata for package distribution
@@ -15,7 +15,7 @@ LUFS Calibration System: Create/update profiles from reference tracks
 Per-profile LUFS measurement settings (segment size, percentile, threshold)
 Normalization resets Item Gain and Take Volume before processing
 Fixed mode switching: tracks reload when toggling Import/Normalize]]></changelog>
-        <source main="main">https://github.com/acklin83/reaper-scripts/raw/8b01c38285e917657dceb71cb00b28b4585ec9dc/RAPID/RAPID.lua</source>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/e30b9e5808db7d94b1ff7027beceb9e1f09882b2/RAPID/RAPID.lua</source>
       </version>
       <version name="2.5" author="Frank Acklin" time="2026-02-08T13:00:48Z">
         <changelog><![CDATA[Multi-RPP Import: import multiple RPP files into one template
@@ -24,7 +24,7 @@ Time-based offset system (seconds) for all positioning
 Track consolidation with lane alignment and group flag copying
 Column-based mapping UI with per-RPP dropdowns and drag-drop reordering
 Editable template track names in both single and multi-RPP mode]]></changelog>
-        <source main="main">https://github.com/acklin83/reaper-scripts/raw/b104e48530c06abca2b0eec5d74db2d4a50b02f5/RAPID/RAPID.lua</source>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/c8e68a63b6b8dce5dfffe8a297cf38a79fe491d4/RAPID/RAPID.lua</source>
       </version>
       <version name="2.6" author="Frank Acklin" time="2026-02-09T14:27:23Z">
         <changelog><![CDATA[Drag & drop .rpp and audio files from OS file manager onto window
@@ -627,6 +627,9 @@ Bug fixes:
         <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/reaper_rea-sixty.dylib</source>
         <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libusb-1.0.0.dylib</source>
         <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/reaper_rea-sixty-x86_64.dylib%20%3E%20reaper_rea-sixty.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libusb-1.0.0-x86_64.dylib%20%3E%20libusb-1.0.0.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libhidapi.0-x86_64.dylib%20%3E%20libhidapi.0.dylib</source>
         <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/reaper_rea-sixty.dll</source>
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/hidapi.dll</source>
