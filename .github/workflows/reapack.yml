@@ -35,6 +35,7 @@ jobs:
             --url-template 'https://github.com/acklin83/reaper-scripts/raw/$commit/$path' \
             --commit \
             --rebuild \
+            --amend \
             --verbose \
             . \
             --output index.xml
