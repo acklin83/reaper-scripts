@@ -12,9 +12,9 @@
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libhidapi.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
-  [darwin64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/reaper_rea-sixty-x86_64.dylib
-  [darwin64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/libusb-1.0.0-x86_64.dylib
-  [darwin64] libhidapi.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/libhidapi.0-x86_64.dylib
+  [darwin64] reaper_rea-sixty-x86_64.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path > reaper_rea-sixty.dylib
+  [darwin64] libusb-1.0.0-x86_64.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path > libusb-1.0.0.dylib
+  [darwin64] libhidapi.0-x86_64.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path > libhidapi.0.dylib
   [win64] reaper_rea-sixty.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [win64] libusb-1.0.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [win64] hidapi.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
