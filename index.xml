@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="79bb3660bd22aa68f4597d48b9b9c94f583c19ac">
+<index version="1" name="Frank Acklin Scripts" commit="a657f5acd0eee2c5e4e37d6df818752c86e53f16">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -616,6 +616,21 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.29/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.30" author="Frank Acklin" time="2026-06-18T15:47:41Z">
+        <changelog><![CDATA[- Codename: Exsqueeze me? Baking powder?
+- New: global per-surface V-Pot / encoder speed + Fine factor (Settings → Device) — tune UF8 and UC1 independently
+- New: tunable 0 dB virtual notch on UF8 V-Pots AND UC1 knobs (EQ gains / trims / fader level) — snaps reliably to 0 dB on approach; settings for notch zone, fine step near 0, and a soft-detent "hold" so an endless encoder can't overshoot
+- New: pan honours the same V-Pot speed / Fine scaling
+- Fix: Learn-HUD "End() too many times" crash (hardware-layout tab / collapsed HUD); geometry-section parse hardened
+- Fix: stale pre-ReaImGui companion scripts removed on load, so an old Action can no longer launch the broken gfx HUD]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libhidapi.0.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
