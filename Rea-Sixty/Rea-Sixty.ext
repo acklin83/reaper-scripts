@@ -1,13 +1,13 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.30
+@version 0.1.31
 @changelog
-  - Codename: Exsqueeze me? Baking powder?
-  - New: global per-surface V-Pot / encoder speed + Fine factor (Settings → Device) — tune UF8 and UC1 independently
-  - New: tunable 0 dB virtual notch on UF8 V-Pots AND UC1 knobs (EQ gains / trims / fader level) — snaps reliably to 0 dB on approach; settings for notch zone, fine step near 0, and a soft-detent "hold" so an endless encoder can't overshoot
-  - New: pan honours the same V-Pot speed / Fine scaling
-  - Fix: Learn-HUD "End() too many times" crash (hardware-layout tab / collapsed HUD); geometry-section parse hardened
-  - Fix: stale pre-ReaImGui companion scripts removed on load, so an old Action can no longer launch the broken gfx HUD
+  - Codename: 60% of the time, it works every time.
+  - Fix: FX-Learn params on JSFX plug-ins no longer slam to an extreme — driven as continuous with a sub-linear accel curve; UF8 V-Pots and UC1 encoders now feel identical on the same param
+  - Fix: Fine mode (Shift) keeps working on coarse JSFX sliders — sub-step moves accumulate until the value advances
+  - New: FX Learn → Advanced sensitivity goes down to 0.01 (typeable value box); Device speed minimum lowered to 0.10
+  - Fix: UC1 CHANNEL-encoder scroll no longer leaves the 7-seg / LCD counting up after a fast flick — display jumps straight to the landed track
+  - New: UF8 bank-scroll stride (Settings → Bindings → UF8) — scroll past the surface edge by 8 (next bank) or by 1 channel
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
