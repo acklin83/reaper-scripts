@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="f58457e171dcc97f10c77e8c2d179f51df392bc2">
+<index version="1" name="Frank Acklin Scripts" commit="dc6602e2fb90c86b22c1c1fcfff497abc9708e7c">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -634,6 +634,24 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.30/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.1.31" author="Frank Acklin" time="2026-06-19T15:39:43Z">
+        <changelog><![CDATA[- Codename: 60% of the time, it works every time.
+- Fix: FX-Learn params on JSFX plug-ins no longer slam to an extreme — driven as continuous with a sub-linear accel curve; UF8 V-Pots and UC1 encoders now feel identical on the same param
+- Fix: Fine mode (Shift) keeps working on coarse JSFX sliders — sub-step moves accumulate until the value advances
+- New: FX Learn → Advanced sensitivity goes down to 0.01 (typeable value box); Device speed minimum lowered to 0.10
+- Fix: UC1 CHANNEL-encoder scroll no longer leaves the 7-seg / LCD counting up after a fast flick — display jumps straight to the landed track
+- New: UF8 bank-scroll stride (Settings → Bindings → UF8) — scroll past the surface edge by 8 (next bank) or by 1 channel]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.31/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
