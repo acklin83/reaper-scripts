@@ -1,13 +1,10 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.31
+@version 0.1.32
 @changelog
-  - Codename: 60% of the time, it works every time.
-  - Fix: FX-Learn params on JSFX plug-ins no longer slam to an extreme — driven as continuous with a sub-linear accel curve; UF8 V-Pots and UC1 encoders now feel identical on the same param
-  - Fix: Fine mode (Shift) keeps working on coarse JSFX sliders — sub-step moves accumulate until the value advances
-  - New: FX Learn → Advanced sensitivity goes down to 0.01 (typeable value box); Device speed minimum lowered to 0.10
-  - Fix: UC1 CHANNEL-encoder scroll no longer leaves the 7-seg / LCD counting up after a fast flick — display jumps straight to the landed track
-  - New: UF8 bank-scroll stride (Settings → Bindings → UF8) — scroll past the surface edge by 8 (next bank) or by 1 channel
+  - Codename: 60.01% of the time, it works every time.
+  - New: Device V-Pot / encoder speed minimum lowered from 0.10 to 0.01 (Settings → Device) for ultra-slow, ultra-fine control
+  - Fix: a typed 0.01 device speed is no longer clamped back to 0.10 internally or lost on restart — the lower bound now applies consistently in the UI field, the setter and the persisted setting
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
