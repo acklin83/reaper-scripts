@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="dc6602e2fb90c86b22c1c1fcfff497abc9708e7c">
+<index version="1" name="Frank Acklin Scripts" commit="bc4f39d017f392699afe25229e9270a2ef60bd07">
+  <category name="Mixnote">
+    <reapack name="Mixnote.lua" type="script" desc="Mixnote Comments">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Mixnote Comments\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 REAPER integration for the Mixnote audio review platform. Load a project by share link, view the waveform with comment markers, and create, reply to, resolve, edit or delete timeline comments directly from REAPER.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Requires the ReaImGui extension (install via ReaPack). Configure your Mixnote server URL and log in inside the script.\par}
+}
+]]></description>
+        <link rel="website" href="https://github.com/acklin83/mixnote">GitHub</link>
+      </metadata>
+      <version name="1.0" author="Frank Acklin" time="2026-06-19T17:21:22Z">
+        <changelog><![CDATA[Initial ReaPack release]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/bc4f39d017f392699afe25229e9270a2ef60bd07/Mixnote/Mixnote.lua</source>
+      </version>
+    </reapack>
+  </category>
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
