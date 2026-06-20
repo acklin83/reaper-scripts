@@ -1,23 +1,23 @@
--- @description Mixnote Comments
+-- @description ReaMark Comments
 -- @author Frank Acklin
 -- @version 1.0
--- @link GitHub https://github.com/acklin83/mixnote
+-- @link GitHub https://github.com/acklin83/reamark
 -- @changelog
 --   Initial ReaPack release
 -- @about
---   # Mixnote Comments
+--   # ReaMark Comments
 --
---   REAPER integration for the Mixnote audio review platform. Load a project
+--   REAPER integration for the ReaMark audio review platform. Load a project
 --   by share link, view the waveform with comment markers, and create, reply
 --   to, resolve, edit or delete timeline comments directly from REAPER.
 --
 --   Requires the ReaImGui extension (install via ReaPack). Configure your
---   Mixnote server URL and log in inside the script.
+--   ReaMark server URL and log in inside the script.
 --
--- Mixnote Comments v2 - REAPER Integration Script
+-- ReaMark Comments v2 - REAPER Integration Script
 -- Requires ReaImGui (install via ReaPack)
--- Connects to Mixnote API for comment management
--- Styled to match Mixnote website dark theme
+-- Connects to ReaMark API for comment management
+-- Styled to match ReaMark website dark theme
 --
 -- Usage: Run from REAPER Actions list
 -- Dependencies: ReaImGui, json (bundled below)
@@ -186,7 +186,7 @@ end
 ---------------------------------------------------------------------------
 -- State
 ---------------------------------------------------------------------------
-local ctx = reaper.ImGui_CreateContext('Mixnote Comments')
+local ctx = reaper.ImGui_CreateContext('ReaMark Comments')
 local FONT_SIZE = 14
 
 local function hash_string(str)
@@ -209,13 +209,13 @@ local reaper_project_id = get_project_id()
 local is_linked = false
 local linked_uuid = ""
 
-local server_url = reaper.GetExtState("Mixnote", "server_url")
-local author_name = reaper.GetExtState("Mixnote", "author_name")
-local username = reaper.GetExtState("Mixnote", "username")
-local share_link_input = reaper.GetExtState("Mixnote", "last_share_link")
+local server_url = reaper.GetExtState("ReaMark", "server_url")
+local author_name = reaper.GetExtState("ReaMark", "author_name")
+local username = reaper.GetExtState("ReaMark", "username")
+local share_link_input = reaper.GetExtState("ReaMark", "last_share_link")
 
 if reaper_project_id then
-  linked_uuid = reaper.GetExtState("Mixnote_Link", reaper_project_id)
+  linked_uuid = reaper.GetExtState("ReaMark_Link", reaper_project_id)
   if linked_uuid ~= "" then
     is_linked = true
     share_link_input = linked_uuid
@@ -225,7 +225,7 @@ end
 -- No hardcoded defaults - user must configure on first run
 if author_name == "" and username ~= "" then author_name = username end
 
-local password = reaper.GetExtState("Mixnote", "password")
+local password = reaper.GetExtState("ReaMark", "password")
 if password == nil then password = "" end
 local remember_password = (password ~= "")
 local jwt_token = ""
@@ -260,10 +260,10 @@ local filter_mode = 0
 -- Waveform state
 local waveform_peaks = {}
 local waveform_duration = 0
-local autoplay_enabled = reaper.GetExtState("Mixnote", "autoplay") ~= "false"
+local autoplay_enabled = reaper.GetExtState("ReaMark", "autoplay") ~= "false"
 
 ---------------------------------------------------------------------------
--- Theme colors (matching Mixnote website dark theme)
+-- Theme colors (matching ReaMark website dark theme)
 ---------------------------------------------------------------------------
 local C = {
   -- Backgrounds (4-level hierarchy like website)
@@ -378,21 +378,21 @@ local function get_current_offset()
 end
 
 local function save_state()
-  reaper.SetExtState("Mixnote", "server_url", server_url, true)
-  reaper.SetExtState("Mixnote", "author_name", author_name, true)
-  reaper.SetExtState("Mixnote", "username", username, true)
-  reaper.SetExtState("Mixnote", "last_share_link", share_link_input, true)
+  reaper.SetExtState("ReaMark", "server_url", server_url, true)
+  reaper.SetExtState("ReaMark", "author_name", author_name, true)
+  reaper.SetExtState("ReaMark", "username", username, true)
+  reaper.SetExtState("ReaMark", "last_share_link", share_link_input, true)
   if remember_password then
-    reaper.SetExtState("Mixnote", "password", password, true)
+    reaper.SetExtState("ReaMark", "password", password, true)
   else
-    reaper.DeleteExtState("Mixnote", "password", true)
+    reaper.DeleteExtState("ReaMark", "password", true)
   end
-  reaper.SetExtState("Mixnote", "autoplay", tostring(autoplay_enabled), true)
+  reaper.SetExtState("ReaMark", "autoplay", tostring(autoplay_enabled), true)
 end
 
 local function link_project()
   if reaper_project_id and share_link_input ~= "" then
-    reaper.SetExtState("Mixnote_Link", reaper_project_id, share_link_input, true)
+    reaper.SetExtState("ReaMark_Link", reaper_project_id, share_link_input, true)
     linked_uuid = share_link_input
     is_linked = true
   end
@@ -400,7 +400,7 @@ end
 
 local function unlink_project()
   if reaper_project_id then
-    reaper.DeleteExtState("Mixnote_Link", reaper_project_id, true)
+    reaper.DeleteExtState("ReaMark_Link", reaper_project_id, true)
     linked_uuid = ""
     is_linked = false
   end
@@ -445,7 +445,7 @@ local function load_calibration_offsets()
   calibration_offsets = {}
   for _, song in ipairs(songs) do
     local key = tostring(song.id)
-    local rv, saved = reaper.GetProjExtState(0, "Mixnote", "offset_" .. key)
+    local rv, saved = reaper.GetProjExtState(0, "ReaMark", "offset_" .. key)
     if rv > 0 and saved ~= "" then calibration_offsets[key] = tonumber(saved) end
   end
 end
@@ -517,7 +517,7 @@ local function api_load_admin_projects()
   if status == 200 then
     admin_projects = json.decode(resp) or {}
     if reaper_project_id then
-      local rv, saved_id = reaper.GetProjExtState(0, "Mixnote", "selected_project_id")
+      local rv, saved_id = reaper.GetProjExtState(0, "ReaMark", "selected_project_id")
       if rv > 0 and saved_id ~= "" then
         for i, p in ipairs(admin_projects) do
           if p.share_link == saved_id then
@@ -743,7 +743,7 @@ local function draw_project_section()
           share_link_input = p.share_link
           api_load_project()
           if reaper_project_id then
-            reaper.SetProjExtState(0, "Mixnote", "selected_project_id", p.share_link)
+            reaper.SetProjExtState(0, "ReaMark", "selected_project_id", p.share_link)
           end
         end
       end
@@ -829,7 +829,7 @@ local function draw_song_version_section()
     local key = get_offset_key()
     if key ~= "" then
       calibration_offsets[key] = reaper.GetCursorPosition()
-      reaper.SetProjExtState(0, "Mixnote", "offset_" .. key, tostring(calibration_offsets[key]))
+      reaper.SetProjExtState(0, "ReaMark", "offset_" .. key, tostring(calibration_offsets[key]))
     end
   end
   if offset == 0 then
@@ -1205,7 +1205,7 @@ local function loop()
   apply_theme()
   reaper.ImGui_SetNextWindowSize(ctx, 420, 700, reaper.ImGui_Cond_FirstUseEver())
   reaper.ImGui_SetNextWindowSizeConstraints(ctx, 420, 300, 9999, 9999)
-  local visible, open = reaper.ImGui_Begin(ctx, 'Mixnote', true)
+  local visible, open = reaper.ImGui_Begin(ctx, 'ReaMark', true)
 
   if visible then
     draw_login_section()
