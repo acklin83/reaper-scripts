@@ -1,10 +1,19 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.1.32
+@version 0.2
 @changelog
-  - Codename: 60.01% of the time, it works every time.
-  - New: Device V-Pot / encoder speed minimum lowered from 0.10 to 0.01 (Settings → Device) for ultra-slow, ultra-fine control
-  - Fix: a typed 0.01 device speed is no longer clamped back to 0.10 internally or lost on restart — the lower bound now applies consistently in the UI field, the setter and the persisted setting
+  - Codename: There's always money in the banana-stand.
+  - New: Channel-Strip Switch — 8 favourite Channel Strips swap in place, carrying values across by engineering value + meaning (favourites must be mapped)
+  - New: Touch-to-Learn — touch a control and wiggle a parameter to bind it on the fly, without opening Settings
+  - New: Rotary Step cycle — put a plug-in's button/enum options on a V-Pot or UC1 knob (turn to scrub, press to step)
+  - New: Parameter Groups mirror an unmapped, identical plug-in 1:1 across group members — no mapping needed
+  - New: Focus Set — pin the focused track (or a chosen set) to the left of the surface
+  - New: Solo/Mute modifier modes — hold a keyboard modifier + Solo/Cut for REAPER's solo/mute button modes (UF8 + UC1)
+  - New: V-Pot pan now records track-pan automation in Touch and holds
+  - New: empty UF8 channels park the fader fully down
+  - New: user-definable SSL CS/BC free soft-key slots + coherent factory banks
+  - New: in-app manual is searchable and rewritten in plain, user-facing language
+  - Fix: JSFX continuous knobs resolve finely; binary on/off knob flips per detent; Learn-HUD nil-crash; CS-Switch value-transfer robustness; Windows build
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
