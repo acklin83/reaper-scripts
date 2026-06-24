@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="57fc452d4c64715dcfaee67003be4e752d63f6f3">
+<index version="1" name="Frank Acklin Scripts" commit="d5b37c314939ea40374d066003333c50b065dfbc">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -667,6 +667,30 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.32/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.32/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.1.32/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.2" author="Frank Acklin" time="2026-06-24T13:52:59Z">
+        <changelog><![CDATA[- Codename: There's always money in the banana-stand.
+- New: Channel-Strip Switch — 8 favourite Channel Strips swap in place, carrying values across by engineering value + meaning (favourites must be mapped)
+- New: Touch-to-Learn — touch a control and wiggle a parameter to bind it on the fly, without opening Settings
+- New: Rotary Step cycle — put a plug-in's button/enum options on a V-Pot or UC1 knob (turn to scrub, press to step)
+- New: Parameter Groups mirror an unmapped, identical plug-in 1:1 across group members — no mapping needed
+- New: Focus Set — pin the focused track (or a chosen set) to the left of the surface
+- New: Solo/Mute modifier modes — hold a keyboard modifier + Solo/Cut for REAPER's solo/mute button modes (UF8 + UC1)
+- New: V-Pot pan now records track-pan automation in Touch and holds
+- New: empty UF8 channels park the fader fully down
+- New: user-definable SSL CS/BC free soft-key slots + coherent factory banks
+- New: in-app manual is searchable and rewritten in plain, user-facing language
+- Fix: JSFX continuous knobs resolve finely; binary on/off knob flips per detent; Learn-HUD nil-crash; CS-Switch value-transfer robustness; Windows build]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
