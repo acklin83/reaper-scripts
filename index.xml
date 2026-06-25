@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="d5b37c314939ea40374d066003333c50b065dfbc">
+<index version="1" name="Frank Acklin Scripts" commit="78e7884d0183efa6fc123620f9cc2a7406a08004">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -691,6 +691,26 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.2.1" author="Frank Acklin" time="2026-06-25T15:37:18Z">
+        <changelog><![CDATA[- Codename: We can't stop here, this is bat country.
+- New: Send/Receive surface views follow REAPER 7.75 — empty send slots show as gaps in the right place, reordered sends keep their order, and a send after an empty slot no longer disappears
+- New: hardware outputs appear in the Send view alongside track sends (same order as REAPER's mixer send list), named by output channel, each with its own fader/pan
+- Fix: soloing a send now mutes every other track send AND hardware output across the whole list (was stopping at the first gap); send mute LEDs show on all routed strips
+- New: empty FX-chain slots (REAPER 7.75) handled by the inserts overlay, Encoder FX-Move, and Channel-Strip Switch
+- New: inserts overlay marks the selected FX, and follows the mixer when hidden/shown or fullscreen
+- New: sensitivity is shown in the Learn-HUD and FX-Learn hover tooltips
+- Fix: Fill Sequential carries every per-control property (steps, mode, feel, label); Windows modifier feed + build]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
