@@ -1,19 +1,15 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.2
+@version 0.2.1
 @changelog
-  - Codename: There's always money in the banana-stand.
-  - New: Channel-Strip Switch — 8 favourite Channel Strips swap in place, carrying values across by engineering value + meaning (favourites must be mapped)
-  - New: Touch-to-Learn — touch a control and wiggle a parameter to bind it on the fly, without opening Settings
-  - New: Rotary Step cycle — put a plug-in's button/enum options on a V-Pot or UC1 knob (turn to scrub, press to step)
-  - New: Parameter Groups mirror an unmapped, identical plug-in 1:1 across group members — no mapping needed
-  - New: Focus Set — pin the focused track (or a chosen set) to the left of the surface
-  - New: Solo/Mute modifier modes — hold a keyboard modifier + Solo/Cut for REAPER's solo/mute button modes (UF8 + UC1)
-  - New: V-Pot pan now records track-pan automation in Touch and holds
-  - New: empty UF8 channels park the fader fully down
-  - New: user-definable SSL CS/BC free soft-key slots + coherent factory banks
-  - New: in-app manual is searchable and rewritten in plain, user-facing language
-  - Fix: JSFX continuous knobs resolve finely; binary on/off knob flips per detent; Learn-HUD nil-crash; CS-Switch value-transfer robustness; Windows build
+  - Codename: We can't stop here, this is bat country.
+  - New: Send/Receive surface views follow REAPER 7.75 — empty send slots show as gaps in the right place, reordered sends keep their order, and a send after an empty slot no longer disappears
+  - New: hardware outputs appear in the Send view alongside track sends (same order as REAPER's mixer send list), named by output channel, each with its own fader/pan
+  - Fix: soloing a send now mutes every other track send AND hardware output across the whole list (was stopping at the first gap); send mute LEDs show on all routed strips
+  - New: empty FX-chain slots (REAPER 7.75) handled by the inserts overlay, Encoder FX-Move, and Channel-Strip Switch
+  - New: inserts overlay marks the selected FX, and follows the mixer when hidden/shown or fullscreen
+  - New: sensitivity is shown in the Learn-HUD and FX-Learn hover tooltips
+  - Fix: Fill Sequential carries every per-control property (steps, mode, feel, label); Windows modifier feed + build
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
