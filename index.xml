@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="78e7884d0183efa6fc123620f9cc2a7406a08004">
+<index version="1" name="Frank Acklin Scripts" commit="07d9f71d81eff6ed9cc023fbe8a69491aa4ff648">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -711,6 +711,28 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.1/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.2.2" author="Frank Acklin" time="2026-06-26T20:45:47Z">
+        <changelog><![CDATA[- Codename: Trust me - I know what I'm doing!
+- New: Bus-Compressor favourites alongside Channel-Strip favourites — same 8-slot Switch / Cycle / Copy model on its own domain
+- New: named favourite Sets with separate CS and BC libraries, assignable per track (one CS + one BC set); tracks with no set use the Base bank
+- New: Copy vs Own settings per domain when switching/cycling a favourite (CS defaults Copy, BC defaults Own); per-favourite + per-track settings memory keyed by plug-in identity
+- New: Copy-to-CS-N (A/B) inserts a favourite below the active strip with values carried and the original bypassed, with a per-section copy mask (EQ / Dyn / Gate / Fader)
+- New: unified domain-aware Switch / Copy / Cycle to Favourite N actions + one Favourites soft-key bank
+- New: UC1 favourite-cycle carousel (prev / current / next), left encoder = CS, right = BC
+- New: send & receive faders write volume + pan automation (Touch) and mirror onto the motor fader / V-Pot ring
+- New: additive Settings search — space-separated words in any order (e.g. "favo focu" finds "Favourite ... Focused")
+- Fix: with "Parameter change switches soft-key bank" off, a soft-key press fires the bank its labels show (no label/dispatch mismatch); send-pan readout shows the send's effective pan]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
