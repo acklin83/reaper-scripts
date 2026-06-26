@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="07d9f71d81eff6ed9cc023fbe8a69491aa4ff648">
+<index version="1" name="Frank Acklin Scripts" commit="9c1c4afc63c376d878597de10730598509016773">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -720,7 +720,7 @@ Bug fixes:
 - New: Copy-to-CS-N (A/B) inserts a favourite below the active strip with values carried and the original bypassed, with a per-section copy mask (EQ / Dyn / Gate / Fader)
 - New: unified domain-aware Switch / Copy / Cycle to Favourite N actions + one Favourites soft-key bank
 - New: UC1 favourite-cycle carousel (prev / current / next), left encoder = CS, right = BC
-- New: send & receive faders write volume + pan automation (Touch) and mirror onto the motor fader / V-Pot ring
+- Fix: send & receive faders now record automation (volume + pan) in Touch / Write / Latch — previously CSurf writes did not record reliably; now via the correct UI path, and the surface follows recorded send automation and snaps back on Touch release
 - New: additive Settings search — space-separated words in any order (e.g. "favo focu" finds "Favourite ... Focused")
 - Fix: with "Parameter change switches soft-key bank" off, a soft-key press fires the bank its labels show (no label/dispatch mismatch); send-pan readout shows the send's effective pan]]></changelog>
         <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/reaper_rea-sixty.dylib</source>
