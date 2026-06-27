@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="9c1c4afc63c376d878597de10730598509016773">
+<index version="1" name="Frank Acklin Scripts" commit="e1b4d6d1651809203fa9a776258d61262893d209">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -733,6 +733,27 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.2/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.2.3" author="Frank Acklin" time="2026-06-27T17:48:30Z">
+        <changelog><![CDATA[- Codename: Did you try turning it off and on again?
+- Fix: macOS 26 meter stutter — the Inserts overlay located targets with a full-mixer pixel sweep; on macOS 26 each probe round-trips through the window server, stalling the main thread (peak meters + edit cursor hitched every 1-2 s while mixing). Now finds each strip from track geometry (~60 probes/track instead of ~8000)
+- New: focused panel — click a CS/BC plug-in name to float/unfloat it; persistent Selection/Encoder mode indicator + mode-change flash; Settings / HUD / CS-BC cycle buttons
+- New: focused panel drag-to-arrange elements (per-block order + line breaks, persisted) + centre horizontally / vertically
+- New: focused panel docking that survives a restart — re-attaches to its REAPER docker next launch
+- Fix: favourites copy only mapped parameters (on by default) — carries only params mapped to a UC1 control, not unmapped plug-in internals matched by name (e.g. the SSL channel's Auto-Makeup setting)
+- Fix: favourites filter open → off across plug-ins — a fully-open low/high-pass lands on the destination's discrete "out" instead of the nearest frequency
+- New: favourites preserve the SSL EQ-Filter-Dyn routing order (incl. Ext-Sidechain) + EXT FUNCS on cycle — carried across switches, restored per-favourite in own-settings mode, saved with the project
+- Fix: per-favourite memory stays consistent across copy/own mode switches]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.3/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
