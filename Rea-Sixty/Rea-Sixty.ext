@@ -1,17 +1,16 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.2.2
+@version 0.2.3
 @changelog
-  - Codename: Trust me - I know what I'm doing!
-  - New: Bus-Compressor favourites alongside Channel-Strip favourites — same 8-slot Switch / Cycle / Copy model on its own domain
-  - New: named favourite Sets with separate CS and BC libraries, assignable per track (one CS + one BC set); tracks with no set use the Base bank
-  - New: Copy vs Own settings per domain when switching/cycling a favourite (CS defaults Copy, BC defaults Own); per-favourite + per-track settings memory keyed by plug-in identity
-  - New: Copy-to-CS-N (A/B) inserts a favourite below the active strip with values carried and the original bypassed, with a per-section copy mask (EQ / Dyn / Gate / Fader)
-  - New: unified domain-aware Switch / Copy / Cycle to Favourite N actions + one Favourites soft-key bank
-  - New: UC1 favourite-cycle carousel (prev / current / next), left encoder = CS, right = BC
-  - Fix: send & receive faders now record automation (volume + pan) in Touch / Write / Latch — previously CSurf writes did not record reliably; now via the correct UI path, and the surface follows recorded send automation and snaps back on Touch release
-  - New: additive Settings search — space-separated words in any order (e.g. "favo focu" finds "Favourite ... Focused")
-  - Fix: with "Parameter change switches soft-key bank" off, a soft-key press fires the bank its labels show (no label/dispatch mismatch); send-pan readout shows the send's effective pan
+  - Codename: Did you try turning it off and on again?
+  - Fix: macOS 26 meter stutter — the Inserts overlay located targets with a full-mixer pixel sweep; on macOS 26 each probe round-trips through the window server, stalling the main thread (peak meters + edit cursor hitched every 1-2 s while mixing). Now finds each strip from track geometry (~60 probes/track instead of ~8000)
+  - New: focused panel — click a CS/BC plug-in name to float/unfloat it; persistent Selection/Encoder mode indicator + mode-change flash; Settings / HUD / CS-BC cycle buttons
+  - New: focused panel drag-to-arrange elements (per-block order + line breaks, persisted) + centre horizontally / vertically
+  - New: focused panel docking that survives a restart — re-attaches to its REAPER docker next launch
+  - Fix: favourites copy only mapped parameters (on by default) — carries only params mapped to a UC1 control, not unmapped plug-in internals matched by name (e.g. the SSL channel's Auto-Makeup setting)
+  - Fix: favourites filter open → off across plug-ins — a fully-open low/high-pass lands on the destination's discrete "out" instead of the nearest frequency
+  - New: favourites preserve the SSL EQ-Filter-Dyn routing order (incl. Ext-Sidechain) + EXT FUNCS on cycle — carried across switches, restored per-favourite in own-settings mode, saved with the project
+  - Fix: per-favourite memory stays consistent across copy/own mode switches
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
