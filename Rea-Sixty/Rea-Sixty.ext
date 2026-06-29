@@ -3,8 +3,8 @@
 @version 0.2.4
 @changelog
   - Codename: 1.21 Gigawatts!
-  - New: dynamic soft-key banks — a Sub-Bank computes its 8 keys live from the focused track (FX 1-8/9-16, Parameter Groups, or Track Colours); FX/Sends banks page by a chosen control
-  - New: FX bank lights only the focused FX bright — press to focus, press again to solo + focus; Parameter Groups + Track Colours apply to all selected tracks (group on/off + names saved per project)
+  - New: dynamic soft-key banks — a Sub-Bank computes its 8 keys live from the focused track (FX 1-8/9-16, Parameter Groups, or Track Colours); the FX bank is pageable by a chosen control
+  - New: FX bank lights only the focused FX bright (bypassed dark) — each key acts on its FX with a configurable gesture (Focus / Float / Bypass / FX-solo / Offline / Move / Delete, default press = Focus); Parameter Groups + Track Colours apply to all selected tracks (group on/off + names saved per project)
   - New: DynaMount mode — control up to 8 robotic mic stands from the UF8 strips (fader = X left/right, FLIP = Y distance, V-Pot = rotation, per-mount Home calibration + a Settings tab for name/IP/colour)
   - New: Keyboard macro binding type — capture a key chord live (or type it) and chain several with per-step delays; fires inside REAPER, Ctrl and Cmd kept distinct on macOS
   - Fix: umlauts (ä ö ü ß) render correctly on the UC1 and UF8 LCDs across track / marker / FX / preset names
