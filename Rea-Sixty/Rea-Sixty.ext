@@ -1,15 +1,11 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.2.4
+@version 0.2.5
 @changelog
-  - Codename: 1.21 Gigawatts!
-  - New: dynamic soft-key banks — a Sub-Bank computes its 8 keys live from the focused track (FX 1-8/9-16, Parameter Groups, or Track Colours); the FX bank is pageable by a chosen control
-  - New: FX bank lights only the focused FX bright (bypassed dark) — each key acts on its FX with a configurable gesture (Focus / Float / Bypass / FX-solo / Offline / Move / Delete, default press = Focus); Parameter Groups + Track Colours apply to all selected tracks (group on/off + names saved per project)
-  - New: DynaMount mode — control up to 8 robotic mic stands from the UF8 strips (fader = X left/right, FLIP = Y distance, V-Pot = rotation, per-mount Home calibration + a Settings tab for name/IP/colour)
-  - New: Keyboard macro binding type — capture a key chord live (or type it) and chain several with per-step delays; fires inside REAPER, Ctrl and Cmd kept distinct on macOS
-  - Fix: umlauts (ä ö ü ß) render correctly on the UC1 and UF8 LCDs across track / marker / FX / preset names
-  - New: UC1 channel-strip carousel shows the neighbouring track names for ~1 s after a switch, then collapses to the current name; the edited parameter stays on screen
-  - New: favourites keep the plug-in's own non-mapped parameters (e.g. Analog Molecule "3D Flux" / "Thermal Bloom") across cycling — Channel-Strip and Bus-Compressor, saved with the project
+  - Codename: If we were to fight, I think it would better if we were dubbed and not in subtitles!
+  - New: Mirror to Arrange / Mirror to Mixer actions set which window the surface's visibility follows (mutually exclusive, LED = active); plus a Toggle "Arrange follows selection" action — all in the Hardware Modes category
+  - Change: UC1 bindings page hides the LED-colour block and the Layer breadcrumb, is device-scoped (UC1 tab edits only UC1 controls), and gains UC1-only Save/Load that leaves UF8 bindings untouched
+  - Fix: Solo LED no longer stays dark after switching into a send/receive view and back out with a track soloed
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
