@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="5537a0324275d97408734b056dacdd4cb10bcac6">
+<index version="1" name="Frank Acklin Scripts" commit="fdd2a6db01311695a64c88e446beb311a12a3757">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -790,6 +790,23 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.5/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.5/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.2.5/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.3.0" author="Frank Acklin" time="2026-07-09T14:53:02Z">
+        <changelog><![CDATA[- Codename: Mostly Harmless
+- New: Stream Deck Companion — a companion Stream Deck plugin drives Rea-Sixty over a localhost bridge built into the extension; nine action tiles plus a per-track Meter tile (peak / gain-reduction / combined). Download the .streamDeckPlugin from the GitHub release.
+- New: Fine mode now steps long continuous JSFX sliders by their own native increment, so REAPER's own JSFX (and any very long slider) can be set cleanly (Settings → Plug-ins, on by default; VST3/AU unchanged)
+- Fix: Learn-HUD "Advanced…" curve editor popup no longer sits glued to the frame edge
+- Fix: UC1 Channel-Strip gain-reduction strip no longer mirrors the bus compressor's GR when the focused track is the bus-compressor anchor]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.0/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
