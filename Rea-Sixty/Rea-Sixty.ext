@@ -1,12 +1,14 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.3.1
+@version 0.3.2
 @changelog
-  - Codename: Pain in All the Diodes
-  - New: Bitfocus Companion module (community-supported) — drives Rea-Sixty through the same bridge as the Stream Deck plugin; actions, variables, feedbacks, a graphical meter bar and presets. Source in the repo's companion/ folder.
-  - New: the Rea-Sixty bridge can bind to the LAN (opt-in ExtState rea_sixty/sd_bridge_bind = lan) so Companion or the Stream Deck plugin on another machine can reach REAPER; loopback-only by default.
-  - New: Stream Deck Meter tile font size (Small / Normal / Large / Extra large) scales the dB values and track name.
-  - New: Stream Deck Meter track names now follow the configured Rea-Sixty abbreviation strategy (Truncate vs Smart Abbreviate), matching the UF8 / UC1 surface.
+  - Codename: It can only be attributable to human error.
+  - New: the UC1 Channel Strip Gate GR strip works — Rea-Sixty reads the gate reduction from the SSL plug-in's own meter stream (opt-in ExtState rea_sixty/ssl_core; SSL 360 must be quit). REAPER's GainReduction_dB never carried the gate.
+  - New: "Restart Rea-Sixty (re-open devices)" action — in REAPER's Action list and as a Hardware Modes binding; re-opens the surfaces without the Preferences round-trip.
+  - New: Stream Deck Meter tile — track name can sit at the top of the key and wrap to a second line, and a per-tile Smart-abbrev switch (off shows the full name).
+  - New: Settings -> Logs -> Console output toggle (default off).
+  - Fix: About-page links open on Windows and Linux; log files are written on Windows (%TEMP%, not /tmp).
+  - Fix: MCP Inserts overlay no longer paints onto the row below when a send list or plug-in parameters shorten the FX list.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
