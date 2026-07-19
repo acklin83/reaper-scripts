@@ -1,14 +1,13 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.3.2
+@version 0.3.3
 @changelog
-  - Codename: It can only be attributable to human error.
-  - New: the UC1 Channel Strip Gate GR strip works — Rea-Sixty reads the gate reduction from the SSL plug-in's own meter stream (opt-in ExtState rea_sixty/ssl_core; SSL 360 must be quit). REAPER's GainReduction_dB never carried the gate.
-  - New: "Restart Rea-Sixty (re-open devices)" action — in REAPER's Action list and as a Hardware Modes binding; re-opens the surfaces without the Preferences round-trip.
-  - New: Stream Deck Meter tile — track name can sit at the top of the key and wrap to a second line, and a per-tile Smart-abbrev switch (off shows the full name).
-  - New: Settings -> Logs -> Console output toggle (default off).
-  - Fix: About-page links open on Windows and Linux; log files are written on Windows (%TEMP%, not /tmp).
-  - Fix: MCP Inserts overlay no longer paints onto the row below when a send list or plug-in parameters shorten the FX list.
+  - Codename: Almost, but not quite, entirely unlike tea.
+  - Docs: the manual is current with the shipped build again (it still described v0.2). New chapters for Sends and Receives, dynamic soft-key sub-banks, Hardware Modes, DynaMount, Stream Deck and Companion; Favourites rewritten for the CS + BC model; ~20 stale claims corrected. Readable in Settings -> Manual.
+  - Docs: DynaMount axes were documented inverted — the fader is X, FLIP is Y. The in-app footer was always right.
+  - Docs: the Stream Deck plugin hard-codes 127.0.0.1:49900, so it cannot follow a moved bridge port and the LAN bind does nothing for it. Now stated in streamdeck/README.md.
+  - Fix: the MCP Inserts overlay highlight lands on the right insert. It now reads the mixer's own row labels instead of counting rows, so empty FX slots and grouped plug-in parameters no longer push it onto the wrong row.
+  - Fix: toggling "show FX parameters" now moves the overlay highlight live — it previously stayed wrong until you changed track.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
@@ -38,7 +37,7 @@
   - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match — slot reorders are safe, renames break the binding)
   - **REC + RME (TotalReaper) integration** — per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
   - **Bindings system** — modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
-  - **Settings window** in a dockable ReaImGui context — seven tabs (Device, Bindings, Modes, FX Learn, Selection Sets, Parameter Groups, About) themed to REAPER's active theme
+  - **Settings window** in a dockable ReaImGui context — ten tabs (Device, Appearance, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
 
   ## After install
 
