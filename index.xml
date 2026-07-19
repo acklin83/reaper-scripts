@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="ff6792505e8979638db21ec7a3c55a588d5ff636">
+<index version="1" name="Frank Acklin Scripts" commit="f16c6a185f752dea59f36317bc339f42727e956d">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -94,7 +94,7 @@ Markers/regions created before normalization; source-RPP region count shown pre-
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Generic FX Learn} for any VST/JS/AU plug-in parameter (FX-name substring match \u8212- slot reorders are safe, renames break the binding)\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b REC + RME (TotalReaper) integration} \u8212- per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Bindings system} \u8212- modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Settings window} in a dockable ReaImGui context \u8212- seven tabs (Device, Bindings, Modes, FX Learn, Selection Sets, Parameter Groups, About) themed to REAPER's active theme\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Settings window} in a dockable ReaImGui context \u8212- ten tabs (Device, Appearance, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 After install\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 Preferences -> Control/OSC/Web -> Add -> {\b Rea-Sixty}.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 First-run setup buttons (Windows WinUSB driver + Linux udev rule) live in Settings -> About; macOS needs no extra setup.\par}
@@ -843,6 +843,24 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.2/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.2/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.2/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.3.3" author="Frank Acklin" time="2026-07-19T14:40:07Z">
+        <changelog><![CDATA[- Codename: Almost, but not quite, entirely unlike tea.
+- Docs: the manual is current with the shipped build again (it still described v0.2). New chapters for Sends and Receives, dynamic soft-key sub-banks, Hardware Modes, DynaMount, Stream Deck and Companion; Favourites rewritten for the CS + BC model; ~20 stale claims corrected. Readable in Settings -> Manual.
+- Docs: DynaMount axes were documented inverted — the fader is X, FLIP is Y. The in-app footer was always right.
+- Docs: the Stream Deck plugin hard-codes 127.0.0.1:49900, so it cannot follow a moved bridge port and the LAN bind does nothing for it. Now stated in streamdeck/README.md.
+- Fix: the MCP Inserts overlay highlight lands on the right insert. It now reads the mixer's own row labels instead of counting rows, so empty FX slots and grouped plug-in parameters no longer push it onto the wrong row.
+- Fix: toggling "show FX parameters" now moves the overlay highlight live — it previously stayed wrong until you changed track.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.3.3/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
