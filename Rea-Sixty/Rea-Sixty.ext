@@ -1,13 +1,14 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.3.3
+@version 0.4.0
 @changelog
-  - Codename: Almost, but not quite, entirely unlike tea.
-  - Docs: the manual is current with the shipped build again (it still described v0.2). New chapters for Sends and Receives, dynamic soft-key sub-banks, Hardware Modes, DynaMount, Stream Deck and Companion; Favourites rewritten for the CS + BC model; ~20 stale claims corrected. Readable in Settings -> Manual.
-  - Docs: DynaMount axes were documented inverted — the fader is X, FLIP is Y. The in-app footer was always right.
-  - Docs: the Stream Deck plugin hard-codes 127.0.0.1:49900, so it cannot follow a moved bridge port and the LAN bind does nothing for it. Now stated in streamdeck/README.md.
-  - Fix: the MCP Inserts overlay highlight lands on the right insert. It now reads the mixer's own row labels instead of counting rows, so empty FX slots and grouped plug-in parameters no longer push it onto the wrong row.
-  - Fix: toggling "show FX parameters" now moves the overlay highlight live — it previously stayed wrong until you changed track.
+  - Codename: You've Got to Haggle!
+  - New: reasixty.com is live — the extension's home on the web, generated from the repo, with no tracking and no external hosts. Manual, features, install, about.
+  - New: Mapping Exchange — share and install plug-in mappings (UC1 / UF8 / UC1+UF8) from inside REAPER (Settings -> Exchange) or on the web. Browse by plug-in with a coverage figure and a "works for me" vote; publish with one click from the FX-Learn Share dialog; passkey / magic-link sign-in; CC0; mappings only, never setup bundles.
+  - Learn: Fill Sequential now steps the scribble label with the parameter ("Ch 1" -> "Ch 16"), fader + V-Pot, in both the Settings editor and the Learn-HUD.
+  - Learn-HUD: the UF8 colour bars are clickable — left-click picks a strip's colour, right-click fills all eight strips of the active bank.
+  - FX-Learn: tap Ctrl / Opt / Ctrl+Opt to switch the schematic to that overlay's mapping, tap the same combo again to return to Normal.
+  - FX-Learn: params bound in the UC1 EXT FUNCS menu now show as bound in the parameter list instead of looking free to grab.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
@@ -37,7 +38,7 @@
   - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match — slot reorders are safe, renames break the binding)
   - **REC + RME (TotalReaper) integration** — per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
   - **Bindings system** — modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
-  - **Settings window** in a dockable ReaImGui context — ten tabs (Device, Appearance, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
+  - **Settings window** in a dockable ReaImGui context — eleven tabs (Device, Appearance, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
 
   ## After install
 
