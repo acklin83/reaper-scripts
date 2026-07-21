@@ -1,14 +1,11 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.4.0
+@version 0.4.1
 @changelog
-  - Codename: You've Got to Haggle!
-  - New: reasixty.com is live — the extension's home on the web, generated from the repo, with no tracking and no external hosts. Manual, features, install, about.
-  - New: Mapping Exchange — share and install plug-in mappings (UC1 / UF8 / UC1+UF8) from inside REAPER (Settings -> Exchange) or on the web. Browse by plug-in with a coverage figure and a "works for me" vote; publish with one click from the FX-Learn Share dialog; passkey / magic-link sign-in; CC0; mappings only, never setup bundles.
-  - Learn: Fill Sequential now steps the scribble label with the parameter ("Ch 1" -> "Ch 16"), fader + V-Pot, in both the Settings editor and the Learn-HUD.
-  - Learn-HUD: the UF8 colour bars are clickable — left-click picks a strip's colour, right-click fills all eight strips of the active bank.
-  - FX-Learn: tap Ctrl / Opt / Ctrl+Opt to switch the schematic to that overlay's mapping, tap the same combo again to return to Normal.
-  - FX-Learn: params bound in the UC1 EXT FUNCS menu now show as bound in the parameter list instead of looking free to grab.
+  - Codename: Finest Merchandise
+  - Exchange: a mapping's UC1 EXT FUNCS (the curated hidden BACK-menu) now show up on the map detail — they were being dropped at ingest and vanished. Listed as name -> parameter and counted toward parameter coverage; already-uploaded maps light up too, no re-upload needed.
+  - Exchange: re-publishing a mapping now updates your existing one for that plug-in instead of failing as a duplicate (unchanged) or spawning a second entry (changed). Someone else's identical mapping is still rejected.
+  - FX-Learn: clear off-face bindings — SSL Link slots with no control on the UC1 face (Fader, Pan, quick-access, Comp Mix, SAT) now show in an "Also mapped — off-face" list under the schematic, each with a Clear button, so a stray one can finally be removed.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
