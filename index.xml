@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="0577f7c6c37a2334210aba7b2c80506307374d87">
+<index version="1" name="Frank Acklin Scripts" commit="f7997a1ec09c7fba2795407b841839c51a4641c9">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -880,6 +880,22 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.0/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.0/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.0/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.4.1" author="Frank Acklin" time="2026-07-21T17:10:39Z">
+        <changelog><![CDATA[- Codename: Finest Merchandise
+- Exchange: a mapping's UC1 EXT FUNCS (the curated hidden BACK-menu) now show up on the map detail — they were being dropped at ingest and vanished. Listed as name -> parameter and counted toward parameter coverage; already-uploaded maps light up too, no re-upload needed.
+- Exchange: re-publishing a mapping now updates your existing one for that plug-in instead of failing as a duplicate (unchanged) or spawning a second entry (changed). Someone else's identical mapping is still rejected.
+- FX-Learn: clear off-face bindings — SSL Link slots with no control on the UC1 face (Fader, Pan, quick-access, Comp Mix, SAT) now show in an "Also mapped — off-face" list under the schematic, each with a Clear button, so a stray one can finally be removed.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
