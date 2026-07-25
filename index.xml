@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="f7997a1ec09c7fba2795407b841839c51a4641c9">
+<index version="1" name="Frank Acklin Scripts" commit="05c6f34ecf7f20ca435ef37efe1a5d6ec2ddae90">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -931,6 +931,7 @@ Bug fixes:
 {\pard \ql \f0 \sa180 \li0 \fi0 {\i In Erinnerung an ASIO Direct Monitoring in Samplitude.}\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 What it does\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Routing mirror}: REAPER track volume / mute / pan \u8594 ? TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Solo mirror}: REAPER track solo \u8594 ? TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b 2-Way Control}: optional reverse direction \u8212- TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Per-track preamp control} as REAPER actions: gain \u177 ?1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.\par}
@@ -1022,6 +1023,12 @@ New: Stereo-pair linking — optionally link REAPER stereo inputs as TotalMix st
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.0/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.0/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.0/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.1" author="Frank Acklin" time="2026-07-25T16:11:46Z">
+        <changelog><![CDATA[New: track solo → TotalMix main-out solo. Soloing a monitored track now solos its input on the main output only — the soloed track stays audible, the others on the main bus dim. Cue / headphone submixes are left untouched so each keeps its own balance. Cleared automatically on monitor-off, mute, input change and mirror-disable, so a stale solo can never silence the whole main bus.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.1/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.1/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.1/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
