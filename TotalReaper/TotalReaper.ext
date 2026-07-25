@@ -1,14 +1,8 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.0
+@version 0.2.1
 @changelog
-  First Windows release (reaper_totalreaper.dll) alongside macOS arm64 / x86_64.
-
-  Fixed: direct hardware-output sends are now mirrored. A track routed straight to a hardware output (e.g. the RME phones channels) now follows REAPER — previously only track → bus-track → hardware chains were picked up, so headphone aux levels didn't react. Works forward and via 2-Way Control.
-
-  New: Settings window — action "TotalReaper: Open Settings Window" opens a panel for OSC ports (configurable, applied live) and toggles for Routing Mirror / 2-Way Control / Auto-Talkback / Stereo-Pair Link, kept in sync with the matching actions and toolbar icons. Requires ReaImGui (install via ReaPack → Browse packages); if it's missing the action just says so and everything else keeps working.
-
-  New: Stereo-pair linking — optionally link REAPER stereo inputs as TotalMix stereo pairs; unlinks automatically when you switch back to mono and re-centers the freed partner channel. Pan/balance and stereo width round-trip both directions (REAPER ↔ TotalMix) with echo suppression so TotalMix's hard-L/R reset on link changes doesn't fight your settings.
+  New: track solo → TotalMix main-out solo. Soloing a monitored track now solos its input on the main output only — the soloed track stays audible, the others on the main bus dim. Cue / headphone submixes are left untouched so each keeps its own balance. Cleared automatically on monitor-off, mute, input change and mirror-disable, so a stale solo can never silence the whole main bus.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
@@ -26,6 +20,7 @@
   ## What it does
 
   - **Routing mirror**: REAPER track volume / mute / pan → TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.
+  - **Solo mirror**: REAPER track solo → TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.
   - **2-Way Control**: optional reverse direction — TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.
   - **Track-to-track sends** are walked recursively and projected onto TotalMix routings on every hardware-output destination — cue mixes, headphone sends, etc.
   - **Per-track preamp control** as REAPER actions: gain ±1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.
