@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="05c6f34ecf7f20ca435ef37efe1a5d6ec2ddae90">
+<index version="1" name="Frank Acklin Scripts" commit="87e3d60b2f9eeffdcfd5173836332f450a473f78">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -896,6 +896,23 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.1/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.4.2" author="Frank Acklin" time="2026-07-27T16:33:03Z">
+        <changelog><![CDATA[- Codename: Reticulating Splines
+- Metering: the UF8's second gain-reduction row now shows the focused track's SSL gate attenuation (it was dark), in lock-step with the UC1 gate LEDs. Gate GR on both surfaces follows the selected track's channel strip instead of whichever SSL instance connected first.
+- Load: no more load-time track-selection countdown. With gate metering on, opening a project used to select track 14 down to 2, one per second, over ~12s; the plug-ins now connect in a quick burst so the selection settles almost instantly. Metering unaffected.
+- Nav Mode: top-soft-key marker/region jumps now work when a pinned startup soft-key bank (or any user-Quick) is engaged — the overlay owns the soft-keys while showing. Region jumps also work with the transport stopped. Uncoloured markers/regions are no longer dim on the UC1.
+- Soft-keys: FX dynamic-bank keys are colour-coded by SSL class (CS yellow / BC red / UF8 blue / plain white); a fixed startup soft-key bank can be pinned in Settings -> General.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
