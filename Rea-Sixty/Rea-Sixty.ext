@@ -1,11 +1,12 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.4.1
+@version 0.4.2
 @changelog
-  - Codename: Finest Merchandise
-  - Exchange: a mapping's UC1 EXT FUNCS (the curated hidden BACK-menu) now show up on the map detail — they were being dropped at ingest and vanished. Listed as name -> parameter and counted toward parameter coverage; already-uploaded maps light up too, no re-upload needed.
-  - Exchange: re-publishing a mapping now updates your existing one for that plug-in instead of failing as a duplicate (unchanged) or spawning a second entry (changed). Someone else's identical mapping is still rejected.
-  - FX-Learn: clear off-face bindings — SSL Link slots with no control on the UC1 face (Fader, Pan, quick-access, Comp Mix, SAT) now show in an "Also mapped — off-face" list under the schematic, each with a Clear button, so a stray one can finally be removed.
+  - Codename: Reticulating Splines
+  - Metering: the UF8's second gain-reduction row now shows the focused track's SSL gate attenuation (it was dark), in lock-step with the UC1 gate LEDs. Gate GR on both surfaces follows the selected track's channel strip instead of whichever SSL instance connected first.
+  - Load: no more load-time track-selection countdown. With gate metering on, opening a project used to select track 14 down to 2, one per second, over ~12s; the plug-ins now connect in a quick burst so the selection settles almost instantly. Metering unaffected.
+  - Nav Mode: top-soft-key marker/region jumps now work when a pinned startup soft-key bank (or any user-Quick) is engaged — the overlay owns the soft-keys while showing. Region jumps also work with the transport stopped. Uncoloured markers/regions are no longer dim on the UC1.
+  - Soft-keys: FX dynamic-bank keys are colour-coded by SSL class (CS yellow / BC red / UF8 blue / plain white); a fixed startup soft-key bank can be pinned in Settings -> General.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
