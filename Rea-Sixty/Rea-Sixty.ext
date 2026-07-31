@@ -1,12 +1,11 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.4.2
+@version 0.4.3
 @changelog
-  - Codename: Reticulating Splines
-  - Metering: the UF8's second gain-reduction row now shows the focused track's SSL gate attenuation (it was dark), in lock-step with the UC1 gate LEDs. Gate GR on both surfaces follows the selected track's channel strip instead of whichever SSL instance connected first.
-  - Load: no more load-time track-selection countdown. With gate metering on, opening a project used to select track 14 down to 2, one per second, over ~12s; the plug-ins now connect in a quick burst so the selection settles almost instantly. Metering unaffected.
-  - Nav Mode: top-soft-key marker/region jumps now work when a pinned startup soft-key bank (or any user-Quick) is engaged — the overlay owns the soft-keys while showing. Region jumps also work with the transport stopped. Uncoloured markers/regions are no longer dim on the UC1.
-  - Soft-keys: FX dynamic-bank keys are colour-coded by SSL class (CS yellow / BC red / UF8 blue / plain white); a fixed startup soft-key bank can be pinned in Settings -> General.
+  - Codename: The stickiest of the icky
+  - Sticky Pot (UF8): pin one plug-in parameter per track onto its V-Pot. The pin moves with the track across banks and overrides the strip's normal pan / param view until cleared; each track holds its own. Bind "Sticky Pot: Get next touched Parameter" (arm, then touch the parameter — it pins to its track; a V-Pot press while armed clears the pin) and "Sticky Pot: Toggle active/inactive". A V-Pot press resets the pinned parameter. Pins are saved with the project and step aside while a mode owns the V-Pot (Plug-in / SSL Strip / FLIP / PAN / Instance).
+  - Fix: Page arrows now navigate a Quick's sub-banks (V-POT / Soft 1-5) when a Quick is engaged (e.g. Q3 = I/O) instead of only the plug-in soft-key bank.
+  - Fix: the Bindings editor no longer shows LED-colour options for the UF8 channel encoder (rotate and push) — it has no button LED; the encoder push keeps its modifier and long-press slots.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
