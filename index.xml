@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="87e3d60b2f9eeffdcfd5173836332f450a473f78">
+<index version="1" name="Frank Acklin Scripts" commit="807147af99e51f44b451e14286c0bc6aae8a9ac2">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -913,6 +913,22 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.2/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.4.3" author="Frank Acklin" time="2026-07-31T18:17:25Z">
+        <changelog><![CDATA[- Codename: The stickiest of the icky
+- Sticky Pot (UF8): pin one plug-in parameter per track onto its V-Pot. The pin moves with the track across banks and overrides the strip's normal pan / param view until cleared; each track holds its own. Bind "Sticky Pot: Get next touched Parameter" (arm, then touch the parameter — it pins to its track; a V-Pot press while armed clears the pin) and "Sticky Pot: Toggle active/inactive". A V-Pot press resets the pinned parameter. Pins are saved with the project and step aside while a mode owns the V-Pot (Plug-in / SSL Strip / FLIP / PAN / Instance).
+- Fix: Page arrows now navigate a Quick's sub-banks (V-POT / Soft 1-5) when a Quick is engaged (e.g. Q3 = I/O) instead of only the plug-in soft-key bank.
+- Fix: the Bindings editor no longer shows LED-colour options for the UF8 channel encoder (rotate and push) — it has no button LED; the encoder push keeps its modifier and long-press slots.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/reaper_rea-sixty.so</source>
       </version>
     </reapack>
   </category>
