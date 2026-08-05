@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="807147af99e51f44b451e14286c0bc6aae8a9ac2">
+<index version="1" name="Frank Acklin Scripts" commit="c72153acbd6572a2744ee6d464c32cf1cae376fd">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -929,6 +929,25 @@ Bug fixes:
         <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/libusb-1.0.dll</source>
         <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/hidapi.dll</source>
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.3/reaper_rea-sixty.so</source>
+      </version>
+      <version name="0.4.4" author="Frank Acklin" time="2026-08-05T08:08:35Z">
+        <changelog><![CDATA[- Codename: It's just a flesh wound
+- Linux: self-contained install — libusb + hidapi are now bundled next to the plugin and loaded from its own folder, so a ReaPack install works with no apt install. Fixes the "installed via ReaPack but no Control Surface / no actions" case on minimal Linux (missing libhidapi-hidraw0).
+- FX Learn: "Apply this feel to all mappings" — right-click an FX-Learn slot (or use the Learn HUD) to copy one slot's knob feel (invert / range / curve / sensitivity / polarity / push-default) onto every mapped slot in the current map. Pot controls only.
+- Sticky Pot (UF8): under FLIP the fader now follows the pinned parameter instead of the focused V-Pot param.
+- Fix: the Bindings editor shows the "Display label" field only on controls that render it (UF8 top-soft-keys), not on every button.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.4/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
