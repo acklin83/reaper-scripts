@@ -1,11 +1,12 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.4.3
+@version 0.4.4
 @changelog
-  - Codename: The stickiest of the icky
-  - Sticky Pot (UF8): pin one plug-in parameter per track onto its V-Pot. The pin moves with the track across banks and overrides the strip's normal pan / param view until cleared; each track holds its own. Bind "Sticky Pot: Get next touched Parameter" (arm, then touch the parameter — it pins to its track; a V-Pot press while armed clears the pin) and "Sticky Pot: Toggle active/inactive". A V-Pot press resets the pinned parameter. Pins are saved with the project and step aside while a mode owns the V-Pot (Plug-in / SSL Strip / FLIP / PAN / Instance).
-  - Fix: Page arrows now navigate a Quick's sub-banks (V-POT / Soft 1-5) when a Quick is engaged (e.g. Q3 = I/O) instead of only the plug-in soft-key bank.
-  - Fix: the Bindings editor no longer shows LED-colour options for the UF8 channel encoder (rotate and push) — it has no button LED; the encoder push keeps its modifier and long-press slots.
+  - Codename: It's just a flesh wound
+  - Linux: self-contained install — libusb + hidapi are now bundled next to the plugin and loaded from its own folder, so a ReaPack install works with no apt install. Fixes the "installed via ReaPack but no Control Surface / no actions" case on minimal Linux (missing libhidapi-hidraw0).
+  - FX Learn: "Apply this feel to all mappings" — right-click an FX-Learn slot (or use the Learn HUD) to copy one slot's knob feel (invert / range / curve / sensitivity / polarity / push-default) onto every mapped slot in the current map. Pot controls only.
+  - Sticky Pot (UF8): under FLIP the fader now follows the pinned parameter instead of the focused V-Pot param.
+  - Fix: the Bindings editor shows the "Display label" field only on controls that render it (UF8 top-soft-keys), not on every button.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
@@ -17,6 +18,8 @@
   [win64] libusb-1.0.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [win64] hidapi.dll https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [linux64] reaper_rea-sixty.so https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [linux64] libusb-1.0.so.0 https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
+  [linux64] libhidapi-hidraw.so.0 https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
 @link
   GitHub https://github.com/acklin83/Rea-Sixty
   Issue tracker https://github.com/acklin83/Rea-Sixty/issues
