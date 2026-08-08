@@ -1,12 +1,11 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.4.4
+@version 0.4.5
 @changelog
-  - Codename: It's just a flesh wound
-  - Linux: self-contained install — libusb + hidapi are now bundled next to the plugin and loaded from its own folder, so a ReaPack install works with no apt install. Fixes the "installed via ReaPack but no Control Surface / no actions" case on minimal Linux (missing libhidapi-hidraw0).
-  - FX Learn: "Apply this feel to all mappings" — right-click an FX-Learn slot (or use the Learn HUD) to copy one slot's knob feel (invert / range / curve / sensitivity / polarity / push-default) onto every mapped slot in the current map. Pot controls only.
-  - Sticky Pot (UF8): under FLIP the fader now follows the pinned parameter instead of the focused V-Pot param.
-  - Fix: the Bindings editor shows the "Display label" field only on controls that render it (UF8 top-soft-keys), not on every button.
+  - Codename: Works on my machine
+  - Linux fix: v0.4.4 failed to load on Debian 12 / MX Linux 23 and other older distributions — "version `GLIBCXX_3.4.31' not found", no Control Surface entry, no actions. The package was built on too new a system and demanded newer libraries than those distributions have.
+  - The Linux package is now built on an older baseline and links its own C++ runtime, so the distribution's GLIBCXX version no longer matters. The bundled libusb / hidapi come from the same baseline. Requires glibc 2.34+ (Ubuntu 22.04+, Debian 12+, MX 23+, Fedora 35+). The .so grows ~2 MB.
+  - Linux only. macOS and Windows are functionally identical to v0.4.4.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
