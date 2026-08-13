@@ -1,11 +1,35 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.4.5
+@version 0.5.1
 @changelog
-  - Codename: Works on my machine
-  - Linux fix: v0.4.4 failed to load on Debian 12 / MX Linux 23 and other older distributions — "version `GLIBCXX_3.4.31' not found", no Control Surface entry, no actions. The package was built on too new a system and demanded newer libraries than those distributions have.
-  - The Linux package is now built on an older baseline and links its own C++ runtime, so the distribution's GLIBCXX version no longer matters. The bundled libusb / hidapi come from the same baseline. Requires glibc 2.34+ (Ubuntu 22.04+, Debian 12+, MX 23+, Fedora 35+). The .so grows ~2 MB.
-  - Linux only. macOS and Windows are functionally identical to v0.4.4.
+  - Codename: HOTFIX
+  - Windows: v0.5.0 stopped REAPER from starting at all. The extension reserved more stack than Windows gives a program's main thread, so Windows ended the process while the extension was still loading, before any of its own error handling could run. macOS and Linux were never affected.
+  - If REAPER still will not start: rename reaper_rea-sixty.dll to reaper_rea-sixty.dll.OFF in %APPDATA%\REAPER\UserPlugins, start REAPER, update, then delete the .OFF file.
+  - The build now refuses to compile if any function reserves more than 256 KB of stack, so this cannot come back unnoticed.
+  - The rest of this list came with v0.5.0, which was withdrawn because of the crash above. If you are coming from v0.4.5, all of it is new to you.
+  - The UF1 works. Up to v0.4.x there was no UF1 code at all, so plugging one in did nothing. It is now a full surface: channel, DAW and plug-in views, the four V-Pots on the focused SSL channel strip or Bus Comp, and SSL's own EQ curve on screen.
+  - UF1 meter view: Overview bargraphs, the analogue VU and PPM needles, the goniometer, the RTA spectrum and the Loudness pages, live from the SSL 360 plug-ins. Its own RESET, FINE and PRESETS soft-keys.
+  - Jog Mode on the UF1. The wheel has an object (Playhead, Scrub, Items, Envelope, Razor), the arrow cross selects and the wheel moves. Shift is fine, Cmd copies, Ctrl is the cross axis.
+  - Item and razor drops trim behind and crossfade on release, following REAPER's own editing preferences. Razor edits work on envelope lanes, across lanes and across tracks, and stay non-destructive until you let go.
+  - MODE is a hold carrying two pickers: the soft-keys choose the view, the CHANNEL encoder chooses the encoder mode. Twelve modes, ring configurable, and the UF1 keeps its own separate from the UF8.
+  - FX Learn on the UF1, with its own layer. A plug-in mapped for the UC1 is already mapped on the UF1 unless you switch that layer on.
+  - The UF1 can act as the 9th strip of the UF8 bank, for tracks or for sends.
+  - One name per parameter across UC1, UF8 and UF1, and a plug-in rename now wins everywhere. Colour-bar names take 12 characters instead of 7.
+  - Send and receive strips can name the route's source track in the colour bar. Off by default.
+  - Settings split into Devices, Appearance and Behaviour, with a search that covers every pane control by control.
+  - Mapping Exchange understands UF1 maps.
+  - Fixes: gate gain reduction picks the meter by strip model and reads the active instance; renaming a plug-in no longer crashes the catalog; bound toggle actions light their LEDs; UC1 encoder acceleration removed.
+  - **DAW-layer track colours** on the UF8 scribble strips: every REAPER track shows its assigned colour, no per-track plug-in needed
+  - **Full 16-bit faders** with motor + touch
+  - **UC1 follows the focused REAPER track** and drives the SSL Channel Strip 2 / Bus Compressor 2 / 4K B/E/G / 360° Link plug-ins
+  - **UC1 GR meter** driven from the SSL plug-in itself via REAPER's PreSonus VST3 `GainReduction_dB` host extension
+  - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match, so slot reorders are safe but renames break the binding)
+  - **REC + RME (TotalReaper) integration**: per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
+  - **Bindings system**: modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
+  - **Settings window** in a dockable ReaImGui context: twelve tabs (Devices, Appearance, Behaviour, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
+  - REAPER 6 or later
+  - **ReaImGui** (install separately via ReaPack). Without it the Settings window stays empty, hardware control still works
+  - SSL 360° **not running** (it claims the UF8/UC1 vendor interface exclusively)
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
@@ -30,14 +54,14 @@
 
   ## What it does
 
-  - **DAW-layer track colours** on the UF8 scribble strips — every REAPER track shows its assigned colour, no per-track plug-in needed
+  - **DAW-layer track colours** on the UF8 scribble strips: every REAPER track shows its assigned colour, no per-track plug-in needed
   - **Full 16-bit faders** with motor + touch
   - **UC1 follows the focused REAPER track** and drives the SSL Channel Strip 2 / Bus Compressor 2 / 4K B/E/G / 360° Link plug-ins
   - **UC1 GR meter** driven from the SSL plug-in itself via REAPER's PreSonus VST3 `GainReduction_dB` host extension
-  - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match — slot reorders are safe, renames break the binding)
-  - **REC + RME (TotalReaper) integration** — per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
-  - **Bindings system** — modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
-  - **Settings window** in a dockable ReaImGui context — eleven tabs (Device, Appearance, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
+  - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match, so slot reorders are safe but renames break the binding)
+  - **REC + RME (TotalReaper) integration**: per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
+  - **Bindings system**: modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
+  - **Settings window** in a dockable ReaImGui context: twelve tabs (Devices, Appearance, Behaviour, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
 
   ## After install
 
@@ -50,7 +74,7 @@
   ## Requirements
 
   - REAPER 6 or later
-  - **ReaImGui** (install separately via ReaPack) — without it the Settings window stays empty, hardware control still works
+  - **ReaImGui** (install separately via ReaPack). Without it the Settings window stays empty, hardware control still works
   - SSL 360° **not running** (it claims the UF8/UC1 vendor interface exclusively)
 
   ## Vendor relationship
