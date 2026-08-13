@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="f9db96240cae9a25118dde955869b6e7a58381c2">
+<index version="1" name="Frank Acklin Scripts" commit="98ee1f92af1ef715cc1f8be06da905d8e99a6305">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -87,21 +87,21 @@ Markers/regions created before normalization; source-RPP region count shown pre-
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Rea-Sixty\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 REAPER extension that drives the SSL UF8 and UC1 control surfaces natively over their vendor-USB protocol. Replaces SSL 360\u176 ? without requiring an SSL plug-in on every track.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 What it does\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b DAW-layer track colours} on the UF8 scribble strips \u8212- every REAPER track shows its assigned colour, no per-track plug-in needed\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b DAW-layer track colours} on the UF8 scribble strips: every REAPER track shows its assigned colour, no per-track plug-in needed\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Full 16-bit faders} with motor + touch\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b UC1 follows the focused REAPER track} and drives the SSL Channel Strip 2 / Bus Compressor 2 / 4K B/E/G / 360\u176 ? Link plug-ins\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b UC1 GR meter} driven from the SSL plug-in itself via REAPER's PreSonus VST3 {\f1 GainReduction_dB} host extension\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Generic FX Learn} for any VST/JS/AU plug-in parameter (FX-name substring match \u8212- slot reorders are safe, renames break the binding)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b REC + RME (TotalReaper) integration} \u8212- per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Bindings system} \u8212- modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Settings window} in a dockable ReaImGui context \u8212- eleven tabs (Device, Appearance, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Generic FX Learn} for any VST/JS/AU plug-in parameter (FX-name substring match, so slot reorders are safe but renames break the binding)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b REC + RME (TotalReaper) integration}: per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Bindings system}: modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Settings window} in a dockable ReaImGui context: twelve tabs (Devices, Appearance, Behaviour, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 After install\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 Preferences -> Control/OSC/Web -> Add -> {\b Rea-Sixty}.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 First-run setup buttons (Windows WinUSB driver + Linux udev rule) live in Settings -> About; macOS needs no extra setup.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 Linux constraint: plug UF8 and UC1 into {\b separate} PC USB ports. Daisy-chaining (UC1 through UF8's downstream port) triggers {\f1 xhci_hcd} port-resets on Linux 6.17.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6 or later\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b ReaImGui} (install separately via ReaPack) \u8212- without it the Settings window stays empty, hardware control still works\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b ReaImGui} (install separately via ReaPack). Without it the Settings window stays empty, hardware control still works\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab SSL 360\u176 ? {\b not running} (it claims the UF8/UC1 vendor interface exclusively)\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Vendor relationship\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 Not affiliated with Solid State Logic. SSL ACP Support replied to the project author on 2026-05-18 confirming "no objections to the public, open source-project" but declined to share protocol documentation. Protocol stays self-decoded; firmware-update breakage is on the project to chase.\par}
@@ -966,6 +966,48 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.5/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.5/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.4.5/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.5.1" author="Frank Acklin" time="2026-08-13T07:49:48Z">
+        <changelog><![CDATA[- Codename: HOTFIX
+- Windows: v0.5.0 stopped REAPER from starting at all. The extension reserved more stack than Windows gives a program's main thread, so Windows ended the process while the extension was still loading, before any of its own error handling could run. macOS and Linux were never affected.
+- If REAPER still will not start: rename reaper_rea-sixty.dll to reaper_rea-sixty.dll.OFF in %APPDATA%\REAPER\UserPlugins, start REAPER, update, then delete the .OFF file.
+- The build now refuses to compile if any function reserves more than 256 KB of stack, so this cannot come back unnoticed.
+- The rest of this list came with v0.5.0, which was withdrawn because of the crash above. If you are coming from v0.4.5, all of it is new to you.
+- The UF1 works. Up to v0.4.x there was no UF1 code at all, so plugging one in did nothing. It is now a full surface: channel, DAW and plug-in views, the four V-Pots on the focused SSL channel strip or Bus Comp, and SSL's own EQ curve on screen.
+- UF1 meter view: Overview bargraphs, the analogue VU and PPM needles, the goniometer, the RTA spectrum and the Loudness pages, live from the SSL 360 plug-ins. Its own RESET, FINE and PRESETS soft-keys.
+- Jog Mode on the UF1. The wheel has an object (Playhead, Scrub, Items, Envelope, Razor), the arrow cross selects and the wheel moves. Shift is fine, Cmd copies, Ctrl is the cross axis.
+- Item and razor drops trim behind and crossfade on release, following REAPER's own editing preferences. Razor edits work on envelope lanes, across lanes and across tracks, and stay non-destructive until you let go.
+- MODE is a hold carrying two pickers: the soft-keys choose the view, the CHANNEL encoder chooses the encoder mode. Twelve modes, ring configurable, and the UF1 keeps its own separate from the UF8.
+- FX Learn on the UF1, with its own layer. A plug-in mapped for the UC1 is already mapped on the UF1 unless you switch that layer on.
+- The UF1 can act as the 9th strip of the UF8 bank, for tracks or for sends.
+- One name per parameter across UC1, UF8 and UF1, and a plug-in rename now wins everywhere. Colour-bar names take 12 characters instead of 7.
+- Send and receive strips can name the route's source track in the colour bar. Off by default.
+- Settings split into Devices, Appearance and Behaviour, with a search that covers every pane control by control.
+- Mapping Exchange understands UF1 maps.
+- Fixes: gate gain reduction picks the meter by strip model and reads the active instance; renaming a plug-in no longer crashes the catalog; bound toggle actions light their LEDs; UC1 encoder acceleration removed.
+- **DAW-layer track colours** on the UF8 scribble strips: every REAPER track shows its assigned colour, no per-track plug-in needed
+- **Full 16-bit faders** with motor + touch
+- **UC1 follows the focused REAPER track** and drives the SSL Channel Strip 2 / Bus Compressor 2 / 4K B/E/G / 360° Link plug-ins
+- **UC1 GR meter** driven from the SSL plug-in itself via REAPER's PreSonus VST3 `GainReduction_dB` host extension
+- **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match, so slot reorders are safe but renames break the binding)
+- **REC + RME (TotalReaper) integration**: per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
+- **Bindings system**: modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
+- **Settings window** in a dockable ReaImGui context: twelve tabs (Devices, Appearance, Behaviour, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
+- REAPER 6 or later
+- **ReaImGui** (install separately via ReaPack). Without it the Settings window stays empty, hardware control still works
+- SSL 360° **not running** (it claims the UF8/UC1 vendor interface exclusively)]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.1/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
