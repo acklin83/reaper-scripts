@@ -1,35 +1,21 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.5.1
+@version 0.5.2
 @changelog
-  - Codename: HOTFIX
-  - Windows: v0.5.0 stopped REAPER from starting at all. The extension reserved more stack than Windows gives a program's main thread, so Windows ended the process while the extension was still loading, before any of its own error handling could run. macOS and Linux were never affected.
-  - If REAPER still will not start: rename reaper_rea-sixty.dll to reaper_rea-sixty.dll.OFF in %APPDATA%\REAPER\UserPlugins, start REAPER, update, then delete the .OFF file.
-  - The build now refuses to compile if any function reserves more than 256 KB of stack, so this cannot come back unnoticed.
-  - The rest of this list came with v0.5.0, which was withdrawn because of the crash above. If you are coming from v0.4.5, all of it is new to you.
-  - The UF1 works. Up to v0.4.x there was no UF1 code at all, so plugging one in did nothing. It is now a full surface: channel, DAW and plug-in views, the four V-Pots on the focused SSL channel strip or Bus Comp, and SSL's own EQ curve on screen.
-  - UF1 meter view: Overview bargraphs, the analogue VU and PPM needles, the goniometer, the RTA spectrum and the Loudness pages, live from the SSL 360 plug-ins. Its own RESET, FINE and PRESETS soft-keys.
-  - Jog Mode on the UF1. The wheel has an object (Playhead, Scrub, Items, Envelope, Razor), the arrow cross selects and the wheel moves. Shift is fine, Cmd copies, Ctrl is the cross axis.
-  - Item and razor drops trim behind and crossfade on release, following REAPER's own editing preferences. Razor edits work on envelope lanes, across lanes and across tracks, and stay non-destructive until you let go.
-  - MODE is a hold carrying two pickers: the soft-keys choose the view, the CHANNEL encoder chooses the encoder mode. Twelve modes, ring configurable, and the UF1 keeps its own separate from the UF8.
-  - FX Learn on the UF1, with its own layer. A plug-in mapped for the UC1 is already mapped on the UF1 unless you switch that layer on.
-  - The UF1 can act as the 9th strip of the UF8 bank, for tracks or for sends.
-  - One name per parameter across UC1, UF8 and UF1, and a plug-in rename now wins everywhere. Colour-bar names take 12 characters instead of 7.
-  - Send and receive strips can name the route's source track in the colour bar. Off by default.
-  - Settings split into Devices, Appearance and Behaviour, with a search that covers every pane control by control.
-  - Mapping Exchange understands UF1 maps.
-  - Fixes: gate gain reduction picks the meter by strip model and reads the active instance; renaming a plug-in no longer crashes the catalog; bound toggle actions light their LEDs; UC1 encoder acceleration removed.
-  - **DAW-layer track colours** on the UF8 scribble strips: every REAPER track shows its assigned colour, no per-track plug-in needed
-  - **Full 16-bit faders** with motor + touch
-  - **UC1 follows the focused REAPER track** and drives the SSL Channel Strip 2 / Bus Compressor 2 / 4K B/E/G / 360° Link plug-ins
-  - **UC1 GR meter** driven from the SSL plug-in itself via REAPER's PreSonus VST3 `GainReduction_dB` host extension
-  - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match, so slot reorders are safe but renames break the binding)
-  - **REC + RME (TotalReaper) integration**: per-strip preamp mirror (gain / phantom / pad / phase) plus Shift+V-Pot input-channel switch when TotalReaper is detected
-  - **Bindings system**: modifier combos (incl. double-click latch on Shift), Learn mode, right-click Copy / Paste, per-binding colour overrides
-  - **Settings window** in a dockable ReaImGui context: twelve tabs (Devices, Appearance, Behaviour, Bindings, Modes, FX Learn, Favourites, Selection Sets, Parameter Groups, Exchange, Manual, About) themed to REAPER's active theme, with the full user manual baked into the build
-  - REAPER 6 or later
-  - **ReaImGui** (install separately via ReaPack). Without it the Settings window stays empty, hardware control still works
-  - SSL 360° **not running** (it claims the UF8/UC1 vendor interface exclusively)
+  - Codename: It was never the firmware
+  - REAPER could be killed outright by a plug-in whose parameter values print long text. The UF1 display line counted its lengths in a type that cannot go below zero, so a value as long as the whole line wrapped the arithmetic and the resulting error reached REAPER, which treats one as fatal. SSL's own strips never hit it; FabFilter does, which made it look like a compatibility problem.
+  - The surface tick now catches an unexpected error instead of letting it end the session.
+  - Windows: the driver installer did nothing from the second press onwards. It wrote its signed catalogue into the folder it was hashing, so every run after the first failed before installing anything, with the window closing too fast to read. Pressing again is what people do when nothing happens, so anyone who did was locked out.
+  - Windows: each press also added another copy of the driver package to the store while uninstall removed only one. Uninstall now removes every copy.
+  - Windows: the install says what happened instead of "started": installed, failed with a log path, or cancelled at the permission prompt. Settings, About also shows what each device is bound to right now, with a Refresh button.
+  - Windows: the button says UF8, UC1 and UF1. It always bound all three. After a successful install the devices move to "Universal Serial Bus devices" in Device Manager and are renamed, which the text now says.
+  - Names on the surface were still cut to 7 characters in seven places after the colour-bar zone grew to 12, including the Learn-HUD rename and the shared parameter name when set from the UF8.
+  - UF1: the EQ graph follows a channel change again, whether you use SEL or the channel encoder. Choosing a channel by hand now outranks the plug-in instance you last activated.
+  - UF1: in Extender mode SEL selects the track the fader is on, which is the track its lamp has always reported.
+  - UF1: the EQ graph redraws after the device is unplugged and back.
+  - UF1: the Learn-HUD's UF1 tab shows the name of the plug-in the UF1 is on, not the Channel Strip's.
+  - UF1: umlauts on the panel came out as two characters each.
+  - UF1: the Extender's small display named the selected track instead of the track under the fader; an envelope jog left nothing to undo; a long parameter name overflowed an FX-Learn cell identifier; "Fill: Replace" is capped on plug-ins with hundreds of parameters.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
