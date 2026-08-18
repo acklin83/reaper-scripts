@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="59d298516063f2c90cc3e5d945a9b25a1e0db219">
+<index version="1" name="Frank Acklin Scripts" commit="d2b6beef2282f2f8af6da930507ede4266499568">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1036,6 +1036,49 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.2/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.2/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.2/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.5.3" author="Frank Acklin" time="2026-08-18T15:54:14Z">
+        <changelog><![CDATA[- Codename: Hold my Shift
+- REAPER could vanish without a message while playback carried on. The extension watched its network connections with a mechanism that has a hard ceiling on how many it can watch, and one connection past that ceiling corrupted memory. It now uses one with no such limit, and the connection cap is higher.
+- Every soft-key bank carries two full sets of keys, Plain and Shift. Holding the modifier switches the whole row, labels and all. Each set has its own dynamic-bank setting, its own presets and its own LED colour, so one set can be eight fixed actions while the other is an FX bank.
+- Soft-key slots now take a Behavior (Momentary, Toggle, Hold) and all four modifier slots, like every other key.
+- The bindings editor always edits the bank that is engaged. Clicking a Quick or Sub-Bank engages it, and pressing the modifier key on the surface moves the editor to that set.
+- Copy and paste work on soft-keys.
+- Recalling a preset into a set brings its labels with it.
+- A dynamic sub-bank says so in three places instead of quietly swallowing what you assign: an amber corner on the cell, scribble strips that read the bank kind, and a key press that shows what the bank computes.
+- CS and BC Favourites are a dynamic bank kind of their own, so any sub-bank can become them without loading a preset. Firing a favourite on a track with no Channel Strip now inserts the plug-in instead of doing nothing.
+- The LCD no longer prints internal action names when a slot in a modifier set has no label.
+- The Sub-Bank cell LED follows the modifier set.
+- UF1: the nav cross around the jog wheel is bindable per jog object, five keys by five objects. The same key can do five different things and you decide all five. Shift on those keys is a binding of its own. The factory assignment behaves as it did before.
+- UF1: the surface comes back up in the view it was left in.
+- UF1: three-state send mode in the Sends view, Shift mutes a send, Shift with the V-Pot pans it, Shift with the V-Pot push centres the pan. Receives are reachable with Shift and 5-8.
+- UF1: the four soft keys highlight on screen when engaged, which stays readable while the Bus Compressor meter owns their LEDs.
+- UF1: the phantom low cut on every plug-in that is not an SSL strip is gone. The EQ curve was drawn from defaults as soon as any FX resolved.
+- UF1: the CS type cell and PRE, SOLO SAFE, PLUG-IN stay blank on a track with no plug-in.
+- UF1: the V-Pot reaches minus infinity, the way the fader always could.
+- UF1: the V-Pot bar style is driven live, and a centre bar shows a signed deviation rather than an absolute position.
+- UF1: holding MODE no longer draws the header twice.
+- UF1: six functions no longer need a UC1 to be connected before they will run.
+- UF1: Plugin view on a track without a strip shows nothing instead of dead Pan and Volume readings.
+- UF1: SOLO is yellow, both lit and dim.
+- UF8: Bank left and right stay the fader bank in Plugin Mode.
+- The mode banner no longer announces a state that was merely restored when the project opened.
+- For plug-in display names your own mapping wins over the SSL mapping.
+- Bindings are written in a stable order, so config diffs are readable. The first save after updating is still large, because that is the reordering itself.
+- The Bindings pane remembers which surface you were last on.
+- The manual covers the nav cross and the Jog actions, and several passages that had fallen behind the code are correct again.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
