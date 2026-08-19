@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="ffcf63516fa625cd57f471ef6f001557855f5754">
+<index version="1" name="Frank Acklin Scripts" commit="75f46647b4575e166f9e1e61bfda46f5ed955a03">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1079,6 +1079,33 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.3/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.5.4" author="Frank Acklin" time="2026-08-19T15:38:18Z">
+        <changelog><![CDATA[- Codename: Phantom Power
+- UF1: REC is a selection mode. SEL arms the channel the fader side shows, and the SEL lamp is red, bright when armed. The existing selection-mode actions switch it; nothing new lands on your keys.
+- UF1: with an RME interface and TotalReaper running, REC drives that channel's preamp. The V-Pot above the fader sets gain, Shift on it walks the input channel, and CUT and SOLO are assignable to phantom, pad, phase or AutoLevel. Both rotation toggles default ON here, unlike the UF8's and the UC1's.
+- Settings, Modes, REC reports whether TotalReaper was detected and hands you to ReaPack when it is missing.
+- Settings hides the panes for a surface this computer has never had attached, search included. It remembers rather than checks, so unplugging a surface for a session leaves all of its settings in place. Two buttons under Connected devices cover the rest: Show settings for devices you don't have, and Forget devices that aren't connected.
+- UF1: the fader half and the plug-in half address different tracks, as they are painted. Fader, meter, small display, SOLO, CUT, SEL and the above-fader V-Pot follow the channel on the fader; the four V-Pots, the four display soft keys and the EQ graph follow the selection. In Extender mode CUT lit one track and muted another. MASTER outranks the Extender on both halves.
+- UF1: the small display's bar never worked, for anything. The init sequence set the bar style to off and nothing set it back, so no position ever drew, neither pan nor a Sticky Pot nor a preamp.
+- UF8: turning the RME gain knob flashed TRIM and the channel number.
+- UF8: pan moved at half the UF1's resolution per detent. Both use the same law now, and pan draws as a single travelling line on both instead of filling from the middle.
+- Both Settings tab restores were dead after closing and reopening the window, so the pane and the surface tab were forgotten each time.
+- Toggle V-Pots to Pan no longer appears in the UF1's action picker. It writes state only the eight-strip surfaces read, so on a UF1 key it did nothing, silently.
+- The manual's MIDI chapter described a virtual MIDI port the extension does not open and two message types it cannot send. MIDI bindings go to REAPER's own outputs, by name or all at once.
+- TotalReaper v0.2.2 (same repository) notices a track's input change itself, so the preamp readout no longer describes the previous channel.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
