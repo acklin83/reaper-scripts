@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="d2b6beef2282f2f8af6da930507ede4266499568">
+<index version="1" name="Frank Acklin Scripts" commit="ffcf63516fa625cd57f471ef6f001557855f5754">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1212,6 +1212,12 @@ New: Stereo-pair linking — optionally link REAPER stereo inputs as TotalMix st
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.1/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.1/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.1/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.2" author="Frank Acklin" time="2026-08-19T13:30:21Z">
+        <changelog><![CDATA[Fixed: point a track at a different input and the preamp readout follows on its own. TotalMix only reports a channel when something on it moves, so the cached gain, 48V, pad and phase kept describing the channel you just left until you nudged the gain knob. TotalReaper now watches the track's input assignment, asks TotalMix for a fresh dump shortly after a change, and holds the 2-Way fader path off while the answer arrives so nothing writes stale levels back into REAPER. Spinning an encoder through the input list costs one request, not one per detent.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.2/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.2/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.2/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
