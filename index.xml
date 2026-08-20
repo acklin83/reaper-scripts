@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="75f46647b4575e166f9e1e61bfda46f5ed955a03">
+<index version="1" name="Frank Acklin Scripts" commit="578d7b206c9a6621b69b8d048f2f9a2de1beaf0f">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1106,6 +1106,33 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.4/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.5.5" author="Frank Acklin" time="2026-08-20T15:33:37Z">
+        <changelog><![CDATA[- Codename: He's not just some dingbat I found on the strip, man.
+- Presets load into the plug-in. SSL's plug-ins expose no presets to REAPER at all, so both browsers read SSL's own library off disk instead, in the folders SSL files it in, and a preset you pick is loaded through the plug-in's own state: the instance reports it as loaded rather than as the last one with changes.
+- UC1: the PRESETS screen browses that library. CONFIRM steps into a folder or loads a preset, BACK comes back up, and browsing changes nothing on the way. CHANNEL STRIP browses the strip under the Channel Strip section and BUS COMP the compressor under the Bus Comp section, which are different tracks.
+- UF1: a preset browser for the meter and for the channel strips, on the action "UF1: Preset browser". It opens on the preset the instance has loaded, under the highlight.
+- UF1: Fades is a sixth jog mode. The wheel pulls the fade under the edit cursor, and which edge the cursor sits nearer decides fade or crossfade. On a crossfade the seam stays where it is, so pulling one open never moves audio. The view frames the fade and stands still while you turn.
+- UF1: Cmd and the wheel pull a time selection in Playhead and Scrub (Alt on Windows). Scrub no longer drags one on its own, and the fade-out follows the wheel mirrored.
+- UF1 meter: a meter on the master track or in the monitoring FX chain is reachable. Both were invisible, for two separate reasons.
+- UF1 meter: past 127 tracks the meter followed the wrong track.
+- UF1 meter: the view shows a track's current name, so renaming it updates the display, and umlauts survive.
+- UF1 meter: the V-Pots resolve their parameters by name. On a plain SSL Meter the labels named one parameter and turned another.
+- UF1 meter, Loudness: the scale is labelled from the plug-in's Integrated Target and its Absolute or Relative setting instead of fixed values. PRESETS opens there too, PLAY pauses and resumes the measurement, and RESET clears the plug-in's own peak holds and overloads plus its loudness measurements.
+- On screen: the mode ring is a carousel you can turn, the jog ring is sortable, and the ring opens around the button you pressed instead of walking up the screen with every pick.
+- Windows: the SSL preset folder is found.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
