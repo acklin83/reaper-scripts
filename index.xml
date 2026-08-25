@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="578d7b206c9a6621b69b8d048f2f9a2de1beaf0f">
+<index version="1" name="Frank Acklin Scripts" commit="410301d27e127d857574536a9d0c348b451628e4">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1133,6 +1133,44 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.5/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.5.6" author="Frank Acklin" time="2026-08-25T16:16:45Z">
+        <changelog><![CDATA[- Codename: The other half of Shift
+- SSL rows: the keys the plug-in leaves free are yours in Settings at last, per key rather than the whole Quick, including the empty Bus Comp pages 2 to 5.
+- SSL rows: Plain belongs to the plug-in and every modifier set belongs to you, on every key. Hold FINE and the row shows your set, blank where you assigned nothing, and an empty key does nothing instead of moving the plug-in's focused parameter behind a blank label.
+- While the Bindings pane is open the surface follows the set the Modifier row is on rather than the key you are holding: it shows that set and a press fires it. Close the pane and it follows the held key again.
+- Holding the modifier moves the editor's set from anywhere in that pane, not only once a soft-key is selected.
+- Dynamic banks have their sets. A key you assign in a set fires instead of that key's FX gesture, one you leave empty keeps the gesture, and the row paints what it will do. On the UF1 too, where the gesture always won.
+- A set can be a dynamic bank of its own, so FX on Plain and Track Colours on Shift is one bank. "Off (take Plain's bank)" is what a set does out of the box.
+- Typing a capital letter into a Settings field no longer walks the surface onto its Shift set. Holding SHIFT on the surface is untouched.
+- Track Colours bank: the factory palette uses colours the hardware actually has. Two swatches looked alike and a third went pink, because the firmware rounded them to its own ten.
+- A dimmed key keeps its hue. Dimming ran before the colour was quantised, so three keys read as red and the fourth as unlit.
+- UF1: the nav cross lights from its bindings, one set per jog mode, so a key shows what it does right now instead of sitting dark in three of the six modes. The razor edge, the envelope target, a held item drag and the fade edge still win their own key, now in that binding's active colour.
+- UF1: holding a modifier no longer changes the LED of a key that has nothing assigned on it. Only keys that carry an action for the held modifier switch to its colour.
+- UF1: MASTER, BANK left/right, PAGE left/right and 5-8 follow the colour set for them. They ignored it and painted a fixed one, so they now look like every other key: their colour, bright when the move is possible, dim when it is not. Set Inactive to Off for the old unlit look.
+- LED brightness Off means off, on every UF1 key and on the DAW soft-keys. It rendered as Dim.
+- UF1: the time display can show text. Stepping its format flashes BARS, TIME or SAMPLES, so the field names what it is showing.
+- UF1: a position of ten digits or more no longer loses its leading digit on the time display, and a negative position keeps its minus sign. The field is ten digits wide, not eleven.
+- A parameter with more than five steps steps through all of them. Five probes could not tell ten steps from continuous, and anything called continuous became a hard 0/1 toggle.
+- A long press on a dynamic bank key fires under the finger at half a second instead of waiting for the release.
+- UF1: FLIP in Plug-in Mode puts the last touched V-Pot's plug-in parameter on the fader. Strip Mode, send faders and a sticky pin still win, and it falls back to Pan when there is no parameter to resolve.
+- Selection Mode comes back as NORM on start. Settings, Behaviour, Tracks; on by default, and off restores the old behaviour.
+- UF1: soft-key 1 on the display no longer sits green while the other three are yellow.
+- send_this and recv_this are hidden from the UF1 action picker. They write state no UF1 path reads.
+- Every built-in action carries a one-line description, shown as a tooltip in the action picker and searched along with the name.
+- The Settings window no longer closes itself while scrolling the FX Learn pane.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.6/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
