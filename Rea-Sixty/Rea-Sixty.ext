@@ -1,31 +1,28 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.5.6
+@version 0.5.7
 @changelog
-  - Codename: The other half of Shift
-  - SSL rows: the keys the plug-in leaves free are yours in Settings at last, per key rather than the whole Quick, including the empty Bus Comp pages 2 to 5.
-  - SSL rows: Plain belongs to the plug-in and every modifier set belongs to you, on every key. Hold FINE and the row shows your set, blank where you assigned nothing, and an empty key does nothing instead of moving the plug-in's focused parameter behind a blank label.
-  - While the Bindings pane is open the surface follows the set the Modifier row is on rather than the key you are holding: it shows that set and a press fires it. Close the pane and it follows the held key again.
-  - Holding the modifier moves the editor's set from anywhere in that pane, not only once a soft-key is selected.
-  - Dynamic banks have their sets. A key you assign in a set fires instead of that key's FX gesture, one you leave empty keeps the gesture, and the row paints what it will do. On the UF1 too, where the gesture always won.
-  - A set can be a dynamic bank of its own, so FX on Plain and Track Colours on Shift is one bank. "Off (take Plain's bank)" is what a set does out of the box.
-  - Typing a capital letter into a Settings field no longer walks the surface onto its Shift set. Holding SHIFT on the surface is untouched.
-  - Track Colours bank: the factory palette uses colours the hardware actually has. Two swatches looked alike and a third went pink, because the firmware rounded them to its own ten.
-  - A dimmed key keeps its hue. Dimming ran before the colour was quantised, so three keys read as red and the fourth as unlit.
-  - UF1: the nav cross lights from its bindings, one set per jog mode, so a key shows what it does right now instead of sitting dark in three of the six modes. The razor edge, the envelope target, a held item drag and the fade edge still win their own key, now in that binding's active colour.
-  - UF1: holding a modifier no longer changes the LED of a key that has nothing assigned on it. Only keys that carry an action for the held modifier switch to its colour.
-  - UF1: MASTER, BANK left/right, PAGE left/right and 5-8 follow the colour set for them. They ignored it and painted a fixed one, so they now look like every other key: their colour, bright when the move is possible, dim when it is not. Set Inactive to Off for the old unlit look.
-  - LED brightness Off means off, on every UF1 key and on the DAW soft-keys. It rendered as Dim.
-  - UF1: the time display can show text. Stepping its format flashes BARS, TIME or SAMPLES, so the field names what it is showing.
-  - UF1: a position of ten digits or more no longer loses its leading digit on the time display, and a negative position keeps its minus sign. The field is ten digits wide, not eleven.
-  - A parameter with more than five steps steps through all of them. Five probes could not tell ten steps from continuous, and anything called continuous became a hard 0/1 toggle.
-  - A long press on a dynamic bank key fires under the finger at half a second instead of waiting for the release.
-  - UF1: FLIP in Plug-in Mode puts the last touched V-Pot's plug-in parameter on the fader. Strip Mode, send faders and a sticky pin still win, and it falls back to Pan when there is no parameter to resolve.
-  - Selection Mode comes back as NORM on start. Settings, Behaviour, Tracks; on by default, and off restores the old behaviour.
-  - UF1: soft-key 1 on the display no longer sits green while the other three are yellow.
-  - send_this and recv_this are hidden from the UF1 action picker. They write state no UF1 path reads.
-  - Every built-in action carries a one-line description, shown as a tooltip in the action picker and searched along with the name.
-  - The Settings window no longer closes itself while scrolling the FX Learn pane.
+  - Codename: Say my name.
+  - The UF1's soft-key bank names itself: switch it and the name flashes across the time display for about a second, then the clock comes back. On by default, in Settings, Behaviour, UF1.
+  - Banks carry a name of your own, one per bank and per modifier set, typed in Settings, Bindings, UF1. The field is never empty: without a name it shows what the bank will announce anyway, and clearing it puts that back.
+  - A bank with no name announces what kind of dynamic bank it is (EFFECTS, GROUPS, COLOURS, FAVS) or else its number (SOFT 3).
+  - Holding SHIFT counts as a bank switch, because a modifier set is a bank of its own. If that set simply takes Plain's bank, nothing flashes.
+  - While you type a bank name the UF1 shows it, so you read the real cells in the real font. Seven segments have no shape for K, M, V, W or X, so Mix Keys arrives as MIH KEYS. With no UF1 attached the editor draws the ten cells instead.
+  - The time display's three formats are its own: Time is minutes and seconds, Bars and Samples as before, none of them asking what REAPER's ruler or transport is set to.
+  - Negative positions read correctly. With a negative project start time a cursor 26 ms before zero reached the field as -1:59:59:29.
+  - Envelope mode: Cmd pulls a time selection wherever the wheel is on the play cursor, which now includes Envelope once its centre key has handed the wheel to the playhead.
+  - Envelope mode: once the cursor has moved, the arrows start from where it now is rather than from a point selected before the move.
+  - Envelope mode: the centre key's LED shows which of the two targets the wheel is on, in the colours you gave that key. It used to be lit in both.
+  - Nav Mode: a marker or region with no name reads Region 3 or Marker 7, on the number REAPER shows in the ruler, instead of arriving as a blank strip.
+  - Focused-track panel: two new elements, UF1 encoder mode and UF1 jog mode, both off by default.
+  - FX Learn: the page row stopped fighting its own click. The + that starts a new page was dead whenever the UF1 was showing the plug-in being edited. Both editors also move the device onto a page once something is bound there.
+  - Three text fields could write onto the wrong object when the thing they belong to changed under the cursor: the bank name, FX Learn's Display label and the UF1 cell's Display name.
+  - The MODE-hold menu takes the soft-key highlight with it, so a dynamic bank's selection no longer sits under the mode names.
+  - SCRUB is greyed out like MODE. It picks the Jog Mode and never reached the binding system, so an action put there could never fire. Both keys say what they do on hover.
+  - The dynamic-bank pager line names both page arrows, not just one.
+  - Settings, Modes, NAV lists every key bound to each Nav toggle, by silk-screen label.
+  - The UF1's Strip Mode window follows a channel change. Only the UF8's did.
+  - The bindings file moves to version 32. The addition is the bank names and nothing else; an older configuration loads unchanged.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
