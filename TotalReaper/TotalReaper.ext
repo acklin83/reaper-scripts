@@ -1,8 +1,8 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.2
+@version 0.2.3
 @changelog
-  Fixed: point a track at a different input and the preamp readout follows on its own. TotalMix only reports a channel when something on it moves, so the cached gain, 48V, pad and phase kept describing the channel you just left until you nudged the gain knob. TotalReaper now watches the track's input assignment, asks TotalMix for a fresh dump shortly after a change, and holds the 2-Way fader path off while the answer arrives so nothing writes stale levels back into REAPER. Spinning an encoder through the input list costs one request, not one per detent.
+  Added: Only Set Main Submix, an option in the settings window that narrows TotalReaper to the master track's hardware bus. The other hardware outputs are then left alone in both directions. Nothing is written to them, so a cue mix you built by hand in TotalMix survives, including switching the routing mirror off, which otherwise pulls every routing it ever wrote down to minus infinity. And nothing TotalMix reports on them is read back, so a separate headphone mixer driving those submixes on the interface does not rewrite REAPER's send levels behind you. Switch the option off and the other buses are pushed again on the next tick.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
@@ -23,6 +23,7 @@
   - **Solo mirror**: REAPER track solo → TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.
   - **2-Way Control**: optional reverse direction — TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.
   - **Track-to-track sends** are walked recursively and projected onto TotalMix routings on every hardware-output destination — cue mixes, headphone sends, etc.
+  - **Only Set Main Submix**: narrows all of the above to the master track's hardware bus. The other hardware outputs are never written and never read, so a hand-built cue mix, or a separate headphone mixer running on the interface, stays untouched even when you switch the routing mirror off.
   - **Per-track preamp control** as REAPER actions: gain ±1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.
   - **Studio actions**: Toggle Talkback, Toggle Auto-Talkback on Stop (drives talkback from REAPER's transport state), Save/Load TotalMix Snapshot Slot 1…8.
   - **Stereo input handling**: optionally link REAPER stereo inputs as TotalMix stereo pairs — pan/balance and stereo width round-trip both directions; unlinks automatically on stereo→mono. 2-mono splits still work too.
@@ -31,7 +32,7 @@
   ## Requirements
 
   - REAPER 6 or later (tested through 7.71)
-  - TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings → OSC → Compatibility Mode → Global OSC)
+  - TotalMix FX 2.1 or later, with Global OSC enabled (Settings → OSC → Compatibility Mode → Global OSC). Global OSC arrived with 2.1, which is a public preview at the time of writing; RME's regular downloads page still lists 2.03.
   - RME interface that supports Global OSC (UFX+, UCX II, etc.)
   - ReaImGui — only for the optional Settings window; install via ReaPack → Browse packages. Everything else works without it.
   - **TotalMix Settings → OSC → Details… → "Receive to hidden channels" must be checked.** Otherwise TotalMix silently drops fader writes for any input row or output column not in the current layout — the routing mirror appears dead even though TotalReaper is sending correctly. Some TotalMix versions default this OFF.
