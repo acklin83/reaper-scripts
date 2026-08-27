@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="e484bb429806d65c4ff62a9c64ad15098b8d9db4">
+<index version="1" name="Frank Acklin Scripts" commit="168f8a6b03fd8b1ddd44011d1b4d2097901e801e">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1206,6 +1206,35 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.7/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.7/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.7/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.5.8" author="Frank Acklin" time="2026-08-27T17:20:57Z">
+        <changelog><![CDATA[- Codename: Let There Be Light!
+- Hue mode: Philips Hue lamps on the strips, alongside the tracks rather than instead of them. Bind Selection Mode: Hue to engage it.
+- On a UF8 strip the fader is brightness (all the way down switches the lamp off), the V-Pot is hue, FLIP makes it saturation, a press swaps colour for white, CUT switches the lamp and SOLO leaves this one lit while the other Hue strips go dark.
+- UF1 Mode: Hue puts one lamp on the channel screen with hue, saturation and colour temperature on three pots, and the CHANNEL encoder to walk between lamps. SEL on a UF8 strip sends that lamp to the UF1.
+- Settings, Modes, Hue finds the bridge, pairs with it and lists what it found. Eight rows, one per strip, each targeting a single lamp or a whole room or zone, with a label for the scribble strip and the lamp's live state.
+- Eight scene slots. Hue: recall scene takes a parameter of 1 to 8, so a scene sits on any key of any surface, and a long press starts the ones that move. Or set a soft-key bank's type to Hue Scenes and the whole bank becomes the eight slots, each key wearing its colour and lighting while the bridge reports that scene as the one showing.
+- Also Hue: all lamps off, and Hue: recording light on / off for arming the light without opening Settings.
+- Recording light: pick the lamps or a whole room, the colour and the brightness, and what happens when the take ends, back exactly as they were or into a scene of your choosing. Every affected lamp is read just before the light goes red and written back lamp by lamp afterwards. Only recording touches the lights, never play or stop.
+- Marker cues: name a marker hue:Relax and the scene called Relax is recalled as the playhead passes. The prefix and the transition time are yours, and the settings list every matching marker with the scene it resolves to. Cues fire only while rolling, and only forwards.
+- The Track-Colours keys wear SSL's own names for SSL's own colours (RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE, MAGENTA, PINK, WHITE). An unnamed slot wears the name of the colour it shows, and a name left behind by the earlier palette move is corrected once. A name you chose is never touched.
+- The UF1's coloured display soft keys rest one step above off, the same as the UF8, instead of at half power. SOLO and CUT rest on the UF8's dim bytes too.
+- Fixed: "Touch selects channel" no longer fires in UF8 Plugin Mode. There the eight strips are eight parameters of one plug-in, not eight tracks, so touching a fader moved the focus out from under the plug-in mid-gesture.
+- Fixed: two memory leaks in the JSON path, one of them in every release so far. Parsing once at load hid them; Hue reads the bridge once a second, which is how they were found.
+- The manual's REC + RME chapter now carries what TotalMix needs before the mode works at all, and its Nav Mode chapter has been read against the code and corrected.
+- The bindings file stays at version 32. Hue keeps its configuration outside it, so a v0.5.7 setup loads unchanged.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
