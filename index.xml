@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="01f2d55f51dd32d187efe4f018a23248e8a76b81">
+<index version="1" name="Frank Acklin Scripts" commit="e484bb429806d65c4ff62a9c64ad15098b8d9db4">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1244,13 +1244,14 @@ Bug fixes:
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Solo mirror}: REAPER track solo \u8594 ? TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b 2-Way Control}: optional reverse direction \u8212- TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Only Set Main Submix}: narrows all of the above to the master track's hardware bus. The other hardware outputs are never written and never read, so a hand-built cue mix, or a separate headphone mixer running on the interface, stays untouched even when you switch the routing mirror off.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Per-track preamp control} as REAPER actions: gain \u177 ?1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Studio actions}: Toggle Talkback, Toggle Auto-Talkback on Stop (drives talkback from REAPER's transport state), Save/Load TotalMix Snapshot Slot 1\u8230 ?8.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Stereo input handling}: optionally link REAPER stereo inputs as TotalMix stereo pairs \u8212- pan/balance and stereo width round-trip both directions; unlinks automatically on stereo\u8594 ?mono. 2-mono splits still work too.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Settings window} (action "TotalReaper: Open Settings Window"): configurable OSC ports (applied live) and feature toggles, kept in sync with the matching actions. Needs ReaImGui.\sa180\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab REAPER 6 or later (tested through 7.71)\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab TotalMix FX 2.1 Alpha 4 or later, with Global OSC enabled (Settings \u8594 ? OSC \u8594 ? Compatibility Mode \u8594 ? Global OSC)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab TotalMix FX 2.1 or later, with Global OSC enabled (Settings \u8594 ? OSC \u8594 ? Compatibility Mode \u8594 ? Global OSC). Global OSC arrived with 2.1, which is a public preview at the time of writing; RME's regular downloads page still lists 2.03.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab RME interface that supports Global OSC (UFX+, UCX II, etc.)\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab ReaImGui \u8212- only for the optional Settings window; install via ReaPack \u8594 ? Browse packages. Everything else works without it.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b TotalMix Settings \u8594 ? OSC \u8594 ? Details\u8230 ? \u8594 ? "Receive to hidden channels" must be checked.} Otherwise TotalMix silently drops fader writes for any input row or output column not in the current layout \u8212- the routing mirror appears dead even though TotalReaper is sending correctly. Some TotalMix versions default this OFF.\sa180\par}
@@ -1345,6 +1346,12 @@ New: Stereo-pair linking — optionally link REAPER stereo inputs as TotalMix st
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.2/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.2/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.2/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.3" author="Frank Acklin" time="2026-08-27T12:57:28Z">
+        <changelog><![CDATA[Added: Only Set Main Submix, an option in the settings window that narrows TotalReaper to the master track's hardware bus. The other hardware outputs are then left alone in both directions. Nothing is written to them, so a cue mix you built by hand in TotalMix survives, including switching the routing mirror off, which otherwise pulls every routing it ever wrote down to minus infinity. And nothing TotalMix reports on them is read back, so a separate headphone mixer driving those submixes on the interface does not rewrite REAPER's send levels behind you. Switch the option off and the other buses are pushed again on the next tick.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.3/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.3/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.3/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
