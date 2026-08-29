@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="168f8a6b03fd8b1ddd44011d1b4d2097901e801e">
+<index version="1" name="Frank Acklin Scripts" commit="05297caeeecd909c5222ba44204fd906a888d6f9">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1235,6 +1235,30 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.8/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.5.9" author="Frank Acklin" time="2026-08-29T14:27:48Z">
+        <changelog><![CDATA[- Codename: Nobody was painting
+- Fixed: the UF1 display froze when the master was selected. Everything stopped at once, including the small channel peak meter. Three lookups go blank in the same instant for the master and for nothing else, so the painter returned before it painted while the pacer kept repeating its last picture. A channel-encoder move healed it because it puts a real track back in the selection.
+- Fixed: an empty project kept showing the last channel. Delete the final track and the strip sat on CH 1 with its old levels. The zone is cleared properly now, and the idle cycle keeps streaming so the firmware stays in continuous refresh.
+- Fixed: the master's own chain and its monitoring chain read as one meter. REAPER hands back the same track pointer for both, and every peak hold keyed off that pointer, so switching V-Pot 1 between them changed the stream while the held numbers stayed behind. The holds follow the instance now. A negative track index also arrives as ten varint bytes and only five were read.
+- Fixed: a steady tone disappeared while the transport was stopped. Bars, needle and readouts were discarded as soon as a level stopped changing for 300 ms, without ever asking whether it had stopped at the bottom of the scale. The floor is part of the test now.
+- Fixed: the VU needle sat at rest. Minus 120 dBFS stood for measured silence and for nothing having answered yet, and the needle's rest gate read the second as the first. PPM was unaffected throughout, which is what made it look like a needle problem.
+- Fixed: the goniometer froze on its last frame when the Lissajous stream stopped. An instance with no signal has an empty goniometer, and that is what it draws now.
+- Fixed, Windows: the impersonator could bind next to a running SSL 360. SO_REUSEADDR lets that bind succeed there, and which socket then receives a packet is documented as indeterminate, so meter data could go missing with no error anywhere.
+- Fixed: UF1 soft-key 4 did nothing for a plug-in mapped on the UF1 layer alone. That layout's fourth slot carries a built-in action which fired and returned before the user's own parameter was read. An explicit slot owns its key now. The RME gain readout also got the ceiling it was missing.
+- The bindings file stays at version 32. A v0.5.8 setup loads unchanged.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.5.9/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
