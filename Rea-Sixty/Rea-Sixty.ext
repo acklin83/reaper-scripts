@@ -1,22 +1,17 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.5.8
+@version 0.5.9
 @changelog
-  - Codename: Let There Be Light!
-  - Hue mode: Philips Hue lamps on the strips, alongside the tracks rather than instead of them. Bind Selection Mode: Hue to engage it.
-  - On a UF8 strip the fader is brightness (all the way down switches the lamp off), the V-Pot is hue, FLIP makes it saturation, a press swaps colour for white, CUT switches the lamp and SOLO leaves this one lit while the other Hue strips go dark.
-  - UF1 Mode: Hue puts one lamp on the channel screen with hue, saturation and colour temperature on three pots, and the CHANNEL encoder to walk between lamps. SEL on a UF8 strip sends that lamp to the UF1.
-  - Settings, Modes, Hue finds the bridge, pairs with it and lists what it found. Eight rows, one per strip, each targeting a single lamp or a whole room or zone, with a label for the scribble strip and the lamp's live state.
-  - Eight scene slots. Hue: recall scene takes a parameter of 1 to 8, so a scene sits on any key of any surface, and a long press starts the ones that move. Or set a soft-key bank's type to Hue Scenes and the whole bank becomes the eight slots, each key wearing its colour and lighting while the bridge reports that scene as the one showing.
-  - Also Hue: all lamps off, and Hue: recording light on / off for arming the light without opening Settings.
-  - Recording light: pick the lamps or a whole room, the colour and the brightness, and what happens when the take ends, back exactly as they were or into a scene of your choosing. Every affected lamp is read just before the light goes red and written back lamp by lamp afterwards. Only recording touches the lights, never play or stop.
-  - Marker cues: name a marker hue:Relax and the scene called Relax is recalled as the playhead passes. The prefix and the transition time are yours, and the settings list every matching marker with the scene it resolves to. Cues fire only while rolling, and only forwards.
-  - The Track-Colours keys wear SSL's own names for SSL's own colours (RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE, MAGENTA, PINK, WHITE). An unnamed slot wears the name of the colour it shows, and a name left behind by the earlier palette move is corrected once. A name you chose is never touched.
-  - The UF1's coloured display soft keys rest one step above off, the same as the UF8, instead of at half power. SOLO and CUT rest on the UF8's dim bytes too.
-  - Fixed: "Touch selects channel" no longer fires in UF8 Plugin Mode. There the eight strips are eight parameters of one plug-in, not eight tracks, so touching a fader moved the focus out from under the plug-in mid-gesture.
-  - Fixed: two memory leaks in the JSON path, one of them in every release so far. Parsing once at load hid them; Hue reads the bridge once a second, which is how they were found.
-  - The manual's REC + RME chapter now carries what TotalMix needs before the mode works at all, and its Nav Mode chapter has been read against the code and corrected.
-  - The bindings file stays at version 32. Hue keeps its configuration outside it, so a v0.5.7 setup loads unchanged.
+  - Codename: Nobody was painting
+  - Fixed: the UF1 display froze when the master was selected. Everything stopped at once, including the small channel peak meter. Three lookups go blank in the same instant for the master and for nothing else, so the painter returned before it painted while the pacer kept repeating its last picture. A channel-encoder move healed it because it puts a real track back in the selection.
+  - Fixed: an empty project kept showing the last channel. Delete the final track and the strip sat on CH 1 with its old levels. The zone is cleared properly now, and the idle cycle keeps streaming so the firmware stays in continuous refresh.
+  - Fixed: the master's own chain and its monitoring chain read as one meter. REAPER hands back the same track pointer for both, and every peak hold keyed off that pointer, so switching V-Pot 1 between them changed the stream while the held numbers stayed behind. The holds follow the instance now. A negative track index also arrives as ten varint bytes and only five were read.
+  - Fixed: a steady tone disappeared while the transport was stopped. Bars, needle and readouts were discarded as soon as a level stopped changing for 300 ms, without ever asking whether it had stopped at the bottom of the scale. The floor is part of the test now.
+  - Fixed: the VU needle sat at rest. Minus 120 dBFS stood for measured silence and for nothing having answered yet, and the needle's rest gate read the second as the first. PPM was unaffected throughout, which is what made it look like a needle problem.
+  - Fixed: the goniometer froze on its last frame when the Lissajous stream stopped. An instance with no signal has an empty goniometer, and that is what it draws now.
+  - Fixed, Windows: the impersonator could bind next to a running SSL 360. SO_REUSEADDR lets that bind succeed there, and which socket then receives a packet is documented as indeterminate, so meter data could go missing with no error anywhere.
+  - Fixed: UF1 soft-key 4 did nothing for a plug-in mapped on the UF1 layer alone. That layout's fourth slot carries a built-in action which fired and returned before the user's own parameter was read. An explicit slot owns its key now. The RME gain readout also got the ceiling it was missing.
+  - The bindings file stays at version 32. A v0.5.8 setup loads unchanged.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
