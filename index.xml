@@ -1406,6 +1406,13 @@ New: Stereo-pair linking — optionally link REAPER stereo inputs as TotalMix st
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.3/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.3/reaper_totalreaper.dll</source>
       </version>
+      <version name="0.2.4" author="Frank Acklin" time="2026-09-23T12:17:37Z">
+        <changelog><![CDATA[Fixed: the preamp keys and the studio actions work with the routing mirror switched off. Reading a preamp never asked whether the mirror was on, writing one did, so a surface showed the gain and could not move it: the value went into the track's ExtState and TotalMix never heard about it. Writing follows reading now, for the preamps and for Dim, Mono, Speaker B, Talkback and the snapshot slots. The OSC client is connected when the extension loads, not when the mirror is switched on, and the mirror drives REAPER's monitoring into TotalMix and that alone.
+Fixed: the preamp gain cache is held to 0..75 dB. TotalMix clamps its own preamp and then reports nothing, because it only reports a gain when the value changes and at the ceiling nothing does, so every further detent raised the cache alone and a UF1 strip read 128 dB while the interface sat at 75. 0..75 is the mic-pre range on the UFX+ family; Global OSC exposes no per-channel maximum, so a line or instrument input with a shorter range still stops short of its own ceiling.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.4/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.4/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.4/reaper_totalreaper.dll</source>
+      </version>
     </reapack>
   </category>
 </index>
