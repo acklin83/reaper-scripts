@@ -1,8 +1,9 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.3
+@version 0.2.4
 @changelog
-  Added: Only Set Main Submix, an option in the settings window that narrows TotalReaper to the master track's hardware bus. The other hardware outputs are then left alone in both directions. Nothing is written to them, so a cue mix you built by hand in TotalMix survives, including switching the routing mirror off, which otherwise pulls every routing it ever wrote down to minus infinity. And nothing TotalMix reports on them is read back, so a separate headphone mixer driving those submixes on the interface does not rewrite REAPER's send levels behind you. Switch the option off and the other buses are pushed again on the next tick.
+  Fixed: the preamp keys and the studio actions work with the routing mirror switched off. Reading a preamp never asked whether the mirror was on, writing one did, so a surface showed the gain and could not move it: the value went into the track's ExtState and TotalMix never heard about it. Writing follows reading now, for the preamps and for Dim, Mono, Speaker B, Talkback and the snapshot slots. The OSC client is connected when the extension loads, not when the mirror is switched on, and the mirror drives REAPER's monitoring into TotalMix and that alone.
+  Fixed: the preamp gain cache is held to 0..75 dB. TotalMix clamps its own preamp and then reports nothing, because it only reports a gain when the value changes and at the ceiling nothing does, so every further detent raised the cache alone and a UF1 strip read 128 dB while the interface sat at 75. 0..75 is the mic-pre range on the UFX+ family; Global OSC exposes no per-channel maximum, so a line or instrument input with a shorter range still stops short of its own ceiling.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
