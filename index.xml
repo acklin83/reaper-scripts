@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="35d0511ddcf9ee78f2c91e515d90f04ba8ec3f10">
+<index version="1" name="Frank Acklin Scripts" commit="ad47c5d004eaf13748e6a4872a3d3f89e7c662fb">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1345,6 +1345,38 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.0/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.0/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.0/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.6.1" author="Frank Acklin" time="2026-09-27T16:39:03Z">
+        <changelog><![CDATA[- Codename: My whole brain is crying!
+- Automation: the UF1 follows automation. Its motor fader, the dB and pan readouts and the four volumes of the DAW view show what REAPER plays, envelope included.
+- Automation: the UF1 fader records in Touch. REAPER is told the fader is held for as long as the hand is on it, as it always was for the UF8.
+- Automation: faders let go when the hand does. Pan under FLIP (UF8 and UF1) records and returns on release, and a fader on a plug-in parameter ends its edit on release so Touch returns it like track volume: Plug-in Mode, SSL Strip Mode, FLIP onto a focused parameter and a Sticky Pot under FLIP. This was a known issue in v0.6.0.
+- Automation: a fader reports as touched only what it writes, so a fader on a plug-in parameter no longer makes REAPER write volume or pan points.
+- Automation: pots write a point. In Touch, with the transport running, each turn writes one point into the envelope at the play position, and the value stays until the envelope's next point, like a plug-in parameter on a pot. Track pan, track volume on a pot, send pan and send volume, on the UF8 and the UF1. One undo step per movement.
+- Automation: volume on a pot under FLIP no longer zigzags towards zero while automation plays, and the pan value on the UF8's display follows automation like its ring.
+- UF1: comes back up after being switched off and on; the unit ignores the first contact after power-on, and Rea-Sixty now opens it a second time.
+- UF1 and UF8: no fader sweep on connect.
+- UF1: an empty project blanks only the channel zone; soft-key names, bank header, time field and key lamps stay.
+- UF1: Items can take the fader. Settings, Bindings, UF1, JOG WHEEL, tick Fader = Item Volume on the Items row: the fader sets the volume of every selected item, the others by the same number of dB as the first.
+- UF1: the meter view's soft-key names come back after the MODE menu closes.
+- UF1: a Sticky Pot factory bank with Pin Sticky, Pair Sticky and Sticky OnOff.
+- Fixed: a crash when the UF1 was reopened while its display stream was running.
+- Meter view: the receiver for the SSL plug-ins' own data starts with REAPER, so goniometer, RTA and Loudness on the UF1 and the gate GR on the UC1 and the UF8's second GR row work without a script line. SSL 360 has to be closed while Rea-Sixty runs, as before.
+- Sticky Pot: a pin follows a CS or BC switch to the same control on the new plug-in, both targets of a paired pin. In Copy mode (A/B) it stays on the original.
+- FX Learn and the Learn HUD: the search field stays in view while the parameter list scrolls.
+- Settings, Bindings reopens on the surface tab you used last.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.1/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
