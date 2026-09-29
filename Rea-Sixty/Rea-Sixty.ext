@@ -1,25 +1,15 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.1
+@version 0.6.2
 @changelog
-  - Codename: My whole brain is crying!
-  - Automation: the UF1 follows automation. Its motor fader, the dB and pan readouts and the four volumes of the DAW view show what REAPER plays, envelope included.
-  - Automation: the UF1 fader records in Touch. REAPER is told the fader is held for as long as the hand is on it, as it always was for the UF8.
-  - Automation: faders let go when the hand does. Pan under FLIP (UF8 and UF1) records and returns on release, and a fader on a plug-in parameter ends its edit on release so Touch returns it like track volume: Plug-in Mode, SSL Strip Mode, FLIP onto a focused parameter and a Sticky Pot under FLIP. This was a known issue in v0.6.0.
-  - Automation: a fader reports as touched only what it writes, so a fader on a plug-in parameter no longer makes REAPER write volume or pan points.
-  - Automation: pots write a point. In Touch, with the transport running, each turn writes one point into the envelope at the play position, and the value stays until the envelope's next point, like a plug-in parameter on a pot. Track pan, track volume on a pot, send pan and send volume, on the UF8 and the UF1. One undo step per movement.
-  - Automation: volume on a pot under FLIP no longer zigzags towards zero while automation plays, and the pan value on the UF8's display follows automation like its ring.
-  - UF1: comes back up after being switched off and on; the unit ignores the first contact after power-on, and Rea-Sixty now opens it a second time.
-  - UF1 and UF8: no fader sweep on connect.
-  - UF1: an empty project blanks only the channel zone; soft-key names, bank header, time field and key lamps stay.
-  - UF1: Items can take the fader. Settings, Bindings, UF1, JOG WHEEL, tick Fader = Item Volume on the Items row: the fader sets the volume of every selected item, the others by the same number of dB as the first.
-  - UF1: the meter view's soft-key names come back after the MODE menu closes.
-  - UF1: a Sticky Pot factory bank with Pin Sticky, Pair Sticky and Sticky OnOff.
-  - Fixed: a crash when the UF1 was reopened while its display stream was running.
-  - Meter view: the receiver for the SSL plug-ins' own data starts with REAPER, so goniometer, RTA and Loudness on the UF1 and the gate GR on the UC1 and the UF8's second GR row work without a script line. SSL 360 has to be closed while Rea-Sixty runs, as before.
-  - Sticky Pot: a pin follows a CS or BC switch to the same control on the new plug-in, both targets of a paired pin. In Copy mode (A/B) it stays on the original.
-  - FX Learn and the Learn HUD: the search field stays in view while the parameter list scrolls.
-  - Settings, Bindings reopens on the surface tab you used last.
+  - Codename: Look Ma, No ARC!
+  - New: RME side-car on the UF1 (macOS). The UF1 remote-controls RME TotalMix FX inside REAPER: hold SHIFT, press MODE, pick RME. Fader, pots and keys move TotalMix; the screens show channel names and colours, levels, EQ, reverb and echo. It is set up in ORC, which it needs: https://github.com/acklin83/ORC
+  - New: ORC 1.0.0, the same TotalMix remote on the UF1 without REAPER, as its own free Mac app. When REAPER starts, Rea-Sixty takes the UF1 over from ORC and hands it back when REAPER quits. Settings, Connected devices, Take the UF1 over from ORC (on by default).
+  - UF1 pots: after a push the pot ignores turns for 250 ms, so the reset stays (REAPER and side-car)
+  - UF1 pot above the fader under FLIP: a push resets what it moves (plug-in default, else 0 dB) instead of centring the pan
+  - UF8 send pan: a turn right after the push no longer brings back the old pan
+  - UF1 jog with Playhead snap: stops on every grid line, counted from the bar; Shift makes it finer
+  - Bindings: a key is Press or Toggle, offered only for actions that can be on or off (replaces Momentary/Toggle/Hold)
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
