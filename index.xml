@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="efff0a4d2161003fefcf4a5a08f3f8af67e2d327">
+<index version="1" name="Frank Acklin Scripts" commit="0ffdf17ecd0391c8dc31b26fd4019187794214af">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1423,15 +1423,15 @@ Bug fixes:
     </reapack>
   </category>
   <category name="ReaMark">
-    <reapack name="ReaMark.lua" type="script" desc="ReaMark Comments">
+    <reapack name="ReaMark.lua" type="script" desc="Mix Notes">
       <metadata>
         <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 ReaMark Comments\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 REAPER integration for the ReaMark audio review platform. Load a project by share link, view the waveform with comment markers, and create, reply to, resolve, edit or delete timeline comments directly from REAPER.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Requires the ReaImGui extension (install via ReaPack). Configure your ReaMark server URL and log in inside the script.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Mix Notes\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 REAPER integration for the Studio OS mix-review loop. Connect to your studio with the server URL + connect token, view the waveform with comment markers, and create, reply to, resolve, edit or delete timeline comments from REAPER.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Requires the ReaImGui extension (install via ReaPack). Server URL + connect token are under Studio OS \u8594 ? Settings \u8594 ? Integrations \u8594 ? Mix client (REAPER / VST3).\par}
 }
 ]]></description>
         <link rel="website" href="https://github.com/acklin83/reamark">GitHub</link>
@@ -1439,6 +1439,14 @@ Bug fixes:
       <version name="1.0" author="Frank Acklin" time="2026-06-20T14:10:32Z">
         <changelog><![CDATA[Initial ReaPack release]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/57fc452d4c64715dcfaee67003be4e752d63f6f3/ReaMark/ReaMark.lua</source>
+      </version>
+      <version name="2.2.0" author="Studio OS" time="2026-09-30T15:34:55Z">
+        <changelog><![CDATA[Rebuilt for Studio OS, replacing the ReaMark login: connect with the server URL and
+connect token, versions as chips with their open notes, the Studio OS look.
+New: comments on a range. With a time selection set, Add stores it as the range;
+ranges show as a band on the waveform, and clicking a range pill sets the time
+selection to it and the edit cursor to its start.]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/0ffdf17ecd0391c8dc31b26fd4019187794214af/ReaMark/ReaMark.lua</source>
       </version>
     </reapack>
   </category>
