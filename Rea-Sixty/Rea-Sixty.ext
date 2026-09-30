@@ -1,15 +1,13 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.2
+@version 0.6.3
 @changelog
-  - Codename: Look Ma, No ARC!
-  - New: RME side-car on the UF1 (macOS). The UF1 remote-controls RME TotalMix FX inside REAPER: hold SHIFT, press MODE, pick RME. Fader, pots and keys move TotalMix; the screens show channel names and colours, levels, EQ, reverb and echo. It is set up in ORC, which it needs: https://github.com/acklin83/ORC
-  - New: ORC 1.0.0, the same TotalMix remote on the UF1 without REAPER, as its own free Mac app. When REAPER starts, Rea-Sixty takes the UF1 over from ORC and hands it back when REAPER quits. Settings, Connected devices, Take the UF1 over from ORC (on by default).
-  - UF1 pots: after a push the pot ignores turns for 250 ms, so the reset stays (REAPER and side-car)
-  - UF1 pot above the fader under FLIP: a push resets what it moves (plug-in default, else 0 dB) instead of centring the pan
-  - UF8 send pan: a turn right after the push no longer brings back the old pan
-  - UF1 jog with Playhead snap: stops on every grid line, counted from the bar; Shift makes it finer
-  - Bindings: a key is Press or Toggle, offered only for actions that can be on or off (replaces Momentary/Toggle/Hold)
+  - Codename: Where we're going we don't need no codenames
+  - SSL plug-ins follow their tracks: after inserting or moving tracks, gate GR (UC1, UF8, UF1), the UF1 EQ curve and meter instance, and the HQ and A/B switches stay on the plug-in's own track. They used to shift until the project was reloaded.
+  - Project tabs: each open tab keeps its own Selection Sets and recalled slot, Focus Set, Parameter Groups, Sticky Pot pins and favourite memory. Saving a project from another tab no longer empties them.
+  - Settings, About: the Windows USB driver and the Linux udev rule are back, with Install and Uninstall, plus Logs. Since v0.6.1 they were hidden.
+  - RME side-car (macOS): a transport key with a TotalMix action in ORC shows that action on its lamp, in ORC's colours; soft-key colours from ORC show too. Needs ORC 1.1.0.
+  - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
