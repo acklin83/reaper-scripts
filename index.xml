@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="43fa571f2fe809e2db7e2e882db8a85b57e9e925">
+<index version="1" name="Frank Acklin Scripts" commit="1be872d26c0960115f29b6dd80e83857cd8415fa">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1552,6 +1552,14 @@ Fixed: the preamp gain cache is held to 0..75 dB. TotalMix clamps its own preamp
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.4/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.4/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.4/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.5" author="Frank Acklin" time="2026-09-30T13:10:34Z">
+        <changelog><![CDATA[Fixed: a preamp gain step no longer vanishes without a word. With "Send changes" off in TotalMix' OSC Details, TotalMix answers without any channel value, so the gain has no starting point while 48V, pad and phase still work. REAPER's console and the settings window now say so and name the setting; they also say when TotalMix does not answer at all.
+A gain step without a starting point asks TotalMix for its values again and retries once.
+README: "Send changes" is required; the TotalMix download links point to RME's forum thread.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.5/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.5/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.5/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
