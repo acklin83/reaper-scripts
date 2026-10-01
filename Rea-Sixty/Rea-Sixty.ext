@@ -1,12 +1,22 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.3
+@version 0.6.4
 @changelog
-  - Codename: Where we're going we don't need no codenames
-  - SSL plug-ins follow their tracks: after inserting or moving tracks, gate GR (UC1, UF8, UF1), the UF1 EQ curve and meter instance, and the HQ and A/B switches stay on the plug-in's own track. They used to shift until the project was reloaded.
-  - Project tabs: each open tab keeps its own Selection Sets and recalled slot, Focus Set, Parameter Groups, Sticky Pot pins and favourite memory. Saving a project from another tab no longer empties them.
-  - Settings, About: the Windows USB driver and the Linux udev rule are back, with Install and Uninstall, plus Logs. Since v0.6.1 they were hidden.
-  - RME side-car (macOS): a transport key with a TotalMix action in ORC shows that action on its lamp, in ORC's colours; soft-key colours from ORC show too. Needs ORC 1.1.0.
+  - Codename: Fletcher Dragge is my Spirit Animal
+  - VCA spill: long-press SEL on a VCA lead in VCA Mode; lead stays on strip 1, followers after it, nested VCAs level by level
+  - VCA Mode: only the top VCA leads on the surface
+  - Setting "VCA spill shows hidden tracks" (default on)
+  - Actions: VCA Mode, VCA Spill (selected track), Leave VCA Spill, also in REAPER's Action List
+  - Long-press SEL is a binding on UF8 and UF1, factory action "Spill (folder / VCA)"
+  - SEL editor: double press in the SHORT column
+  - UF1: long-press SEL does nothing in REC and REC + MON
+  - Surface mirrors MCP: a folder collapsed in the Mixer takes its children off the surface
+  - Folder Mode keeps its open folders, saved per project tab
+  - Selection Set group slots and UF1 razor grouping reach all 128 groups (REAPER 7.23+)
+  - REAPER action for Folder Mode
+  - Mode banner names the UF1 RME side-car
+  - Dynamic bank "Selection Sets": slots 1-8 on the keys; push recalls, hold stores into an empty slot, Shift stores over, Cmd selects, Ctrl clears
+  - Selection Sets get a key colour each (Settings, Selection Sets), used by the Selection Sets bank
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
