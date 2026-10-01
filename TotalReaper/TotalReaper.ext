@@ -1,10 +1,8 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.5
+@version 0.2.6
 @changelog
-  Fixed: a preamp gain step no longer vanishes without a word. With "Send changes" off in TotalMix' OSC Details, TotalMix answers without any channel value, so the gain has no starting point while 48V, pad and phase still work. REAPER's console and the settings window now say so and name the setting; they also say when TotalMix does not answer at all.
-  A gain step without a starting point asks TotalMix for its values again and retries once.
-  README: "Send changes" is required; the TotalMix download links point to RME's forum thread.
+  Fixed: REAPER could crash a few seconds after a track's record input changed to a hardware channel, when TotalReaper asked TotalMix for the preamp values again.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
