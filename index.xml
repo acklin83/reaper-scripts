@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="0ffdf17ecd0391c8dc31b26fd4019187794214af">
+<index version="1" name="Frank Acklin Scripts" commit="30274c793ea2fe542ed8498ee31c4345a7c45b44">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1419,6 +1419,36 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.3/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.3/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.3/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.6.4" author="Frank Acklin" time="2026-10-01T13:53:35Z">
+        <changelog><![CDATA[- Codename: Fletcher Dragge is my Spirit Animal
+- VCA spill: long-press SEL on a VCA lead in VCA Mode; lead stays on strip 1, followers after it, nested VCAs level by level
+- VCA Mode: only the top VCA leads on the surface
+- Setting "VCA spill shows hidden tracks" (default on)
+- Actions: VCA Mode, VCA Spill (selected track), Leave VCA Spill, also in REAPER's Action List
+- Long-press SEL is a binding on UF8 and UF1, factory action "Spill (folder / VCA)"
+- SEL editor: double press in the SHORT column
+- UF1: long-press SEL does nothing in REC and REC + MON
+- Surface mirrors MCP: a folder collapsed in the Mixer takes its children off the surface
+- Folder Mode keeps its open folders, saved per project tab
+- Selection Set group slots and UF1 razor grouping reach all 128 groups (REAPER 7.23+)
+- REAPER action for Folder Mode
+- Mode banner names the UF1 RME side-car
+- Dynamic bank "Selection Sets": slots 1-8 on the keys; push recalls, hold stores into an empty slot, Shift stores over, Cmd selects, Ctrl clears
+- Selection Sets get a key colour each (Settings, Selection Sets), used by the Selection Sets bank
+- Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.4/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
