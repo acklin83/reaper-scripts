@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="30274c793ea2fe542ed8498ee31c4345a7c45b44">
+<index version="1" name="Frank Acklin Scripts" commit="b5ef83c6e595c260e83931e01956fd4df7b3613a">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1618,6 +1618,12 @@ README: "Send changes" is required; the TotalMix download links point to RME's f
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.5/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.5/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.5/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.6" author="Frank Acklin" time="2026-10-01T17:11:51Z">
+        <changelog><![CDATA[Fixed: REAPER could crash a few seconds after a track's record input changed to a hardware channel, when TotalReaper asked TotalMix for the preamp values again.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.6/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.6/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.6/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
