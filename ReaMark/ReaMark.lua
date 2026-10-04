@@ -1,9 +1,12 @@
 -- @description Mix Notes
 -- @author Studio OS
--- @version 2.2.0
+-- @version 2.3.0
 -- @provides [main] .
 -- @link GitHub https://github.com/acklin83/reamark
 -- @changelog
+--   New: "Sections from markers" takes the named markers and regions inside the selected
+--   song (Intro, V1, C1 ...) as its sections in Studio OS, measured from the song's start
+--   (the calibration offset, or the region named like the song). Asks before replacing.
 --   Rebuilt for Studio OS, replacing the ReaMark login: connect with the server URL and
 --   connect token, versions as chips with their open notes, the Studio OS look.
 --   New: comments on a range. With a time selection set, Add stores it as the range;
@@ -896,6 +899,130 @@ local function version_chips(versions, selected, right_reserve)
   return clicked
 end
 
+---------------------------------------------------------------------------
+-- Song sections from REAPER markers and regions (Studio OS, 03.10.2026)
+---------------------------------------------------------------------------
+-- Optional: nothing changes for a studio without REAPER, sections are set by hand in Mix Notes.
+-- One project can hold all songs as regions (region name = song title) with section markers
+-- (Intro, V1, C1) inside; or one song per project with markers from the render start. The song's
+-- start is the calibration offset ("Set from Cursor"); without one, the region named like the song.
+local section_preview = nil   -- { song_id, offset, new_offset, list = {{label, start_sek}}, existing }
+local section_msg = ""
+
+local function trim(s) return ((s or ""):gsub("^%s+", ""):gsub("%s+$", "")) end
+
+local function project_markers()
+  local out, i = {}, 0
+  while true do
+    local rv, isrgn, pos, rgnend, name = reaper.EnumProjectMarkers3(0, i)
+    if not rv or rv == 0 then break end
+    out[#out + 1] = { pos = pos, rgnend = rgnend, name = name or "", isrgn = isrgn }
+    i = i + 1
+  end
+  return out
+end
+
+local function sections_prepare(song)
+  section_msg = ""
+  section_preview = nil
+  local all = project_markers()
+  local offset = calibration_offsets[tostring(song.id)] or 0
+  local title = trim(song.title):lower()
+  -- The song's region: named like the song, else the region that starts at the offset.
+  local song_rgn = nil
+  for _, m in ipairs(all) do
+    if m.isrgn and trim(m.name):lower() == title then song_rgn = m; break end
+  end
+  if not song_rgn and offset > 0 then
+    for _, m in ipairs(all) do
+      if m.isrgn and math.abs(m.pos - offset) < 0.05 then song_rgn = m; break end
+    end
+  end
+  local new_offset = nil
+  if offset == 0 and song_rgn and song_rgn.pos > 0 then offset = song_rgn.pos; new_offset = offset end
+  -- End of the song: its region, else the length of the mix, else open.
+  local stop = math.huge
+  if song_rgn and song_rgn.rgnend > offset then stop = song_rgn.rgnend
+  elseif waveform_duration > 0 then stop = offset + waveform_duration end
+  local list, seen = {}, {}
+  for _, m in ipairs(all) do
+    local name = trim(m.name)
+    local covers = m.isrgn and m.pos <= offset + 0.05 and m.rgnend >= stop - 0.05
+    if name ~= "" and m ~= song_rgn and not covers and m.pos >= offset - 0.001 and m.pos < stop then
+      local t = math.floor((m.pos - offset) * 10 + 0.5) / 10
+      if t < 0 then t = 0 end
+      if not seen[t] then
+        seen[t] = true
+        list[#list + 1] = { label = name:sub(1, 60), start_sek = t }
+      end
+    end
+  end
+  table.sort(list, function(a, b) return a.start_sek < b.start_sek end)
+  if #list == 0 then
+    section_msg = "No named markers in this song's range."
+    return
+  end
+  if #list > 60 then
+    section_msg = "More than 60 markers in this song's range."
+    return
+  end
+  local existing = 0
+  local status, resp = http_request("GET", server_url .. "/rmc/admin/songs/" .. tostring(song.id) .. "/abschnitte", nil, auth_token)
+  if status == 200 then
+    local d = json.decode(resp)
+    existing = d and #d or 0
+  else
+    section_msg = "Could not read the current sections (HTTP " .. tostring(status) .. ")"
+    return
+  end
+  section_preview = { song_id = song.id, offset = offset, new_offset = new_offset, list = list, existing = existing }
+end
+
+local function sections_apply()
+  local v = section_preview
+  if not v then return end
+  local status, resp = http_request("PUT", server_url .. "/rmc/admin/songs/" .. tostring(v.song_id) .. "/abschnitte",
+    json.encode(v.list), auth_token)
+  if status == 200 then
+    if v.new_offset then
+      calibration_offsets[tostring(v.song_id)] = v.new_offset
+      reaper.SetProjExtState(0, "ReaMark", "offset_" .. tostring(v.song_id), tostring(v.new_offset))
+    end
+    section_msg = tostring(#v.list) .. " sections saved."
+  else
+    local d = json.decode(resp or "")
+    section_msg = "Saving failed (HTTP " .. tostring(status) .. ")" .. ((d and d.detail) and (": " .. tostring(d.detail)) or "")
+  end
+  section_preview = nil
+end
+
+local function draw_sections_row(song)
+  if not logged_in or not song or song.id == "_project" then return end
+  if sec_button("Sections from markers") then sections_prepare(song) end
+  if reaper.ImGui_IsItemHovered(ctx) then
+    reaper.ImGui_SetTooltip(ctx, "Named markers and regions inside this song become its sections in Studio OS\n(Intro, V1, C1 ...), measured from the song's start.")
+  end
+  if section_msg ~= "" then
+    reaper.ImGui_SameLine(ctx)
+    reaper.ImGui_TextColored(ctx, C.text_muted, section_msg)
+  end
+  local v = section_preview
+  if v and v.song_id == song.id then
+    for _, a in ipairs(v.list) do
+      reaper.ImGui_TextColored(ctx, C.text_dim, format_timecode(a.start_sek) .. "   " .. a.label)
+    end
+    if v.new_offset then
+      reaper.ImGui_TextColored(ctx, C.text_muted, "Song start from its region: " .. format_timecode(v.new_offset) .. " (also sets the offset)")
+    end
+    if v.existing > 0 then
+      reaper.ImGui_TextColored(ctx, C.amber, "Replaces " .. tostring(v.existing) .. " existing sections.")
+    end
+    if prim_button("Apply") then sections_apply() end
+    reaper.ImGui_SameLine(ctx)
+    if sec_button("Cancel") then section_preview = nil end
+  end
+end
+
 local function draw_song_version_section()
   if not project_data or #songs == 0 then return end
 
@@ -983,6 +1110,8 @@ local function draw_song_version_section()
     if changed then save_state() end
     reaper.ImGui_PopStyleVar(ctx)
   end
+
+  draw_sections_row(current_song)
 end
 
 local function draw_waveform_section()
