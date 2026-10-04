@@ -1,9 +1,13 @@
 -- @description Mix Notes
 -- @author Studio OS
--- @version 2.3.0
+-- @version 2.4.0
 -- @provides [main] .
 -- @link GitHub https://github.com/acklin83/reamark
 -- @changelog
+--   New: Preproduction. A Mix | Preproduction switch at the top (remembered per REAPER
+--   project) lists the projects with preproduction versions. Pick a song and a version,
+--   and "Sections from markers" writes that VERSION's sections (each demo keeps its own
+--   timing). No comments there: preproduction notes stay in Studio OS.
 --   New: "Sections from markers" takes the named markers and regions inside the selected
 --   song (Intro, V1, C1 ...) as its sections in Studio OS, measured from the song's start
 --   (the calibration offset, or the region named like the song). Asks before replacing.
@@ -248,6 +252,24 @@ local error_msg = ""
 
 local admin_projects = {}
 local selected_project_idx = 0
+
+-- Mix oder Preproduction (Studio OS, 03.10.2026). Je REAPER-Projekt gemerkt: eine Prepro-Session
+-- öffnet wieder in der Preproduction. In der Preproduction gibt es keinen Mix-Link (`share_link`
+-- bleibt leer): alles läuft über den Connect-Token, und die Kommentarteile bleiben aus.
+local modus = "mix"
+do
+  local rv, m = reaper.GetProjExtState(0, "ReaMark", "modus")
+  if rv > 0 and m == "preprod" then modus = "preprod" end
+end
+local pp_projects = {}
+local selected_pp_idx = 0
+
+-- Ist ein Projekt geladen, dessen Welle gezeigt werden kann? Mix: über den Link; Preproduction:
+-- über die Admin-Wege.
+local function projekt_geladen()
+  if modus == "preprod" then return project_data ~= nil end
+  return share_link ~= ""
+end
 
 local calibration_offsets = {}
 local current_offset_key = ""
@@ -529,12 +551,16 @@ end
 local function api_load_peaks()
   waveform_peaks = {}
   waveform_duration = 0
-  if share_link == "" or selected_song_idx == 0 or selected_version_idx == 0 then return end
+  if not projekt_geladen() or selected_song_idx == 0 or selected_version_idx == 0 then return end
   local song = songs[selected_song_idx]
   local ver = song and song.versions and song.versions[selected_version_idx]
   if not ver then return end
-  local url = server_url .. "/rmc/api/versions/" .. tostring(ver.id) .. "/peaks"
-  local status, resp = http_request("GET", url)
+  local status, resp
+  if modus == "preprod" then
+    status, resp = http_request("GET", server_url .. "/rmc/admin/preprod/versions/" .. tostring(ver.id) .. "/peaks", nil, auth_token)
+  else
+    status, resp = http_request("GET", server_url .. "/rmc/api/versions/" .. tostring(ver.id) .. "/peaks")
+  end
   if status == 200 then
     local data = json.decode(resp)
     if data and data.peaks and data.duration then
@@ -610,6 +636,76 @@ local function api_load_admin_projects()
   end
 end
 
+-- Preproduction: Projekte mit hörbaren Fassungen, und ein Projekt in der Form, die der Mix-Teil
+-- kennt (songs[].versions[]). Nur mit Connect-Token.
+local function api_load_preprod_project(p)
+  error_msg = ""
+  local status, resp = http_request("GET", server_url .. "/rmc/admin/preprod/projects/" .. tostring(p.id), nil, auth_token)
+  if status ~= 200 then
+    error_msg = "Failed to load project (HTTP " .. tostring(status) .. ")"
+    project_data = nil
+    songs = {}
+    return
+  end
+  project_data = json.decode(resp)
+  songs = project_data and project_data.songs or {}
+  comments = {}
+  selected_song_idx = #songs > 0 and 1 or 0
+  selected_version_idx = 0
+  if selected_song_idx > 0 then
+    local versions = songs[1].versions or {}
+    selected_version_idx = #versions
+    for vi, ver in ipairs(versions) do
+      if ver.favourite then selected_version_idx = vi; break end
+    end
+  end
+  load_calibration_offsets()
+  api_load_peaks()
+end
+
+local function api_load_preprod_projects()
+  if not logged_in or auth_token == "" then return end
+  project_data = nil
+  songs = {}
+  comments = {}
+  selected_song_idx = 0
+  selected_version_idx = 0
+  selected_pp_idx = 0
+  local status, resp = http_request("GET", server_url .. "/rmc/admin/preprod/projects", nil, auth_token)
+  if status ~= 200 then
+    error_msg = "Failed to load preproduction projects (HTTP " .. tostring(status) .. ")"
+    pp_projects = {}
+    return
+  end
+  pp_projects = json.decode(resp) or {}
+  local rv, saved_id = reaper.GetProjExtState(0, "ReaMark", "selected_preprod_id")
+  if rv > 0 and saved_id ~= "" then
+    for i, p in ipairs(pp_projects) do
+      if p.id == saved_id then
+        selected_pp_idx = i
+        api_load_preprod_project(p)
+        break
+      end
+    end
+  end
+end
+
+local function modus_setzen(neu)
+  if neu == modus then return end
+  modus = neu
+  reaper.SetProjExtState(0, "ReaMark", "modus", neu)
+  project_data = nil
+  songs = {}
+  comments = {}
+  share_link = ""
+  selected_song_idx = 0
+  selected_version_idx = 0
+  waveform_peaks = {}
+  waveform_duration = 0
+  error_msg = ""
+  if neu == "preprod" then api_load_preprod_projects() else api_load_admin_projects() end
+end
+
 -- Per-tenant brand accent from GET {server}/api/studio (native Studio OS endpoint, no /rmc,
 -- no auth). Overwrites the accent in C so the next frame paints in the studio's colour.
 local function fetch_branding()
@@ -648,7 +744,8 @@ local function api_login()
     logged_in = true
     save_state()
     fetch_branding()            -- per-tenant accent
-    api_load_admin_projects()   -- re-fetches + restores the last-selected project
+    -- re-fetches + restores the last-selected project (Mix oder Preproduction)
+    if modus == "preprod" then api_load_preprod_projects() else api_load_admin_projects() end
   elseif status == 401 or status == 403 then
     auth_token = ""
     login_error = "Connect-Token abgelehnt — in Studio OS neu erzeugen"
@@ -781,6 +878,8 @@ local function draw_login_section()
       selected_version_idx = 1
       selected_project_idx = 0
       admin_projects = {}
+      pp_projects = {}
+      selected_pp_idx = 0
       edit_comment_id = nil
       reply_comment_id = nil
       new_comment_text = ""
@@ -829,6 +928,34 @@ local function draw_project_section()
   reaper.ImGui_Spacing(ctx)
 
   if logged_in then
+    -- Mix | Preproduction, wie die Ansicht-Knöpfe in Studio OS (.ansicht)
+    if ansicht_button("Mix##modus_mix", modus == "mix") then modus_setzen("mix") end
+    reaper.ImGui_SameLine(ctx)
+    if ansicht_button("Preproduction##modus_pp", modus == "preprod") then modus_setzen("preprod") end
+    reaper.ImGui_Spacing(ctx)
+  end
+
+  if logged_in and modus == "preprod" then
+    local current_pp = pp_projects[selected_pp_idx]
+    reaper.ImGui_TextColored(ctx, C.text_dim, "Project")
+    reaper.ImGui_SameLine(ctx, 85)
+    reaper.ImGui_SetNextItemWidth(ctx, -1)
+    if reaper.ImGui_BeginCombo(ctx, "##pp_project_select", current_pp and current_pp.title or "Select project...") then
+      for i, p in ipairs(pp_projects) do
+        if reaper.ImGui_Selectable(ctx, p.title, i == selected_pp_idx) then
+          selected_pp_idx = i
+          api_load_preprod_project(p)
+          if reaper_project_id then
+            reaper.SetProjExtState(0, "ReaMark", "selected_preprod_id", p.id)
+          end
+        end
+      end
+      reaper.ImGui_EndCombo(ctx)
+    end
+    if #pp_projects == 0 then
+      reaper.ImGui_TextColored(ctx, C.text_muted, "No project with preproduction versions.")
+    end
+  elseif logged_in then
     local current_proj = admin_projects[selected_project_idx]
     local proj_label = current_proj and current_proj.title or "Select project..."
 
@@ -906,7 +1033,18 @@ end
 -- One project can hold all songs as regions (region name = song title) with section markers
 -- (Intro, V1, C1) inside; or one song per project with markers from the render start. The song's
 -- start is the calibration offset ("Set from Cursor"); without one, the region named like the song.
-local section_preview = nil   -- { song_id, offset, new_offset, list = {{label, start_sek}}, existing }
+local section_preview = nil   -- { song_id, ziel, offset, new_offset, list = {{label, start_sek}}, existing }
+
+-- Wohin die Abschnitte gehen: im Mix an den Song (gelten für jede Mix-Fassung), in der
+-- Preproduction an die gewählte FASSUNG (jedes Demo hat seine eigenen Zeiten).
+local function sections_url(song)
+  if modus == "preprod" then
+    local ver = song.versions and song.versions[selected_version_idx]
+    if not ver then return nil end
+    return server_url .. "/rmc/admin/preprod/versions/" .. tostring(ver.id) .. "/abschnitte", "pp:" .. tostring(ver.id)
+  end
+  return server_url .. "/rmc/admin/songs/" .. tostring(song.id) .. "/abschnitte", "song:" .. tostring(song.id)
+end
 local section_msg = ""
 
 local function trim(s) return ((s or ""):gsub("^%s+", ""):gsub("%s+$", "")) end
@@ -967,7 +1105,12 @@ local function sections_prepare(song)
     return
   end
   local existing = 0
-  local status, resp = http_request("GET", server_url .. "/rmc/admin/songs/" .. tostring(song.id) .. "/abschnitte", nil, auth_token)
+  local url, ziel = sections_url(song)
+  if not url then
+    section_msg = "Pick a version first."
+    return
+  end
+  local status, resp = http_request("GET", url, nil, auth_token)
   if status == 200 then
     local d = json.decode(resp)
     existing = d and #d or 0
@@ -975,14 +1118,13 @@ local function sections_prepare(song)
     section_msg = "Could not read the current sections (HTTP " .. tostring(status) .. ")"
     return
   end
-  section_preview = { song_id = song.id, offset = offset, new_offset = new_offset, list = list, existing = existing }
+  section_preview = { song_id = song.id, url = url, ziel = ziel, offset = offset, new_offset = new_offset, list = list, existing = existing }
 end
 
 local function sections_apply()
   local v = section_preview
   if not v then return end
-  local status, resp = http_request("PUT", server_url .. "/rmc/admin/songs/" .. tostring(v.song_id) .. "/abschnitte",
-    json.encode(v.list), auth_token)
+  local status, resp = http_request("PUT", v.url, json.encode(v.list), auth_token)
   if status == 200 then
     if v.new_offset then
       calibration_offsets[tostring(v.song_id)] = v.new_offset
@@ -1000,14 +1142,17 @@ local function draw_sections_row(song)
   if not logged_in or not song or song.id == "_project" then return end
   if sec_button("Sections from markers") then sections_prepare(song) end
   if reaper.ImGui_IsItemHovered(ctx) then
-    reaper.ImGui_SetTooltip(ctx, "Named markers and regions inside this song become its sections in Studio OS\n(Intro, V1, C1 ...), measured from the song's start.")
+    reaper.ImGui_SetTooltip(ctx, modus == "preprod"
+      and "Named markers and regions inside this song become the sections of the selected\npreproduction version in Studio OS (Intro, V1, C1 ...), measured from the song's start."
+      or "Named markers and regions inside this song become its sections in Studio OS\n(Intro, V1, C1 ...), measured from the song's start.")
   end
   if section_msg ~= "" then
     reaper.ImGui_SameLine(ctx)
     reaper.ImGui_TextColored(ctx, C.text_muted, section_msg)
   end
   local v = section_preview
-  if v and v.song_id == song.id then
+  local _, ziel_jetzt = sections_url(song)
+  if v and v.ziel == ziel_jetzt then
     for _, a in ipairs(v.list) do
       reaper.ImGui_TextColored(ctx, C.text_dim, format_timecode(a.start_sek) .. "   " .. a.label)
     end
@@ -1015,7 +1160,8 @@ local function draw_sections_row(song)
       reaper.ImGui_TextColored(ctx, C.text_muted, "Song start from its region: " .. format_timecode(v.new_offset) .. " (also sets the offset)")
     end
     if v.existing > 0 then
-      reaper.ImGui_TextColored(ctx, C.amber, "Replaces " .. tostring(v.existing) .. " existing sections.")
+      reaper.ImGui_TextColored(ctx, C.amber, "Replaces " .. tostring(v.existing) .. " existing sections"
+        .. (modus == "preprod" and " of this version." or "."))
     end
     if prim_button("Apply") then sections_apply() end
     reaper.ImGui_SameLine(ctx)
@@ -1056,7 +1202,8 @@ local function draw_song_version_section()
 
   local versions = current_song and current_song.versions or {}
   local current_ver = versions[selected_version_idx]
-  local star_w = (logged_in and current_ver) and 30 or 0
+  -- Der Stern gehört zum Mix (Lieblingsfassung über den Mix-Weg); in der Preproduction setzt man ihn in Studio OS.
+  local star_w = (logged_in and current_ver and modus == "mix") and 30 or 0
   reaper.ImGui_AlignTextToFramePadding(ctx)
   reaper.ImGui_TextColored(ctx, C.text_dim, "Version")
   reaper.ImGui_SameLine(ctx, label_w)
@@ -1101,7 +1248,7 @@ local function draw_song_version_section()
   end
 
   -- Autoplay toggle (right-aligned on offset line)
-  if share_link ~= "" and selected_version_idx > 0 then
+  if projekt_geladen() and selected_version_idx > 0 then
     reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_FramePadding(), 2, 2)
     reaper.ImGui_SameLine(ctx)
     reaper.ImGui_SetCursorPosX(ctx, full_w - 58)
@@ -1115,7 +1262,7 @@ local function draw_song_version_section()
 end
 
 local function draw_waveform_section()
-  if share_link == "" or selected_version_idx == 0 or #waveform_peaks == 0 then return end
+  if not projekt_geladen() or selected_version_idx == 0 or #waveform_peaks == 0 then return end
 
   reaper.ImGui_Spacing(ctx)
 
@@ -1526,8 +1673,8 @@ local function loop()
   end
 end
 
--- Auto-load linked project on script start
-if is_linked and share_link_input ~= "" then
+-- Auto-load linked project on script start (nur im Mix: die Preproduction hat keinen Link)
+if modus == "mix" and is_linked and share_link_input ~= "" then
   api_load_project()
   if selected_version_idx > 0 then
     api_load_comments()
