@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="b5ef83c6e595c260e83931e01956fd4df7b3613a">
+<index version="1" name="Frank Acklin Scripts" commit="10314ff3139a770820bcd8fd863d456a2f4d5c93">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1477,6 +1477,32 @@ New: comments on a range. With a time selection set, Add stores it as the range;
 ranges show as a band on the waveform, and clicking a range pill sets the time
 selection to it and the edit cursor to its start.]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/0ffdf17ecd0391c8dc31b26fd4019187794214af/ReaMark/ReaMark.lua</source>
+      </version>
+      <version name="2.3.0" author="Studio OS" time="2026-10-04T08:01:36Z">
+        <changelog><![CDATA[New: "Sections from markers" takes the named markers and regions inside the selected
+song (Intro, V1, C1 ...) as its sections in Studio OS, measured from the song's start
+(the calibration offset, or the region named like the song). Asks before replacing.
+Rebuilt for Studio OS, replacing the ReaMark login: connect with the server URL and
+connect token, versions as chips with their open notes, the Studio OS look.
+New: comments on a range. With a time selection set, Add stores it as the range;
+ranges show as a band on the waveform, and clicking a range pill sets the time
+selection to it and the edit cursor to its start.]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/7842394cdeaf0c0f287cce65e6e832409e53c5f1/ReaMark/ReaMark.lua</source>
+      </version>
+      <version name="2.4.0" author="Studio OS" time="2026-10-04T08:01:36Z">
+        <changelog><![CDATA[New: Preproduction. A Mix | Preproduction switch at the top (remembered per REAPER
+project) lists the projects with preproduction versions. Pick a song and a version,
+and "Sections from markers" writes that VERSION's sections (each demo keeps its own
+timing). No comments there: preproduction notes stay in Studio OS.
+New: "Sections from markers" takes the named markers and regions inside the selected
+song (Intro, V1, C1 ...) as its sections in Studio OS, measured from the song's start
+(the calibration offset, or the region named like the song). Asks before replacing.
+Rebuilt for Studio OS, replacing the ReaMark login: connect with the server URL and
+connect token, versions as chips with their open notes, the Studio OS look.
+New: comments on a range. With a time selection set, Add stores it as the range;
+ranges show as a band on the waveform, and clicking a range pill sets the time
+selection to it and the edit cursor to its start.]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/10314ff3139a770820bcd8fd863d456a2f4d5c93/ReaMark/ReaMark.lua</source>
       </version>
     </reapack>
   </category>
