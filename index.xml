@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="10314ff3139a770820bcd8fd863d456a2f4d5c93">
+<index version="1" name="Frank Acklin Scripts" commit="c6c66009e0e0a998b96e6958e8fe17ce156cc0e8">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1519,6 +1519,7 @@ selection to it and the edit cursor to its start.]]></changelog>
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 What it does\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Routing mirror}: REAPER track volume / mute / pan \u8594 ? TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Solo mirror}: REAPER track solo \u8594 ? TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Tape-style monitoring}: a track on "Monitor input (tape auto style)" hears its input in TotalMix when stopped and while recording, and the take during playback. With auto-punch (time selection or selected items) the input opens only inside the punch region.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b 2-Way Control}: optional reverse direction \u8212- TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Only Set Main Submix}: narrows all of the above to the master track's hardware bus. The other hardware outputs are never written and never read, so a hand-built cue mix, or a separate headphone mixer running on the interface, stays untouched even when you switch the routing mirror off.\par}
@@ -1650,6 +1651,13 @@ README: "Send changes" is required; the TotalMix download links point to RME's f
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.6/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.6/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.6/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.7" author="Frank Acklin" time="2026-10-08T12:25:52Z">
+        <changelog><![CDATA[New: tracks on "Monitor input (tape auto style)" follow the transport the way REAPER does. The input is open in TotalMix when stopped and while recording, and closed during playback, so you hear the take.
+New: with auto-punch (time selection or selected items), the input opens only inside the punch region while recording.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.7/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.7/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.7/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
