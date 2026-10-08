@@ -1,9 +1,34 @@
 -- @description Mix Notes
 -- @author Studio OS
--- @version 2.4.0
+-- @version 2.5.4
 -- @provides [main] .
 -- @link GitHub https://github.com/acklin83/reamark
 -- @changelog
+--   Sections from REAPER markers keep millisecond precision, like the tempo map. A marker on a
+--   barline was rounded to a tenth and could land a few milliseconds before the bar, so the player
+--   showed the last beat of the previous bar (30.4 instead of 31).
+--   The window keeps its size: Mix Notes remembers width and height itself, per screen size, and
+--   opens at that size next time (it sometimes came back smaller).
+--   The song start comes from the version's FILE in the project: Sync looks for the item whose
+--   file has the version's file name (extension, case, "_" and "-" do not matter, so a WAV in
+--   REAPER matches the MP3 in Studio OS) and measures sections and bars from where that file
+--   starts, trimmed starts included. A region that starts earlier than the file no longer
+--   shifts everything. Without such an item it works as before (offset, then region). The
+--   preview names the file and its start.
+--   Preproduction: each version finds its OWN region. Two versions rendered from two regions
+--   ("Song v1", "Song v2") no longer share one: the region is matched by the song title plus
+--   "v" and the version number, the song title plus the version name ("Song PrePro V2"), or
+--   the uploaded file name ("Song_v2.wav"); case, "_" and "-" do not matter. Only then the
+--   region named like the song, as before. The song start (offset) is kept per version in
+--   Preproduction (a version without one still uses the song's). The preview names the
+--   region it read, so a wrong one shows before Apply.
+--   New: "Sync from REAPER" (was "Sections from markers") also brings the song's tempo map:
+--   tempo and time signature at the song start and every change inside the song, gliding
+--   tempos included, so Studio OS can show bars and beats. One preview for sections and tempo
+--   map, Apply or Cancel. Bar 1 is the song's first bar (count-in before it stays count-in).
+--   The preview checks every bar against REAPER's own bar times and shows the largest
+--   difference; a change inside a bar is placed on the nearest bar start and named.
+--   Songs without named markers keep their sections and only get the tempo map.
 --   New: Preproduction. A Mix | Preproduction switch at the top (remembered per REAPER
 --   project) lists the projects with preproduction versions. Pick a song and a version,
 --   and "Sections from markers" writes that VERSION's sections (each demo keeps its own
@@ -416,17 +441,26 @@ local function with_alpha(col, a)
   return (col & 0xFFFFFF00) | (a & 0xFF)
 end
 
+-- Songstart (Offset): im Mix je Song, in der Preproduction je FASSUNG (2.5.1, Frank 05.10.2026:
+-- zwei Fassungen aus zwei Regionen „Song v1", „Song v2" teilten sonst einen Start).
+local function offset_key_for(song, ver)
+  if modus == "preprod" and ver then return "pp:" .. tostring(ver.id) end
+  return tostring(song.id)
+end
+
 local function get_offset_key()
   if selected_song_idx > 0 then
     local song = songs[selected_song_idx]
-    if song then return tostring(song.id) end
+    if song then return offset_key_for(song, song.versions and song.versions[selected_version_idx]) end
   end
   return ""
 end
 
+-- Eine Fassung ohne eigenen Start nimmt den des Songs (so war es bis 2.5.0 gespeichert).
 local function get_current_offset()
   local key = get_offset_key()
-  return calibration_offsets[key] or 0
+  local song = songs[selected_song_idx]
+  return calibration_offsets[key] or (song and calibration_offsets[tostring(song.id)]) or 0
 end
 
 local function save_state()
@@ -545,6 +579,11 @@ local function load_calibration_offsets()
     local key = tostring(song.id)
     local rv, saved = reaper.GetProjExtState(0, "ReaMark", "offset_" .. key)
     if rv > 0 and saved ~= "" then calibration_offsets[key] = tonumber(saved) end
+    for _, ver in ipairs(song.versions or {}) do
+      local vkey = "pp:" .. tostring(ver.id)
+      local vrv, vsaved = reaper.GetProjExtState(0, "ReaMark", "offset_" .. vkey)
+      if vrv > 0 and vsaved ~= "" then calibration_offsets[vkey] = tonumber(vsaved) end
+    end
   end
 end
 
@@ -1033,17 +1072,19 @@ end
 -- One project can hold all songs as regions (region name = song title) with section markers
 -- (Intro, V1, C1) inside; or one song per project with markers from the render start. The song's
 -- start is the calibration offset ("Set from Cursor"); without one, the region named like the song.
-local section_preview = nil   -- { song_id, ziel, offset, new_offset, list = {{label, start_sek}}, existing }
+local section_preview = nil   -- { song_id, offset, new_offset, list, existing, tempo = {...} }
 
 -- Wohin die Abschnitte gehen: im Mix an den Song (gelten für jede Mix-Fassung), in der
--- Preproduction an die gewählte FASSUNG (jedes Demo hat seine eigenen Zeiten).
-local function sections_url(song)
+-- Preproduction an die gewählte FASSUNG (jedes Demo hat seine eigenen Zeiten). Die Tempokarte
+-- (2.5.0) hängt am selben Ziel, nur mit /tempo statt /abschnitte.
+local function sections_url(song, was)
+  was = was or "abschnitte"
   if modus == "preprod" then
     local ver = song.versions and song.versions[selected_version_idx]
     if not ver then return nil end
-    return server_url .. "/rmc/admin/preprod/versions/" .. tostring(ver.id) .. "/abschnitte", "pp:" .. tostring(ver.id)
+    return server_url .. "/rmc/admin/preprod/versions/" .. tostring(ver.id) .. "/" .. was, "pp:" .. tostring(ver.id)
   end
-  return server_url .. "/rmc/admin/songs/" .. tostring(song.id) .. "/abschnitte", "song:" .. tostring(song.id)
+  return server_url .. "/rmc/admin/songs/" .. tostring(song.id) .. "/" .. was, "song:" .. tostring(song.id)
 end
 local section_msg = ""
 
@@ -1060,91 +1101,353 @@ local function project_markers()
   return out
 end
 
+---------------------------------------------------------------------------
+-- Tempo map (2.5.0): REAPER's tempo/time signature markers inside the song become the song's
+-- tempo map in Studio OS. Studio OS keeps it as "bar 1 at start_sek" plus points per bar
+-- {takt, bpm, zaehler, nenner, linear}; BPM counts quarter notes, like REAPER
+-- (TimeMap_GetDividedBpmAtTime is "2x in /8 signatures"). The bar times Studio OS will compute
+-- are checked against REAPER's own measure starts (tk_sek below mirrors frontend app/takte.js),
+-- and the preview shows the largest difference.
+---------------------------------------------------------------------------
+local function tk_segmente(k)
+  local P = {}
+  for _, p in ipairs(k.punkte) do if p.bpm > 0 then P[#P + 1] = p end end
+  table.sort(P, function(x, y) return x.takt < y.takt end)
+  local t, seg = k.start_sek, {}
+  for i, p in ipairs(P) do
+    local nx = P[i + 1]
+    local q = p.zaehler * 4 / p.nenner
+    local bpm1 = (p.linear and nx) and nx.bpm or p.bpm
+    seg[#seg + 1] = { takt = p.takt, bpm = p.bpm, bpm1 = bpm1, q = q, t0 = t, bis = nx and nx.takt or math.huge }
+    if nx then
+      local Q = (nx.takt - p.takt) * q
+      if math.abs(bpm1 - p.bpm) < 1e-9 then t = t + Q * 60 / p.bpm
+      else t = t + (60 * Q / (bpm1 - p.bpm)) * math.log(bpm1 / p.bpm) end
+    end
+  end
+  return seg
+end
+
+local function tk_sek(seg, takt)   -- start of a bar, seconds after the song start
+  local s = seg[1]
+  for _, x in ipairs(seg) do if takt >= x.takt then s = x end end
+  local x = (takt - s.takt) * s.q
+  if x < 0 then return s.t0 + x * 60 / s.bpm end
+  if math.abs(s.bpm1 - s.bpm) < 1e-9 or s.bis == math.huge then return s.t0 + x * 60 / s.bpm end
+  local kk = (s.bpm1 - s.bpm) / ((s.bis - s.takt) * s.q)
+  return s.t0 + (60 / kk) * math.log((s.bpm + kk * x) / s.bpm)
+end
+
+local function measure_start(m) return (reaper.TimeMap_GetMeasureInfo(0, m)) end
+
+-- The measure that contains time t. Corrected against the measure starts, so it does not depend
+-- on how TimeMap2_timeToBeats numbers its measures.
+local function measure_at(t)
+  local _, m = reaper.TimeMap2_timeToBeats(0, t)
+  m = math.floor(m or 0)
+  -- Walks until the measure brackets t, however REAPER numbers them (project start measure).
+  for _ = 1, 5000 do
+    if measure_start(m) > t + 1e-6 then m = m - 1
+    elseif measure_start(m + 1) <= t + 1e-6 then m = m + 1
+    else break end
+  end
+  return m
+end
+
+local function tempo_markers()
+  local out = {}
+  for i = 0, reaper.CountTempoTimeSigMarkers(0) - 1 do
+    local rv, pos, _, _, bpm, num, den, lin = reaper.GetTempoTimeSigMarker(0, i)
+    if rv then out[#out + 1] = { pos = pos, bpm = bpm, num = num or 0, den = den or 0, lin = lin and true or false } end
+  end
+  table.sort(out, function(x, y) return x.pos < y.pos end)
+  return out
+end
+
+local function bpm_text(b) return (math.abs(b - math.floor(b + 0.5)) < 0.005) and tostring(math.floor(b + 0.5)) or string.format("%.2f", b) end
+
+local function tempo_prepare(offset, stop)
+  if stop == math.huge then stop = offset + math.max(1, reaper.GetProjectLength(0) - offset) end
+  -- Bar 1 = the song's first measure: the one starting at the song start, else the next one
+  -- (what lies before is count-in).
+  local m1 = measure_at(offset)
+  if measure_start(m1) < offset - 0.001 then m1 = m1 + 1 end
+  local t1 = measure_start(m1)
+  local num, den, bpm = reaper.TimeMap_GetTimeSigAtTime(0, t1 + 1e-6)
+  local marks = tempo_markers()
+  local warnings = {}
+  -- A glide that is already running at bar 1 keeps gliding to its next marker.
+  local laufend = false
+  for i, mk in ipairs(marks) do
+    if mk.pos <= t1 + 1e-6 and mk.lin and marks[i + 1] and marks[i + 1].pos > t1 + 1e-6 then laufend = true end
+  end
+  local punkte = { { takt = 1, bpm = bpm, zaehler = num, nenner = den, linear = laufend } }
+  local cur_num, cur_den = num, den
+  for i, mk in ipairs(marks) do
+    local danach = mk.pos >= stop and punkte[#punkte].linear   -- the end point of a glide that runs past the song end
+    if mk.pos > t1 + 1e-6 and (mk.pos < stop or danach) then
+      local m = measure_at(mk.pos)
+      local rein, raus = mk.pos - measure_start(m), measure_start(m + 1) - mk.pos
+      -- Studio OS keeps changes on bar starts: take the nearest one, and say so when it is not one already.
+      if rein > raus then m = m + 1 end
+      if math.min(rein, raus) > 0.002 then
+        warnings[#warnings + 1] = "Change at " .. format_timecode(mk.pos - offset) .. " is inside a bar; placed at bar " .. tostring(m - m1 + 1) .. "."
+      end
+      local takt = m - m1 + 1
+      if mk.num and mk.num > 0 and mk.den and mk.den > 0 then cur_num, cur_den = mk.num, mk.den end
+      local p = { takt = takt, bpm = mk.bpm, zaehler = cur_num, nenner = cur_den, linear = mk.lin }
+      if takt <= punkte[#punkte].takt then
+        if takt > 1 then warnings[#warnings + 1] = "Two changes in bar " .. tostring(takt) .. "; the later one counts." end
+        p.takt = punkte[#punkte].takt   -- the marker's own tempo counts, also on bar 1
+        punkte[#punkte] = p
+      else
+        punkte[#punkte + 1] = p
+      end
+      if danach then break end
+    end
+  end
+  for _, p in ipairs(punkte) do p.zaehler, p.nenner = math.floor(p.zaehler + 0.5), math.floor(p.nenner + 0.5) end
+  local karte = { start_sek = math.max(0, math.floor((t1 - offset) * 1000 + 0.5) / 1000), punkte = punkte, quelle = "reaper" }
+  -- Check: every bar of the song, Studio OS's time against REAPER's measure start.
+  local seg, worst, worst_bar, bars = tk_segmente(karte), 0, 0, 0
+  local k = 1
+  while k <= 4000 do
+    local t = measure_start(m1 + k - 1)
+    if t > stop then break end
+    local d = math.abs(tk_sek(seg, k) - (t - offset))
+    if d > worst then worst, worst_bar = d, k end
+    bars = k
+    k = k + 1
+  end
+  -- Studio OS keeps at most 500 points (backend app/tempokarte.py PUNKTE_MAX).
+  local zuviel = #punkte > 500
+  -- Without any tempo marker REAPER only knows the project tempo, often never set (120). That
+  -- becomes a map only when ticked in the preview.
+  local nur_projekt = reaper.CountTempoTimeSigMarkers(0) == 0
+  return { karte = karte, warnings = warnings, worst = worst, worst_bar = worst_bar, bars = bars, zuviel = zuviel,
+           nur_projekt = nur_projekt, uebernehmen = not nur_projekt and not zuviel }
+end
+
+local function tempo_lines(tp)
+  local out, vor = {}, nil
+  for i, p in ipairs(tp.karte.punkte) do
+    local teile = {}
+    -- Arriving at the end of a glide is no change of its own.
+    if i == 1 or p.linear or math.abs(p.bpm - (vor.linear and p.bpm or vor.bpm)) > 0.005 then
+      teile[#teile + 1] = bpm_text(p.bpm) .. " BPM"
+    end
+    if i == 1 or p.zaehler ~= vor.zaehler or p.nenner ~= vor.nenner then teile[#teile + 1] = p.zaehler .. "/" .. p.nenner end
+    if p.linear and tp.karte.punkte[i + 1] then teile[#teile + 1] = "glides to " .. bpm_text(tp.karte.punkte[i + 1].bpm) end
+    if #teile > 0 then out[#out + 1] = "bar " .. tostring(p.takt) .. ":  " .. table.concat(teile, ", ") end
+    vor = p
+  end
+  return out
+end
+
+-- Names compared loosely: case, "_", "-", ".", brackets and "v 1" vs "v1" do not matter
+-- ("On_The_Open_Sea_V2" = "On the Open Sea v2").
+local function name_norm(s)
+  s = (s or ""):lower():gsub("[_%-%.%(%)%[%]]", " "):gsub("%s+", " ")
+  s = trim(s):gsub(" v (%d)", " v%1")
+  return s
+end
+
+-- The names a preproduction version's region may have: the uploaded file's name without its extension
+-- (rendered from a region, the file is usually named after it), "<song> v<number>", "<song> <label>".
+local function version_region_names(song, ver)
+  local out, t = {}, name_norm(song.title)
+  local f = ver.original_filename or ""
+  if f ~= "" then out[#out + 1] = name_norm((f:gsub("%.[^%.]+$", ""))) end
+  if ver.version_number then out[#out + 1] = t .. " v" .. tostring(ver.version_number) end
+  if trim(ver.label) ~= "" then out[#out + 1] = t .. " " .. name_norm(ver.label) end
+  return out
+end
+
+-- The version's file in the project (2.5.2, Frank 05.10.2026: a client file that does not start on bar 1 sits later than
+-- its region, everything measured from the region was off by that gap). Matches the take's source file name against the
+-- version's file name, both without extension and loosely written (`name_norm`). Returns where the FILE starts on the
+-- timeline (item position minus the trimmed part), the earliest if the file is used more than once; nil if none.
+local function version_file_item(ver)
+  local f = ver and ver.original_filename or ""
+  if f == "" then return nil end
+  local want = name_norm((f:gsub("%.[^%.]+$", "")))
+  if want == "" then return nil end
+  local best, n = nil, 0
+  for i = 0, reaper.CountMediaItems(0) - 1 do
+    local item = reaper.GetMediaItem(0, i)
+    local take = item and reaper.GetActiveTake(item)
+    local src = take and reaper.GetMediaItemTake_Source(take)
+    -- Sections and reversed sources hang under a parent that carries the file.
+    while src do
+      local parent = reaper.GetMediaSourceParent(src)
+      if not parent then break end
+      src = parent
+    end
+    local fn = src and reaper.GetMediaSourceFileName(src) or ""
+    local stem = ((fn:match("([^/\\]+)$") or ""):gsub("%.[^%.]+$", ""))
+    if stem ~= "" and name_norm(stem) == want then
+      n = n + 1
+      local rate = reaper.GetMediaItemTakeInfo_Value(take, "D_PLAYRATE")
+      if not rate or rate <= 0 then rate = 1 end
+      local start = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+        - reaper.GetMediaItemTakeInfo_Value(take, "D_STARTOFFS") / rate
+      if not best or start < best.start then
+        best = { start = start, name = stem, rate = rate, len = reaper.GetMediaSourceLength(src) }
+      end
+    end
+  end
+  if best then best.n = n end
+  return best
+end
+
 local function sections_prepare(song)
   section_msg = ""
   section_preview = nil
   local all = project_markers()
-  local offset = calibration_offsets[tostring(song.id)] or 0
-  local title = trim(song.title):lower()
-  -- The song's region: named like the song, else the region that starts at the offset.
-  local song_rgn = nil
-  for _, m in ipairs(all) do
-    if m.isrgn and trim(m.name):lower() == title then song_rgn = m; break end
+  local sel = song.versions and song.versions[selected_version_idx] or nil   -- the selected version, Mix or Preproduction
+  local ver = (modus == "preprod") and sel or nil
+  local okey = offset_key_for(song, ver)
+  local offset = calibration_offsets[okey]
+  -- The song's region. Preproduction: first the region named after the VERSION ("Song v2", the file name),
+  -- so two versions rendered from two regions each get their own; then the region named like the song,
+  -- else the region that starts at the offset.
+  local song_rgn, rgn_wie = nil, nil
+  if ver then
+    local namen = {}
+    for _, n in ipairs(version_region_names(song, ver)) do namen[n] = true end
+    for _, m in ipairs(all) do
+      if m.isrgn and namen[name_norm(m.name)] then song_rgn, rgn_wie = m, "version"; break end
+    end
   end
+  if not song_rgn then
+    local title = name_norm(song.title)
+    for _, m in ipairs(all) do
+      if m.isrgn and name_norm(m.name) == title then song_rgn, rgn_wie = m, "song"; break end
+    end
+  end
+  -- A version without its own start uses the song's (stored that way up to 2.5.0), unless its own region was found.
+  if offset == nil and ver and rgn_wie ~= "version" then offset = calibration_offsets[tostring(song.id)] end
+  offset = offset or 0
   if not song_rgn and offset > 0 then
     for _, m in ipairs(all) do
-      if m.isrgn and math.abs(m.pos - offset) < 0.05 then song_rgn = m; break end
+      if m.isrgn and math.abs(m.pos - offset) < 0.05 then song_rgn, rgn_wie = m, "offset"; break end
     end
   end
   local new_offset = nil
   if offset == 0 and song_rgn and song_rgn.pos > 0 then offset = song_rgn.pos; new_offset = offset end
+  -- The file's own start wins over offset and region: it is where the listener's 0:00 is.
+  local item = version_file_item(sel)
+  if item then
+    new_offset = (math.abs((calibration_offsets[okey] or math.huge) - item.start) > 0.0005) and item.start or nil
+    offset = item.start
+  end
   -- End of the song: its region, else the length of the mix, else open.
   local stop = math.huge
   if song_rgn and song_rgn.rgnend > offset then stop = song_rgn.rgnend
+  elseif item and (item.len or 0) > 0 then stop = offset + item.len / item.rate
   elseif waveform_duration > 0 then stop = offset + waveform_duration end
   local list, seen = {}, {}
   for _, m in ipairs(all) do
     local name = trim(m.name)
     local covers = m.isrgn and m.pos <= offset + 0.05 and m.rgnend >= stop - 0.05
     if name ~= "" and m ~= song_rgn and not covers and m.pos >= offset - 0.001 and m.pos < stop then
-      local t = math.floor((m.pos - offset) * 10 + 0.5) / 10
+      -- Milliseconds like the tempo map, not tenths: a marker on a barline (115 bpm, bar 31 = 62.6087 s) became
+      -- 62.6, 9 ms before the bar, and the player showed 30.4 (2.5.4). Two markers within a tenth stay one.
+      local t = math.floor((m.pos - offset) * 1000 + 0.5) / 1000
       if t < 0 then t = 0 end
-      if not seen[t] then
-        seen[t] = true
+      local key = math.floor(t * 10 + 0.5)
+      if not seen[key] then
+        seen[key] = true
         list[#list + 1] = { label = name:sub(1, 60), start_sek = t }
       end
     end
   end
   table.sort(list, function(a, b) return a.start_sek < b.start_sek end)
-  if #list == 0 then
-    section_msg = "No named markers in this song's range."
-    return
-  end
   if #list > 60 then
     section_msg = "More than 60 markers in this song's range."
     return
   end
-  local existing = 0
   local url, ziel = sections_url(song)
   if not url then
     section_msg = "Pick a version first."
     return
   end
-  local status, resp = http_request("GET", url, nil, auth_token)
-  if status == 200 then
+  -- What is there now: sections (replaced only when REAPER has some) and the tempo map.
+  local existing = 0
+  if #list > 0 then
+    local status, resp = http_request("GET", url, nil, auth_token)
+    if status ~= 200 then
+      section_msg = "Could not read the current sections (HTTP " .. tostring(status) .. ")"
+      return
+    end
     local d = json.decode(resp)
     existing = d and #d or 0
-  else
-    section_msg = "Could not read the current sections (HTTP " .. tostring(status) .. ")"
+  end
+  local turl = sections_url(song, "tempo")
+  local tstatus, tresp = http_request("GET", turl, nil, auth_token)
+  local alt = (tstatus == 200) and json.decode(tresp or "") or nil
+  local tp = tempo_prepare(offset, stop)
+  if tstatus ~= 200 then
+    -- An older server without tempo maps: sections still work.
+    tp.uebernehmen, tp.fehlt = false, "Tempo map not available on the server (HTTP " .. tostring(tstatus) .. "); sections only."
+  end
+  if #list == 0 and not tp.uebernehmen and not tp.nur_projekt then
+    section_msg = tp.fehlt or "Nothing to sync: no named markers in this song's range."
     return
   end
-  section_preview = { song_id = song.id, url = url, ziel = ziel, offset = offset, new_offset = new_offset, list = list, existing = existing }
+  section_preview = { song_id = song.id, offset_key = okey, region = song_rgn, region_wie = rgn_wie, item = item, url = url, turl = turl, ziel = ziel, offset = offset, new_offset = new_offset,
+                      list = list, existing = existing, tempo = tp, tempo_alt = (type(alt) == "table") and alt or nil }
 end
 
 local function sections_apply()
   local v = section_preview
   if not v then return end
-  local status, resp = http_request("PUT", v.url, json.encode(v.list), auth_token)
-  if status == 200 then
-    if v.new_offset then
-      calibration_offsets[tostring(v.song_id)] = v.new_offset
-      reaper.SetProjExtState(0, "ReaMark", "offset_" .. tostring(v.song_id), tostring(v.new_offset))
+  local teile = {}
+  if #v.list > 0 then
+    local status, resp = http_request("PUT", v.url, json.encode(v.list), auth_token)
+    if status ~= 200 then
+      local d = json.decode(resp or "")
+      section_msg = "Saving the sections failed (HTTP " .. tostring(status) .. ")" .. ((d and d.detail) and (": " .. tostring(d.detail)) or "")
+      section_preview = nil
+      return
     end
-    section_msg = tostring(#v.list) .. " sections saved."
-  else
-    local d = json.decode(resp or "")
-    section_msg = "Saving failed (HTTP " .. tostring(status) .. ")" .. ((d and d.detail) and (": " .. tostring(d.detail)) or "")
+    teile[#teile + 1] = tostring(#v.list) .. " sections"
   end
+  -- The sections are measured from this offset: keep it as soon as anything relative to it is saved.
+  local function offset_merken()
+    if v.new_offset then
+      calibration_offsets[v.offset_key] = v.new_offset
+      reaper.SetProjExtState(0, "ReaMark", "offset_" .. v.offset_key, tostring(v.new_offset))
+    end
+  end
+  if #teile > 0 then offset_merken() end
+  if v.tempo.uebernehmen then
+    local status, resp = http_request("PUT", v.turl, json.encode(v.tempo.karte), auth_token)
+    if status ~= 200 then
+      local d = json.decode(resp or "")
+      section_msg = (#teile > 0 and (teile[1] .. " saved; ") or "") .. "saving the tempo map failed (HTTP " .. tostring(status) .. ")"
+        .. ((d and d.detail) and (": " .. tostring(d.detail)) or "")
+      section_preview = nil
+      return
+    end
+    teile[#teile + 1] = "the tempo map"
+    offset_merken()
+  end
+  section_msg = #teile > 0 and (table.concat(teile, " and ") .. " saved.") or "Nothing saved."
   section_preview = nil
 end
 
 local function draw_sections_row(song)
   if not logged_in or not song or song.id == "_project" then return end
-  if sec_button("Sections from markers") then sections_prepare(song) end
+  if sec_button("Sync from REAPER") then sections_prepare(song) end
   if reaper.ImGui_IsItemHovered(ctx) then
-    reaper.ImGui_SetTooltip(ctx, modus == "preprod"
-      and "Named markers and regions inside this song become the sections of the selected\npreproduction version in Studio OS (Intro, V1, C1 ...), measured from the song's start."
-      or "Named markers and regions inside this song become its sections in Studio OS\n(Intro, V1, C1 ...), measured from the song's start.")
+    reaper.ImGui_SetTooltip(ctx, (modus == "preprod"
+      and "For the selected preproduction version in Studio OS:\n"
+      or "For this song in Studio OS:\n")
+      .. "named markers and regions inside the song become its sections (Intro, V1, C1 ...),\n"
+      .. "and the tempo and time signature markers become its tempo map (bars in the player).\n"
+      .. "Measured from where the version's file starts in the project (its item),\n"
+      .. "else from the song's start (offset or region). Shows a preview first.")
   end
   if section_msg ~= "" then
     reaper.ImGui_SameLine(ctx)
@@ -1153,15 +1456,69 @@ local function draw_sections_row(song)
   local v = section_preview
   local _, ziel_jetzt = sections_url(song)
   if v and v.ziel == ziel_jetzt then
+    reaper.ImGui_TextColored(ctx, C.text_muted, "Sections")
+    if #v.list == 0 then
+      reaper.ImGui_TextColored(ctx, C.text_dim, "No named markers in this song; the current sections stay.")
+    end
     for _, a in ipairs(v.list) do
       reaper.ImGui_TextColored(ctx, C.text_dim, format_timecode(a.start_sek) .. "   " .. a.label)
-    end
-    if v.new_offset then
-      reaper.ImGui_TextColored(ctx, C.text_muted, "Song start from its region: " .. format_timecode(v.new_offset) .. " (also sets the offset)")
     end
     if v.existing > 0 then
       reaper.ImGui_TextColored(ctx, C.amber, "Replaces " .. tostring(v.existing) .. " existing sections"
         .. (modus == "preprod" and " of this version." or "."))
+    end
+    local tp = v.tempo
+    reaper.ImGui_Spacing(ctx)
+    reaper.ImGui_TextColored(ctx, C.text_muted, "Tempo map  (bar 1 at " .. format_timecode(tp.karte.start_sek) .. ")")
+    if tp.fehlt then reaper.ImGui_TextColored(ctx, C.amber, tp.fehlt) end
+    if tp.nur_projekt and not tp.fehlt then
+      -- No tempo markers: the project tempo may never have been set. Only on request.
+      local _, an = reaper.ImGui_Checkbox(ctx, "No tempo markers: use the project tempo as the tempo map##tk", tp.uebernehmen)
+      tp.uebernehmen = an
+    end
+    local zeilen = tempo_lines(tp)
+    for i, l in ipairs(zeilen) do
+      if i > 30 then reaper.ImGui_TextColored(ctx, C.text_muted, "... " .. tostring(#zeilen - 30) .. " more changes"); break end
+      reaper.ImGui_TextColored(ctx, C.text_dim, l)
+    end
+    if tp.zuviel then
+      reaper.ImGui_TextColored(ctx, C.amber, "More than 500 tempo changes in this song; Studio OS keeps at most 500. Only the sections are saved.")
+    end
+    for _, w in ipairs(tp.warnings) do reaper.ImGui_TextColored(ctx, C.amber, w) end
+    if tp.bars > 0 then
+      if tp.worst < 0.005 then
+        reaper.ImGui_TextColored(ctx, C.text_muted, "All " .. tostring(tp.bars) .. " bars match REAPER.")
+      else
+        reaper.ImGui_TextColored(ctx, tp.worst < 0.05 and C.text_muted or C.amber, string.format(
+          "Bars differ from REAPER by up to %d ms (bar %d of %d).", math.floor(tp.worst * 1000 + 0.5), tp.worst_bar, tp.bars))
+      end
+    end
+    if v.tempo_alt and tp.uebernehmen then
+      reaper.ImGui_TextColored(ctx, C.amber, "Replaces the existing tempo map"
+        .. (v.tempo_alt.quelle == "reaper" and " (from REAPER)." or " (made by hand)."))
+    end
+    -- Which part of the project was read, so a wrong region shows before Apply.
+    local wer = modus == "preprod" and "version" or "song"
+    if v.item then
+      reaper.ImGui_TextColored(ctx, C.text_muted, "Start: the file \"" .. v.item.name .. "\" in the project at "
+        .. format_timecode(v.item.start) .. (v.item.n > 1 and ("  (" .. tostring(v.item.n) .. " items, the earliest)") or ""))
+      if math.abs(v.item.rate - 1) > 0.0001 then
+        reaper.ImGui_TextColored(ctx, C.amber, "That item plays at a different rate: times in Studio OS will not match.")
+      end
+    end
+    if v.region then
+      reaper.ImGui_TextColored(ctx, C.text_muted, "Region: \"" .. trim(v.region.name) .. "\"  ("
+        .. format_timecode(v.region.pos) .. " to " .. format_timecode(v.region.rgnend) .. ")"
+        .. (v.region_wie == "offset" and ", starts at the offset" or ""))
+    elseif v.item then
+      reaper.ImGui_TextColored(ctx, C.text_muted, "No region named after this " .. wer .. ": ends with the file.")
+    else
+      reaper.ImGui_TextColored(ctx, modus == "preprod" and C.amber or C.text_muted, "No region named after this " .. wer .. ": from the offset "
+        .. format_timecode(v.offset) .. (modus == "preprod" and ".\nName it like the song plus the version (\"" .. trim(song.title) .. " v2\") or like the file." or "."))
+    end
+    if v.new_offset then
+      reaper.ImGui_TextColored(ctx, C.text_muted, (v.item and "Start from the file: " or "Start from the region: ")
+        .. format_timecode(v.new_offset) .. " (also sets the offset of this " .. wer .. ")")
     end
     if prim_button("Apply") then sections_apply() end
     reaper.ImGui_SameLine(ctx)
@@ -1647,12 +2004,36 @@ local function draw_comments_section()
   end
 end
 
+-- Fenstergrösse selbst merken (2.5.3, Frank 06.10.2026: „beim nächsten Öffnen kommt es kleiner wieder"). Nicht nur
+-- ReaImGuis eigener Speicher: der schreibt verzögert und wird über Syncthing zwischen den Macs geteilt. Je
+-- Bildschirmgrösse ein eigener Wert, damit das MacBook dem Studio-Bildschirm nicht die Höhe vorgibt.
+local _vl, _vt, _vr, _vb = reaper.my_getViewport(0, 0, 0, 0, 0, 0, 0, 0, true)
+local groesse_key = "fenster_" .. tostring((_vr or 0) - (_vl or 0)) .. "x" .. tostring((_vb or 0) - (_vt or 0))
+local gemerkt_w, gemerkt_h = (reaper.GetExtState("ReaMark", groesse_key) or ""):match("^(%d+)x(%d+)$")
+local groesse_gesetzt, groesse_zuletzt = false, nil
+
+local function groesse_merken()
+  if reaper.ImGui_IsMouseDown(ctx, 0) then return end   -- erst nach dem Ziehen, nicht bei jedem Bild
+  local w, h = reaper.ImGui_GetWindowSize(ctx)
+  local neu = math.floor(w + 0.5) .. "x" .. math.floor(h + 0.5)
+  if neu == groesse_zuletzt then return end
+  groesse_zuletzt = neu
+  if gemerkt_w and neu == (gemerkt_w .. "x" .. gemerkt_h) then return end
+  reaper.SetExtState("ReaMark", groesse_key, neu, true)
+  gemerkt_w, gemerkt_h = neu:match("^(%d+)x(%d+)$")
+end
+
 ---------------------------------------------------------------------------
 -- Main loop
 ---------------------------------------------------------------------------
 local function loop()
   apply_theme()
-  reaper.ImGui_SetNextWindowSize(ctx, 420, 700, reaper.ImGui_Cond_FirstUseEver())
+  if not groesse_gesetzt and gemerkt_w then
+    reaper.ImGui_SetNextWindowSize(ctx, tonumber(gemerkt_w), tonumber(gemerkt_h), reaper.ImGui_Cond_Always())
+  else
+    reaper.ImGui_SetNextWindowSize(ctx, 420, 700, reaper.ImGui_Cond_FirstUseEver())
+  end
+  groesse_gesetzt = true
   reaper.ImGui_SetNextWindowSizeConstraints(ctx, 420, 300, 9999, 9999)
   local visible, open = reaper.ImGui_Begin(ctx, 'Mix Notes', true)
 
@@ -1663,6 +2044,7 @@ local function loop()
     draw_waveform_section()
     draw_new_comment_section()
     draw_comments_section()
+    groesse_merken()
     reaper.ImGui_End(ctx)
   end
 
