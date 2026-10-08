@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="c6c66009e0e0a998b96e6958e8fe17ce156cc0e8">
+<index version="1" name="Frank Acklin Scripts" commit="0f7e6f1a7d6d7ef664c9f7bec7bdaa4827e20df2">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1503,6 +1503,46 @@ New: comments on a range. With a time selection set, Add stores it as the range;
 ranges show as a band on the waveform, and clicking a range pill sets the time
 selection to it and the edit cursor to its start.]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/10314ff3139a770820bcd8fd863d456a2f4d5c93/ReaMark/ReaMark.lua</source>
+      </version>
+      <version name="2.5.4" author="Studio OS" time="2026-10-08T16:06:23Z">
+        <changelog><![CDATA[Sections from REAPER markers keep millisecond precision, like the tempo map. A marker on a
+barline was rounded to a tenth and could land a few milliseconds before the bar, so the player
+showed the last beat of the previous bar (30.4 instead of 31).
+The window keeps its size: Mix Notes remembers width and height itself, per screen size, and
+opens at that size next time (it sometimes came back smaller).
+The song start comes from the version's FILE in the project: Sync looks for the item whose
+file has the version's file name (extension, case, "_" and "-" do not matter, so a WAV in
+REAPER matches the MP3 in Studio OS) and measures sections and bars from where that file
+starts, trimmed starts included. A region that starts earlier than the file no longer
+shifts everything. Without such an item it works as before (offset, then region). The
+preview names the file and its start.
+Preproduction: each version finds its OWN region. Two versions rendered from two regions
+("Song v1", "Song v2") no longer share one: the region is matched by the song title plus
+"v" and the version number, the song title plus the version name ("Song PrePro V2"), or
+the uploaded file name ("Song_v2.wav"); case, "_" and "-" do not matter. Only then the
+region named like the song, as before. The song start (offset) is kept per version in
+Preproduction (a version without one still uses the song's). The preview names the
+region it read, so a wrong one shows before Apply.
+New: "Sync from REAPER" (was "Sections from markers") also brings the song's tempo map:
+tempo and time signature at the song start and every change inside the song, gliding
+tempos included, so Studio OS can show bars and beats. One preview for sections and tempo
+map, Apply or Cancel. Bar 1 is the song's first bar (count-in before it stays count-in).
+The preview checks every bar against REAPER's own bar times and shows the largest
+difference; a change inside a bar is placed on the nearest bar start and named.
+Songs without named markers keep their sections and only get the tempo map.
+New: Preproduction. A Mix | Preproduction switch at the top (remembered per REAPER
+project) lists the projects with preproduction versions. Pick a song and a version,
+and "Sections from markers" writes that VERSION's sections (each demo keeps its own
+timing). No comments there: preproduction notes stay in Studio OS.
+New: "Sections from markers" takes the named markers and regions inside the selected
+song (Intro, V1, C1 ...) as its sections in Studio OS, measured from the song's start
+(the calibration offset, or the region named like the song). Asks before replacing.
+Rebuilt for Studio OS, replacing the ReaMark login: connect with the server URL and
+connect token, versions as chips with their open notes, the Studio OS look.
+New: comments on a range. With a time selection set, Add stores it as the range;
+ranges show as a band on the waveform, and clicking a range pill sets the time
+selection to it and the edit cursor to its start.]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/0f7e6f1a7d6d7ef664c9f7bec7bdaa4827e20df2/ReaMark/ReaMark.lua</source>
       </version>
     </reapack>
   </category>
