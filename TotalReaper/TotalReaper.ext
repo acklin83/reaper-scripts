@@ -1,8 +1,9 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.6
+@version 0.2.7
 @changelog
-  Fixed: REAPER could crash a few seconds after a track's record input changed to a hardware channel, when TotalReaper asked TotalMix for the preamp values again.
+  New: tracks on "Monitor input (tape auto style)" follow the transport the way REAPER does. The input is open in TotalMix when stopped and while recording, and closed during playback, so you hear the take.
+  New: with auto-punch (time selection or selected items), the input opens only inside the punch region while recording.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
@@ -21,6 +22,7 @@
 
   - **Routing mirror**: REAPER track volume / mute / pan → TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.
   - **Solo mirror**: REAPER track solo → TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.
+  - **Tape-style monitoring**: a track on "Monitor input (tape auto style)" hears its input in TotalMix when stopped and while recording, and the take during playback. With auto-punch (time selection or selected items) the input opens only inside the punch region.
   - **2-Way Control**: optional reverse direction — TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.
   - **Track-to-track sends** are walked recursively and projected onto TotalMix routings on every hardware-output destination — cue mixes, headphone sends, etc.
   - **Only Set Main Submix**: narrows all of the above to the master track's hardware bus. The other hardware outputs are never written and never read, so a hand-built cue mix, or a separate headphone mixer running on the interface, stays untouched even when you switch the routing mirror off.
