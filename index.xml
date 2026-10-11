@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="0f7e6f1a7d6d7ef664c9f7bec7bdaa4827e20df2">
+<index version="1" name="Frank Acklin Scripts" commit="53b6b83d1e020333ba9d8ad826924bdd7ea22774">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1560,7 +1560,8 @@ selection to it and the edit cursor to its start.]]></changelog>
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Routing mirror}: REAPER track volume / mute / pan \u8594 ? TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Solo mirror}: REAPER track solo \u8594 ? TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Tape-style monitoring}: a track on "Monitor input (tape auto style)" hears its input in TotalMix when stopped and while recording, and the take during playback. With auto-punch (time selection or selected items) the input opens only inside the punch region.\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b 2-Way Control}: optional reverse direction \u8212- TotalMix fader/balpan moves drive matching REAPER tracks and direct sends. Echo-suppression keeps the loop stable.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b 2-Way Control}: optional reverse direction \u8212- TotalMix fader/balpan moves drive the REAPER tracks and direct sends the mirror is driving. Echo-suppression keeps the loop stable.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Send Only Changes}: values go to TotalMix when they change, plus a refresh once a second, which keeps the OSC traffic low while nothing moves. Can be switched off in the settings window.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Only Set Main Submix}: narrows all of the above to the master track's hardware bus. The other hardware outputs are never written and never read, so a hand-built cue mix, or a separate headphone mixer running on the interface, stays untouched even when you switch the routing mirror off.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Per-track preamp control} as REAPER actions: gain \u177 ?1 dB, 48V toggle, pad toggle (with mute pulse to hide the hardware pop), phase invert, AutoLevel. Multi-select.\par}
@@ -1698,6 +1699,13 @@ New: with auto-punch (time selection or selected items), the input opens only in
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.7/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.7/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.7/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.8" author="Frank Acklin" time="2026-10-11T17:30:45Z">
+        <changelog><![CDATA[New: "Send Only Changes" (settings window, on by default). A fader, pan or solo value goes to TotalMix when it changes in REAPER, and all of them again once a second. Up to 0.2.7 every value went out again on every update: with one monitored mono track about 100 OSC messages a second while nothing moved, now 3. Turn it off for the old behaviour.
+Fixed: 2-Way Control wrote a TotalMix fader move into a REAPER track the mirror wasn't driving (monitoring off, or tape style during playback). It now only writes into the track the mirror drives for that input.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.8/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.8/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.8/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
