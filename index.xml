@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="53b6b83d1e020333ba9d8ad826924bdd7ea22774">
+<index version="1" name="Frank Acklin Scripts" commit="5ed37fe54e1f07f6d853a001d6fdbbf05beab04e">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1706,6 +1706,12 @@ Fixed: 2-Way Control wrote a TotalMix fader move into a REAPER track the mirror 
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.8/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.8/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.8/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.9" author="Frank Acklin" time="2026-10-13T09:50:26Z">
+        <changelog><![CDATA[Fixed: the settings window kept showing "TotalMix does not answer" although REAPER and TotalMix were talking. "Apply ports" now asks TotalMix again, and the note clears as soon as TotalMix answers.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.9/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.9/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.9/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
