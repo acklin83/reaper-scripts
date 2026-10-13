@@ -1,9 +1,8 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.8
+@version 0.2.9
 @changelog
-  New: "Send Only Changes" (settings window, on by default). A fader, pan or solo value goes to TotalMix when it changes in REAPER, and all of them again once a second. Up to 0.2.7 every value went out again on every update: with one monitored mono track about 100 OSC messages a second while nothing moved, now 3. Turn it off for the old behaviour.
-  Fixed: 2-Way Control wrote a TotalMix fader move into a REAPER track the mirror wasn't driving (monitoring off, or tape style during playback). It now only writes into the track the mirror drives for that input.
+  Fixed: the settings window kept showing "TotalMix does not answer" although REAPER and TotalMix were talking. "Apply ports" now asks TotalMix again, and the note clears as soon as TotalMix answers.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
