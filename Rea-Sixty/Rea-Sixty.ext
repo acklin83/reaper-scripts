@@ -1,22 +1,16 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.4
+@version 0.6.5
 @changelog
-  - Codename: Fletcher Dragge is my Spirit Animal
-  - VCA spill: long-press SEL on a VCA lead in VCA Mode; lead stays on strip 1, followers after it, nested VCAs level by level
-  - VCA Mode: only the top VCA leads on the surface
-  - Setting "VCA spill shows hidden tracks" (default on)
-  - Actions: VCA Mode, VCA Spill (selected track), Leave VCA Spill, also in REAPER's Action List
-  - Long-press SEL is a binding on UF8 and UF1, factory action "Spill (folder / VCA)"
-  - SEL editor: double press in the SHORT column
-  - UF1: long-press SEL does nothing in REC and REC + MON
-  - Surface mirrors MCP: a folder collapsed in the Mixer takes its children off the surface
-  - Folder Mode keeps its open folders, saved per project tab
-  - Selection Set group slots and UF1 razor grouping reach all 128 groups (REAPER 7.23+)
-  - REAPER action for Folder Mode
-  - Mode banner names the UF1 RME side-car
-  - Dynamic bank "Selection Sets": slots 1-8 on the keys; push recalls, hold stores into an empty slot, Shift stores over, Cmd selects, Ctrl clears
-  - Selection Sets get a key colour each (Settings, Selection Sets), used by the Selection Sets bank
+  - Codename: My Llama spits Codenames. My Lama not so much.
+  - Layers switch Quicks only: Quick 1-3 and the V-POT / Soft 1-5 bank keys edited on Layer 2 or 3 stay on that layer (they were written to Layer 1); editor, right-click menu and tile colours follow the layer the key fires on
+  - Startup bank "Use current hardware bank" takes the layer the surface is on under Layers switch Quicks only
+  - UC1 input meter skips the audio accessor on tracks with item FX: no more 1-2 s lag on Mixer channel changes and broken-up audio; meter such a track with the Rea-Sixty Input Level JSFX
+  - Sleep: letting go of the key that put the surfaces to sleep no longer wakes them
+  - RME side-car asks TotalMix for its whole state twice more, 3 s and 10 s after connecting
+  - New built-ins (RME): "RME: Ask TotalMix again" and "UF1 Mode: RME" (side-car on / off, as SHIFT + MODE, RME), from any surface and the Stream Deck
+  - RME side-car Output page: Crossfeed, Delay, Ref Level, FX Return; Pan stays on the V-Pot above the fader, the extra FX Return page is gone (your own pages stay)
+  - TotalMix snapshot and layout keys light in the key's Active / Inactive colours (white when none are set)
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
