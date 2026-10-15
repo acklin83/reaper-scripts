@@ -1,8 +1,11 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.9
+@version 0.2.10
 @changelog
-  Fixed: the settings window kept showing "TotalMix does not answer" although REAPER and TotalMix were talking. "Apply ports" now asks TotalMix again, and the note clears as soon as TotalMix answers.
+  New: you hear the last take while the routing mirror is on. REAPER's own monitoring of a track is only muted while REAPER plays the input itself, so in tape-style playback the take stays audible.
+  New: "Keep the live input open during playback" (settings window, off by default). Tape-style tracks keep the live input in TotalMix while REAPER plays the take, so you hear both.
+  Fixed: a project saved while mirroring came back with its tracks' master sends off. The original setting is now stored in the track and restored.
+  Fixed: without an output on the master, 2-Way moves the fader of a track whose only way out is its own hardware output, instead of that output's volume.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
@@ -21,7 +24,7 @@
 
   - **Routing mirror**: REAPER track volume / mute / pan → TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.
   - **Solo mirror**: REAPER track solo → TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.
-  - **Tape-style monitoring**: a track on "Monitor input (tape auto style)" hears its input in TotalMix when stopped and while recording, and the take during playback. With auto-punch (time selection or selected items) the input opens only inside the punch region.
+  - **Tape-style monitoring**: a track on "Monitor input (tape auto style)" hears its input in TotalMix when stopped and while recording, and the take during playback. With auto-punch (time selection or selected items) the input opens only inside the punch region. Optionally the live input stays open during playback as well, so you hear take and musician together.
   - **2-Way Control**: optional reverse direction — TotalMix fader/balpan moves drive the REAPER tracks and direct sends the mirror is driving. Echo-suppression keeps the loop stable.
   - **Send Only Changes**: values go to TotalMix when they change, plus a refresh once a second, which keeps the OSC traffic low while nothing moves. Can be switched off in the settings window.
   - **Track-to-track sends** are walked recursively and projected onto TotalMix routings on every hardware-output destination — cue mixes, headphone sends, etc.
