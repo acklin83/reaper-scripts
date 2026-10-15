@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="289bca88c5fe5af1f2e9b4aa4d94c8f4a5206a5c">
+<index version="1" name="Frank Acklin Scripts" commit="5cff5c90c0e5ce6efaad36f6b05d0789cd676eca">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1473,6 +1473,26 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.5/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.5/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.5/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.6.6" author="Frank Acklin" time="2026-10-15T12:33:55Z">
+        <changelog><![CDATA[- Codename: Orcs have Layers.
+- UF1 Mode: RME is in the Settings picker under Hardware Modes (v0.6.5 put it under RME, which the picker does not show, so only the Stream Deck reached it)
+- Quick keys in Settings, Bindings: clicking or pressing a Quick (or a V-POT / Soft 1-5 bank key) whose binding leads to another layer only selects it; the surface and the editor stay on the layer you are editing
+- Soft-Key Sets name where they live, e.g. "Soft-Key Set 2 (Layer 2, Quick 1)": Set 1 = Layer 1 Quick 3, Sets 2-7 = Layers 2 and 3, Sets 8/9 = Layer 1 Quick 1/2
+- The UF1's RME mode is ORC inside REAPER: its soft keys, banks, transport keys and RME actions (Ask TotalMix again included) are set in ORC only, not in Rea-Sixty's Settings
+- Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
