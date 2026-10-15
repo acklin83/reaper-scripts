@@ -1,11 +1,8 @@
 @description TotalReaper
 @author Frank Acklin
-@version 0.2.10
+@version 0.2.11
 @changelog
-  New: you hear the last take while the routing mirror is on. REAPER's own monitoring of a track is only muted while REAPER plays the input itself, so in tape-style playback the take stays audible.
-  New: "Keep the live input open during playback" (settings window, off by default). Tape-style tracks keep the live input in TotalMix while REAPER plays the take, so you hear both.
-  Fixed: a project saved while mirroring came back with its tracks' master sends off. The original setting is now stored in the track and restored.
-  Fixed: without an output on the master, 2-Way moves the fader of a track whose only way out is its own hardware output, instead of that output's volume.
+  Fixed: without an output on the master, a TotalMix fader pulled all the way down and back up no longer leaves the REAPER track fader behind. 2-Way follows it again.
 @provides
   [darwin-arm64] reaper_totalreaper-arm64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
   [darwin64] reaper_totalreaper-x86_64.dylib https://github.com/acklin83/totalreaper/releases/download/v$version/$path
