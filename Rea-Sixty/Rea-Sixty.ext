@@ -1,16 +1,12 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.5
+@version 0.6.6
 @changelog
-  - Codename: My Llama spits Codenames. My Lama not so much.
-  - Layers switch Quicks only: Quick 1-3 and the V-POT / Soft 1-5 bank keys edited on Layer 2 or 3 stay on that layer (they were written to Layer 1); editor, right-click menu and tile colours follow the layer the key fires on
-  - Startup bank "Use current hardware bank" takes the layer the surface is on under Layers switch Quicks only
-  - UC1 input meter skips the audio accessor on tracks with item FX: no more 1-2 s lag on Mixer channel changes and broken-up audio; meter such a track with the Rea-Sixty Input Level JSFX
-  - Sleep: letting go of the key that put the surfaces to sleep no longer wakes them
-  - RME side-car asks TotalMix for its whole state twice more, 3 s and 10 s after connecting
-  - New built-ins (RME): "RME: Ask TotalMix again" and "UF1 Mode: RME" (side-car on / off, as SHIFT + MODE, RME), from any surface and the Stream Deck
-  - RME side-car Output page: Crossfeed, Delay, Ref Level, FX Return; Pan stays on the V-Pot above the fader, the extra FX Return page is gone (your own pages stay)
-  - TotalMix snapshot and layout keys light in the key's Active / Inactive colours (white when none are set)
+  - Codename: Orcs have Layers.
+  - UF1 Mode: RME is in the Settings picker under Hardware Modes (v0.6.5 put it under RME, which the picker does not show, so only the Stream Deck reached it)
+  - Quick keys in Settings, Bindings: clicking or pressing a Quick (or a V-POT / Soft 1-5 bank key) whose binding leads to another layer only selects it; the surface and the editor stay on the layer you are editing
+  - Soft-Key Sets name where they live, e.g. "Soft-Key Set 2 (Layer 2, Quick 1)": Set 1 = Layer 1 Quick 3, Sets 2-7 = Layers 2 and 3, Sets 8/9 = Layer 1 Quick 1/2
+  - The UF1's RME mode is ORC inside REAPER: its soft keys, banks, transport keys and RME actions (Ask TotalMix again included) are set in ORC only, not in Rea-Sixty's Settings
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
