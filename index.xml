@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="c407bbc29ffc92d82dffe7594dbf2d820dcedc37">
+<index version="1" name="Frank Acklin Scripts" commit="289bca88c5fe5af1f2e9b4aa4d94c8f4a5206a5c">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1583,7 +1583,7 @@ selection to it and the edit cursor to its start.]]></changelog>
 {\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 What it does\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Routing mirror}: REAPER track volume / mute / pan \u8594 ? TotalMix input matrix in real time. REAPER's software monitor is muted while the mirror is engaged so you only hear TotalMix's hardware (zero-latency) path.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Solo mirror}: REAPER track solo \u8594 ? TotalMix solo on the main output only. The soloed track stays audible while the others on the main bus dim; cue / headphone submixes keep their own balance.\par}
-{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Tape-style monitoring}: a track on "Monitor input (tape auto style)" hears its input in TotalMix when stopped and while recording, and the take during playback. With auto-punch (time selection or selected items) the input opens only inside the punch region.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Tape-style monitoring}: a track on "Monitor input (tape auto style)" hears its input in TotalMix when stopped and while recording, and the take during playback. With auto-punch (time selection or selected items) the input opens only inside the punch region. Optionally the live input stays open during playback as well, so you hear take and musician together.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b 2-Way Control}: optional reverse direction \u8212- TotalMix fader/balpan moves drive the REAPER tracks and direct sends the mirror is driving. Echo-suppression keeps the loop stable.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Send Only Changes}: values go to TotalMix when they change, plus a refresh once a second, which keeps the OSC traffic low while nothing moves. Can be switched off in the settings window.\par}
 {\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b Track-to-track sends} are walked recursively and projected onto TotalMix routings on every hardware-output destination \u8212- cue mixes, headphone sends, etc.\par}
@@ -1736,6 +1736,15 @@ Fixed: 2-Way Control wrote a TotalMix fader move into a REAPER track the mirror 
         <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.9/reaper_totalreaper-arm64.dylib</source>
         <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.9/reaper_totalreaper-x86_64.dylib</source>
         <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.9/reaper_totalreaper.dll</source>
+      </version>
+      <version name="0.2.10" author="Frank Acklin" time="2026-10-15T12:04:03Z">
+        <changelog><![CDATA[New: you hear the last take while the routing mirror is on. REAPER's own monitoring of a track is only muted while REAPER plays the input itself, so in tape-style playback the take stays audible.
+New: "Keep the live input open during playback" (settings window, off by default). Tape-style tracks keep the live input in TotalMix while REAPER plays the take, so you hear both.
+Fixed: a project saved while mirroring came back with its tracks' master sends off. The original setting is now stored in the track and restored.
+Fixed: without an output on the master, 2-Way moves the fader of a track whose only way out is its own hardware output, instead of that output's volume.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_totalreaper-arm64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.10/reaper_totalreaper-arm64.dylib</source>
+        <source platform="darwin64" file="reaper_totalreaper-x86_64.dylib">https://github.com/acklin83/totalreaper/releases/download/v0.2.10/reaper_totalreaper-x86_64.dylib</source>
+        <source platform="win64" file="reaper_totalreaper.dll">https://github.com/acklin83/totalreaper/releases/download/v0.2.10/reaper_totalreaper.dll</source>
       </version>
     </reapack>
   </category>
