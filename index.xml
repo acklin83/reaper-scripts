@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="850586e7d1d98ec3ead3475f0e365ac486d9d448">
+<index version="1" name="Frank Acklin Scripts" commit="0598fa4f6504413e5344803672625b2c6fde5c5b">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1493,6 +1493,41 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.6/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.6.7" author="Frank Acklin" time="2026-10-16T16:57:03Z">
+        <changelog><![CDATA[- Codename: Living in the fast lane
+- Fixed lanes (REAPER 7.12+, selected track): jog mode Lanes on the UF1, encoder mode Lanes on the UF8. See the manual chapter "Fixed lanes"
+- Lanes: the wheel moves the edit cursor; SHIFT + wheel changes the lane, or on a track with a comp lane gives the comp area under the cursor the next take
+- Lanes cross: up/down play the lane above/below alone, SHIFT + up/down move the comp area, left/right go to the previous/next edge, SHIFT + right = A/B, centre tap plays the comp, SHIFT + centre = Comp here
+- Comp here: the lane you hear into the comp over time selection, loop or item under the cursor; never from the comp lane; one undo step
+- Painting: hold the centre and turn the wheel, a razor shows the stretch, let go and it goes into the comp (one undo), REAPER plays it with 1 s either side
+- Live comping: bind "Lanes: live comping on / off"; while playing every lane change is a cut, a lane heard under 0.5 s counts as passed, stop ends the last part
+- Looping a cut: SHIFT + left loops 2 s around the nearest cut and turns repeat on; again at the same cut turns both back
+- Lanes bank (dynamic soft-key bank): one key per lane by name, lit while it plays, comp green; push = alone (or comp area from that take), SHIFT = layer / audition, Cmd = Comp here; comes by itself on the UF8 in Lanes; "Lanes on" on a track without lanes
+- Lanes follow REAPER's item grouping (media-edit groups); switching lanes writes no undo, SHIFT + wheel on a comp area is one undo per turn
+- Settings, Behaviour, Fixed lanes: skip comp lane, UF8 Lanes bank, scrub while painting (off), play the stroke after painting (on, 1 s), snap cuts to grid (off), cut lead-in (20 ms). Loop length under Bindings, UF1, jog Lanes
+- All Lanes functions are built-ins under "Lanes" in the picker
+- UF8: hold the encoder push and turn to pick an encoder mode on the scribble strips; ring order and ticks under PUSH in Settings, Bindings, UF8
+- UF8: cursor pad and push have their own bindings per encoder mode, "Encoder mode" drop-down above the editor; every mode starts with the bindings you had
+- UF8: the encoder push fires on release and only unturned; it has no long press any more
+- A ring order you set is kept when a new mode arrives, the new mode goes at the end
+- Settings, Bindings, UF1: clicking JOG or a nav-cross key no longer closes the Settings window (short window scrolled to the top)
+- A UF8 or UC1 that does not open at REAPER start is retried every 5 s, as the UF1 already was
+- A UC1 dropping off USB while being reopened could crash REAPER
+- UC1: when many lamps change at once only the newest state of each goes out
+- Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.6.7/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
