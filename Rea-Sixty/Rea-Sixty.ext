@@ -1,12 +1,27 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.6
+@version 0.6.7
 @changelog
-  - Codename: Orcs have Layers.
-  - UF1 Mode: RME is in the Settings picker under Hardware Modes (v0.6.5 put it under RME, which the picker does not show, so only the Stream Deck reached it)
-  - Quick keys in Settings, Bindings: clicking or pressing a Quick (or a V-POT / Soft 1-5 bank key) whose binding leads to another layer only selects it; the surface and the editor stay on the layer you are editing
-  - Soft-Key Sets name where they live, e.g. "Soft-Key Set 2 (Layer 2, Quick 1)": Set 1 = Layer 1 Quick 3, Sets 2-7 = Layers 2 and 3, Sets 8/9 = Layer 1 Quick 1/2
-  - The UF1's RME mode is ORC inside REAPER: its soft keys, banks, transport keys and RME actions (Ask TotalMix again included) are set in ORC only, not in Rea-Sixty's Settings
+  - Codename: Living in the fast lane
+  - Fixed lanes (REAPER 7.12+, selected track): jog mode Lanes on the UF1, encoder mode Lanes on the UF8. See the manual chapter "Fixed lanes"
+  - Lanes: the wheel moves the edit cursor; SHIFT + wheel changes the lane, or on a track with a comp lane gives the comp area under the cursor the next take
+  - Lanes cross: up/down play the lane above/below alone, SHIFT + up/down move the comp area, left/right go to the previous/next edge, SHIFT + right = A/B, centre tap plays the comp, SHIFT + centre = Comp here
+  - Comp here: the lane you hear into the comp over time selection, loop or item under the cursor; never from the comp lane; one undo step
+  - Painting: hold the centre and turn the wheel, a razor shows the stretch, let go and it goes into the comp (one undo), REAPER plays it with 1 s either side
+  - Live comping: bind "Lanes: live comping on / off"; while playing every lane change is a cut, a lane heard under 0.5 s counts as passed, stop ends the last part
+  - Looping a cut: SHIFT + left loops 2 s around the nearest cut and turns repeat on; again at the same cut turns both back
+  - Lanes bank (dynamic soft-key bank): one key per lane by name, lit while it plays, comp green; push = alone (or comp area from that take), SHIFT = layer / audition, Cmd = Comp here; comes by itself on the UF8 in Lanes; "Lanes on" on a track without lanes
+  - Lanes follow REAPER's item grouping (media-edit groups); switching lanes writes no undo, SHIFT + wheel on a comp area is one undo per turn
+  - Settings, Behaviour, Fixed lanes: skip comp lane, UF8 Lanes bank, scrub while painting (off), play the stroke after painting (on, 1 s), snap cuts to grid (off), cut lead-in (20 ms). Loop length under Bindings, UF1, jog Lanes
+  - All Lanes functions are built-ins under "Lanes" in the picker
+  - UF8: hold the encoder push and turn to pick an encoder mode on the scribble strips; ring order and ticks under PUSH in Settings, Bindings, UF8
+  - UF8: cursor pad and push have their own bindings per encoder mode, "Encoder mode" drop-down above the editor; every mode starts with the bindings you had
+  - UF8: the encoder push fires on release and only unturned; it has no long press any more
+  - A ring order you set is kept when a new mode arrives, the new mode goes at the end
+  - Settings, Bindings, UF1: clicking JOG or a nav-cross key no longer closes the Settings window (short window scrolled to the top)
+  - A UF8 or UC1 that does not open at REAPER start is retried every 5 s, as the UF1 already was
+  - A UC1 dropping off USB while being reopened could crash REAPER
+  - UC1: when many lamps change at once only the newest state of each goes out
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
