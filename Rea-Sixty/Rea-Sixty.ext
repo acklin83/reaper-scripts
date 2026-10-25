@@ -1,27 +1,12 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.7
+@version 0.6.8
 @changelog
-  - Codename: Living in the fast lane
-  - Fixed lanes (REAPER 7.12+, selected track): jog mode Lanes on the UF1, encoder mode Lanes on the UF8. See the manual chapter "Fixed lanes"
-  - Lanes: the wheel moves the edit cursor; SHIFT + wheel changes the lane, or on a track with a comp lane gives the comp area under the cursor the next take
-  - Lanes cross: up/down play the lane above/below alone, SHIFT + up/down move the comp area, left/right go to the previous/next edge, SHIFT + right = A/B, centre tap plays the comp, SHIFT + centre = Comp here
-  - Comp here: the lane you hear into the comp over time selection, loop or item under the cursor; never from the comp lane; one undo step
-  - Painting: hold the centre and turn the wheel, a razor shows the stretch, let go and it goes into the comp (one undo), REAPER plays it with 1 s either side
-  - Live comping: bind "Lanes: live comping on / off"; while playing every lane change is a cut, a lane heard under 0.5 s counts as passed, stop ends the last part
-  - Looping a cut: SHIFT + left loops 2 s around the nearest cut and turns repeat on; again at the same cut turns both back
-  - Lanes bank (dynamic soft-key bank): one key per lane by name, lit while it plays, comp green; push = alone (or comp area from that take), SHIFT = layer / audition, Cmd = Comp here; comes by itself on the UF8 in Lanes; "Lanes on" on a track without lanes
-  - Lanes follow REAPER's item grouping (media-edit groups); switching lanes writes no undo, SHIFT + wheel on a comp area is one undo per turn
-  - Settings, Behaviour, Fixed lanes: skip comp lane, UF8 Lanes bank, scrub while painting (off), play the stroke after painting (on, 1 s), snap cuts to grid (off), cut lead-in (20 ms). Loop length under Bindings, UF1, jog Lanes
-  - All Lanes functions are built-ins under "Lanes" in the picker
-  - UF8: hold the encoder push and turn to pick an encoder mode on the scribble strips; ring order and ticks under PUSH in Settings, Bindings, UF8
-  - UF8: cursor pad and push have their own bindings per encoder mode, "Encoder mode" drop-down above the editor; every mode starts with the bindings you had
-  - UF8: the encoder push fires on release and only unturned; it has no long press any more
-  - A ring order you set is kept when a new mode arrives, the new mode goes at the end
-  - Settings, Bindings, UF1: clicking JOG or a nav-cross key no longer closes the Settings window (short window scrolled to the top)
-  - A UF8 or UC1 that does not open at REAPER start is retried every 5 s, as the UF1 already was
-  - A UC1 dropping off USB while being reopened could crash REAPER
-  - UC1: when many lamps change at once only the newest state of each goes out
+  - Codename: Smooth Operator
+  - UF8 and UF1 faders reach +12 dB and -inf at the end stops. UF8: the bottom stopped around -100 dB, different per channel, and a fast push stopped short of +12. UF1: track volume, sends and item volume stopped at +11.9
+  - UF8 faders move smoothly in REAPER: every position the UF8 reports is used now, twice as many as before, no more stairs in REAPER's fader and in written automation
+  - UF8: no more short spikes in volume automation when several faders move at once (a position split over two USB packets was put together wrong)
+  - UF8: a held fader no longer jumps back to where it was touched when the touch sensor flickers
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
