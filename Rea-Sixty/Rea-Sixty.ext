@@ -1,12 +1,16 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.6.8
+@version 0.7.0
 @changelog
-  - Codename: Smooth Operator
-  - UF8 and UF1 faders reach +12 dB and -inf at the end stops. UF8: the bottom stopped around -100 dB, different per channel, and a fast push stopped short of +12. UF1: track volume, sends and item volume stopped at +11.9
-  - UF8 faders move smoothly in REAPER: every position the UF8 reports is used now, twice as many as before, no more stairs in REAPER's fader and in written automation
-  - UF8: no more short spikes in volume automation when several faders move at once (a position split over two USB packets was put together wrong)
-  - UF8: a held fader no longer jumps back to where it was touched when the touch sensor flickers
+  - Codename: Easy MIDI Rider
+  - New: MIDI CC layer on the UF8. Set a layer to MIDI CC in Settings, Bindings, UF8: faders, V-Pots, V-Pot pushes, soft-keys and foot switches send Control Change, the SEND/PLUG-IN keys Program Change, to REAPER's virtual MIDI keyboard and to MIDI outputs
+  - MIDI CC layer: six pages (V-POT and soft-key bank 1 to 5, PAGE), name and colour per control shown on the UF8, 14-bit faders on CC 0 to 31, toggle or momentary keys, CC presets, FLIP swaps faders and V-Pots
+  - MIDI CC layer works both ways: faders and rings follow the CC lanes of the selected track while REAPER plays or records, and a synth on the layer's MIDI input moves them with its knobs
+  - New: Bank follows REAPER selection (Bindings, UF8; also a switch for a key and a REAPER action). Off, a track selected in REAPER leaves the bank where it is; selecting on the surface still banks. On by default
+  - UC1 input meter on a fixed-lane track reads only the lanes that play (items on silent lanes were added in)
+  - UF1 small-display comp GR follows GR meter source: with Only Show Channel Strip GR a compressor that is not a mapped channel strip no longer lights it
+  - Manual: new chapter MIDI CC layer (UF8); the UF1 soft-key LEDs as Bus Comp GR meter and Scroll banks are described
+  - Known issue: if the MIDI CC layer shows Device busy next to its Input, switch the device off as an input in REAPER's MIDI preferences
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
@@ -28,12 +32,12 @@
 @about
   # Rea-Sixty
 
-  REAPER extension that drives the SSL UF8 and UC1 control surfaces natively over their vendor-USB protocol. Replaces SSL 360° without requiring an SSL plug-in on every track.
+  REAPER extension that drives the SSL UF8, UF1 and UC1 control surfaces natively over their vendor-USB protocol. Replaces SSL 360° without requiring an SSL plug-in on every track.
 
   ## What it does
 
   - **DAW-layer track colours** on the UF8 scribble strips: every REAPER track shows its assigned colour, no per-track plug-in needed
-  - **Full 16-bit faders** with motor + touch
+  - **Motorised faders with touch**, 14 bit on the UF8 and 15 bit on the UF1
   - **UC1 follows the focused REAPER track** and drives the SSL Channel Strip 2 / Bus Compressor 2 / 4K B/E/G / 360° Link plug-ins
   - **UC1 GR meter** driven from the SSL plug-in itself via REAPER's PreSonus VST3 `GainReduction_dB` host extension
   - **Generic FX Learn** for any VST/JS/AU plug-in parameter (FX-name substring match, so slot reorders are safe but renames break the binding)
