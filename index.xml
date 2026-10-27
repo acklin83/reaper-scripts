@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="cfc99f5d3a1f06717063e13d2ed5802cc97414f2">
+<index version="1" name="Frank Acklin Scripts" commit="7c70238b91aa2c59f0570e0844c862686d4a4399">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1642,6 +1642,28 @@ New: comments on a range. With a time selection set, Add stores it as the range;
 ranges show as a band on the waveform, and clicking a range pill sets the time
 selection to it and the edit cursor to its start.]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/0f7e6f1a7d6d7ef664c9f7bec7bdaa4827e20df2/ReaMark/ReaMark.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="RegionsToProjects">
+    <reapack name="RegionsToProjects.lua" type="script" desc="Regions to Projects">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Regions to Projects\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Saves each region of the current project as its own REAPER project, named like the region.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Each new project has every track (FX, sends, routing, folders), the items of the region (cut at the region edges), all envelopes over that range, the tempo map with the tempo and time signature at the region start and every change inside it, the markers and regions inside it and the region itself. The song starts at the beginning of the new project. Audio files are referenced, not copied.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Asks for: all regions or only those touching the time selection, and the output folder (default: " Songs" next to the project). One folder per song: {\f1 <output>/<region>/<region>.RPP}. Existing projects are never overwritten; a name that is already taken gets " (2)", " (3)" ...\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The original project stays as it is: the script saves a temporary copy next to it, opens it in a new tab per region, edits and saves that, closes the tab and deletes the copy.\par}
+}
+]]></description>
+        <link rel="website" href="https://github.com/acklin83/reaper-scripts">GitHub</link>
+      </metadata>
+      <version name="1.0" author="Frank Acklin" time="2026-10-27T13:52:48Z">
+        <changelog><![CDATA[First version: every region of the current project becomes its own project.]]></changelog>
+        <source main="main">https://github.com/acklin83/reaper-scripts/raw/7c70238b91aa2c59f0570e0844c862686d4a4399/RegionsToProjects/RegionsToProjects.lua</source>
       </version>
     </reapack>
   </category>
