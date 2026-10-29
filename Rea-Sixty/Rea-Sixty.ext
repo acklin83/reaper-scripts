@@ -1,15 +1,9 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.7.0
+@version 0.7.1
 @changelog
-  - Codename: Easy MIDI Rider
-  - New: MIDI CC layer on the UF8. Set a layer to MIDI CC in Settings, Bindings, UF8: faders, V-Pots, V-Pot pushes, soft-keys and foot switches send Control Change, the SEND/PLUG-IN keys Program Change, to REAPER's virtual MIDI keyboard and to MIDI outputs
-  - MIDI CC layer: six pages (V-POT and soft-key bank 1 to 5, PAGE), name and colour per control shown on the UF8, 14-bit faders on CC 0 to 31, toggle or momentary keys, CC presets, FLIP swaps faders and V-Pots
-  - MIDI CC layer works both ways: faders and rings follow the CC lanes of the selected track while REAPER plays or records, and a synth on the layer's MIDI input moves them with its knobs
-  - New: Bank follows REAPER selection (Bindings, UF8; also a switch for a key and a REAPER action). Off, a track selected in REAPER leaves the bank where it is; selecting on the surface still banks. On by default
-  - UC1 input meter on a fixed-lane track reads only the lanes that play (items on silent lanes were added in)
-  - UF1 small-display comp GR follows GR meter source: with Only Show Channel Strip GR a compressor that is not a mapped channel strip no longer lights it
-  - Manual: new chapter MIDI CC layer (UF8); the UF1 soft-key LEDs as Bus Comp GR meter and Scroll banks are described
+  - Codename: Shift Happens
+  - Keys with an empty Shift slot run their normal action while Shift is held or latched. This stopped PAGE on the UF1, whose PAGE keys also have a long press, and any key whose Shift slot carried only a colour or a label
   - Known issue: if the MIDI CC layer shows Device busy next to its Input, switch the device off as an input in REAPER's MIDI preferences
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
