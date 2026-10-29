@@ -1,9 +1,15 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.7.1
+@version 0.8.0
 @changelog
-  - Codename: Shift Happens
-  - Keys with an empty Shift slot run their normal action while Shift is held or latched. This stopped PAGE on the UF1, whose PAGE keys also have a long press, and any key whose Shift slot carried only a colour or a label
+  - Codename: The Return of the Son of Shut Up and Play yer UF8
+  - Two UF8s side by side as one surface with 16 strips, built from Tim Shadgett's pull request (#10). Settings, Devices: Second UF8 (off out of the box), UF8 L and UF8 R with Identify each, Swap. The right unit's soft-keys show the next page, FX and Lanes banks run on, the MIDI CC layer shows the next page on the right, a 16-channel Plug-in Mode map lies across both, the UF1 Extender can sit between them. Action Swap UF8s, manual chapter Two UF8s
+  - Hue and DynaMount take the whole left UF8 on Shift + LAYER 2 and 3; the same key goes back. Their soft-keys are the eight Hue scenes and the eight DynaMount presets. The V-Pot rings of lamps and stands show again
+  - DynaMount presets: eight, by name, where every stand is. Push recalls, long press on an empty key stores, Shift + push stores over, Ctrl + push clears. Bank kind DynaMount Presets, actions, a table in the Dynamount tab
+  - With ORC: Shift + LAYER 1 puts TotalMix on the left UF8, one selection with the UF1: strips, submix on SEND/PLUG-IN 1-6 and in the colour bar, channel view on PLUG-IN or the CHANNEL push, TotalMix soft-key banks on V-POT and 1-5, Main on the CHANNEL encoder, shown on strip 8 while it turns
+  - With ORC: REAPER waits for ORC to let go of the UF1 and the UF8; Hue, DynaMount and OBS stay in step at every handover (newer wins), the stands' positions travel with it; Import from ORC; Stereo is always the fourth key of the first STRIP page
+  - Fixed: Hue labels follow the picked scene or lamp unless typed; an import no longer turns a right DynaMount fill to the left
+  - Known issue: Two UF8s has not been run on two units yet; with Second UF8 off one UF8 works as before
   - Known issue: if the MIDI CC layer shows Device busy next to its Input, switch the device off as an input in REAPER's MIDI preferences
   - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
 @provides
