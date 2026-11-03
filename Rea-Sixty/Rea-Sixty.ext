@@ -1,14 +1,20 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.8.1
+@version 0.9.0
 @changelog
-  - Codename: Armhangeddon
-  - UC1: arming a track in a large project no longer holds REAPER up. On every arm REAPER reports the solo state of all tracks, and the UC1 was redrawn for each report (about one second per arm at 738 tracks); it now redraws once per batch (#11). Thanks to Tiago Rodrigues for the report and the testing
-  - TotalMix on the UF8: UF8 V-Pot speed now applies to the V-Pots there too, not only the Fine factor
-  - TotalMix side-car: the right half of a linked stereo pair no longer shows as a channel of its own; after unlinking, the right half shows its current level again
-  - Known issue: Two UF8s has not been run on two units yet; with Second UF8 off one UF8 works as before
-  - Known issue: if the MIDI CC layer shows Device busy next to its Input, switch the device off as an input in REAPER's MIDI preferences
-  - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image"). Turning Smart App Control off lets it load.
+  - Codename: Drop it like it's hot
+  - Settings, Bindings: drag and drop. UF8 bank matrix: a bank onto another cell, a set's number onto another set's number. UF1 bank matrix: a column header onto another, a cell onto another cell. UF8 schematic: a soft key or its LCD onto another key of the bank. The two swap places, onto an empty place that is a move. Hold Cmd (Alt on Windows) to copy. On Plain a bank or key goes with its Shift set, on Shift only the Shift set goes. Sets 8 and 9, keys the SSL plug-in fills and keys of a dynamic bank stay where they are.
+  - TotalMix on the UF8, with ORC 1.6.0: SEND/PLUG-IN 1-8 each pick any output as the submix, assigned in ORC. A key whose output is hidden in TotalMix is dark and does nothing.
+  - TotalMix soft-key bank TotalMix submixes: eight outputs of your choice with their names from TotalMix, set up in ORC.
+  - TotalMix Cue: SOLO on an output is its Cue, on the UF8 and the UF1. On the UF8, FINE and a submix key cues that output, and so does SHIFT or FINE with a key of a submix bank. The submix stays, and the key turns yellow.
+  - New action RME: Link Main B to Main, a toggle.
+  - UF8 and UF1 each show their own soft-key bank.
+  - UF8 meters: a stereo channel shows left and right apart.
+  - Quick and Layer keys: while TotalMix, Hue or DynaMount is on the left UF8, the Quick keys and the Layer keys without Shift do nothing.
+  - A channel hidden in TotalMix leaves the surfaces a few seconds later.
+  - Known issue: Two UF8s has not been run on two units yet; with Second UF8 off one UF8 works as before.
+  - Known issue: if the MIDI CC layer shows Device busy next to its Input, switch the device off as an input in REAPER's MIDI preferences.
+  - Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image", error 0xc0e90002); turning Smart App Control off lets it load.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
