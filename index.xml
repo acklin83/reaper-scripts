@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="22dae6551b9171413755d3d5aca2fd195c785031">
+<index version="1" name="Frank Acklin Scripts" commit="8184b5ac929090fcde74c7dea7acd89a46758215">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1635,6 +1635,33 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.8.1/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.8.1/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.8.1/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.9.0" author="Frank Acklin" time="2026-11-03T17:10:58Z">
+        <changelog><![CDATA[- Codename: Drop it like it's hot
+- Settings, Bindings: drag and drop. UF8 bank matrix: a bank onto another cell, a set's number onto another set's number. UF1 bank matrix: a column header onto another, a cell onto another cell. UF8 schematic: a soft key or its LCD onto another key of the bank. The two swap places, onto an empty place that is a move. Hold Cmd (Alt on Windows) to copy. On Plain a bank or key goes with its Shift set, on Shift only the Shift set goes. Sets 8 and 9, keys the SSL plug-in fills and keys of a dynamic bank stay where they are.
+- TotalMix on the UF8, with ORC 1.6.0: SEND/PLUG-IN 1-8 each pick any output as the submix, assigned in ORC. A key whose output is hidden in TotalMix is dark and does nothing.
+- TotalMix soft-key bank TotalMix submixes: eight outputs of your choice with their names from TotalMix, set up in ORC.
+- TotalMix Cue: SOLO on an output is its Cue, on the UF8 and the UF1. On the UF8, FINE and a submix key cues that output, and so does SHIFT or FINE with a key of a submix bank. The submix stays, and the key turns yellow.
+- New action RME: Link Main B to Main, a toggle.
+- UF8 and UF1 each show their own soft-key bank.
+- UF8 meters: a stereo channel shows left and right apart.
+- Quick and Layer keys: while TotalMix, Hue or DynaMount is on the left UF8, the Quick keys and the Layer keys without Shift do nothing.
+- A channel hidden in TotalMix leaves the surfaces a few seconds later.
+- Known issue: Two UF8s has not been run on two units yet; with Second UF8 off one UF8 works as before.
+- Known issue: if the MIDI CC layer shows Device busy next to its Input, switch the device off as an input in REAPER's MIDI preferences.
+- Known issue: Windows 11 with Smart App Control on refuses to load the unsigned extension ("Bad Image", error 0xc0e90002); turning Smart App Control off lets it load.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
