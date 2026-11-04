@@ -3,6 +3,7 @@
 @version 0.9.1
 @changelog
   - Codename: Fifteen Milliseconds of Fame
+  - ORC now runs on Windows, and Rea-Sixty works with it there.
   - ORC on Windows: with ORC 1.6.1 or later installed, REAPER takes the UF1 and the UF8 over from ORC when it starts and hands them back when it quits, as on a Mac. Take the UF1 over from ORC under Settings, Connected devices, switches that off.
   - TotalMix on the surfaces under Windows: with ORC installed, SHIFT + MODE offers RME on the UF1, and SHIFT + LAYER 1 puts TotalMix on the left UF8.
 @provides
