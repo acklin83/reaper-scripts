@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="8184b5ac929090fcde74c7dea7acd89a46758215">
+<index version="1" name="Frank Acklin Scripts" commit="0b42af3f6e28460c286636717831e0505e6d0759">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1662,6 +1662,23 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.0/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.9.1" author="Frank Acklin" time="2026-11-04T14:35:32Z">
+        <changelog><![CDATA[- Codename: Fifteen Milliseconds of Fame
+- ORC on Windows: with ORC 1.6.1 or later installed, REAPER takes the UF1 and the UF8 over from ORC when it starts and hands them back when it quits, as on a Mac. Take the UF1 over from ORC under Settings, Connected devices, switches that off.
+- TotalMix on the surfaces under Windows: with ORC installed, SHIFT + MODE offers RME on the UF1, and SHIFT + LAYER 1 puts TotalMix on the left UF8.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.1/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
