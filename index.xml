@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="6b4794863241db972084ef9a60570574047f760d">
+<index version="1" name="Frank Acklin Scripts" commit="aa17fcf2bea13a8964d60322f70795831c9d6553">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1705,6 +1705,31 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.2/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.2/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.2/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.9.3" author="Frank Acklin" time="2026-11-17T14:34:14Z">
+        <changelog><![CDATA[- Codename: Reservoir Jogs
+- Four jog modes of your own on the UF1, and the UF1 fader can go with the jog mode: track, item volume, take volume or the last touched parameter.
+- Your own jog modes on the UF1: User 1 to User 4, hidden until you tick them under Settings, Bindings, UF1, JOG WHEEL. Each gets a name of up to 8 characters, shown on the UF1 and in the mode banner.
+- Left / right: each detent fires the Turn left or the Turn right action. One action with direction: the action gets the detents with their direction, like a relative MIDI controller, for REAPER's (MIDI CC relative/mousewheel) actions such as zoom and scroll.
+- Detents per step 1 to 64. SHIFT without its own action runs the plain one, finer by Shift fine div. The nav cross has its own keys in each mode. New actions UF1 Jog Mode: User 1 to User 4.
+- The UF1 fader per jog mode: every jog mode has a menu for it, Track (factory), Item volume, Take volume or Last touched parameter. The channel display names what the fader moves (Item Vol, Take Vol, the parameter) or reads no item, no take, no param.
+- What the fader moves is fixed while your hand is on it. Each grab on item or take volume is one undo step. Fader = Item Volume from v0.9.2 comes over as Item volume.
+- The jog mode list is a table: Show, Order, Mode, Fader. UF1 Jog Mode: cycle steps only through the ticked modes.
+- Items jog mode: on a track with fixed lanes the nav cross selects only items on lanes that play.
+- Fix: a key with Settings on its long press, such as 360, closes Settings again while the Bindings pane is open.
+- Fix: with ORC running before REAPER started, the UF8 tab under Bindings could be missing.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
