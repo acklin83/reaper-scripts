@@ -1,18 +1,18 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.9.2
+@version 0.9.3
 @changelog
-  - Codename: Left Side Story
-  - In the Meter view the UF1's fader and the display above it stay with the track, and TotalMix on the UF8 gets PAN, 48V and SEL on the submix.
-  - UF1 Meter view: the fader and the display above it work as in every other view. Track name, dB, pan line, channel number and colour follow a track change, a rename and the fader. Until now they stayed on the track that was there when the Meter view opened.
-  - TotalMix on the UF8, with ORC installed: PAN on the left UF8 switches the V-Pots on inputs with a preamp between gain and pan.
-  - A V-Pot push on gain switches 48V on and off where TotalMix reports it for the channel, and does nothing on other channels. It used to reset the gain to 0 dB. The value line reads Gain 48V while it is on.
-  - On the output row, SEL follows the submix picked with SEND/PLUG-IN, the submix bank or nav left/right, and the UF1 fader goes along with it.
-  - With Link A/B on in TotalMix, Main and Main B light together on SEL, SEND/PLUG-IN and the submix bank. The faders still write to the one submix.
-  - TotalMix has six layouts, so keys 7 and 8 of a layout bank are empty and send nothing.
-  - A layout loaded from a surface takes hidden channels off the surface sooner.
-  - Four new actions for any key, each with a lamp: RME: Input row, RME: Playback row, RME: Output row, RME: FX row.
-  - Fix: a TotalMix fader moved shortly after connecting, a layout load or a refresh could jump back to its previous value.
+  - Codename: Reservoir Jogs
+  - Four jog modes of your own on the UF1, and the UF1 fader can go with the jog mode: track, item volume, take volume or the last touched parameter.
+  - Your own jog modes on the UF1: User 1 to User 4, hidden until you tick them under Settings, Bindings, UF1, JOG WHEEL. Each gets a name of up to 8 characters, shown on the UF1 and in the mode banner.
+  - Left / right: each detent fires the Turn left or the Turn right action. One action with direction: the action gets the detents with their direction, like a relative MIDI controller, for REAPER's (MIDI CC relative/mousewheel) actions such as zoom and scroll.
+  - Detents per step 1 to 64. SHIFT without its own action runs the plain one, finer by Shift fine div. The nav cross has its own keys in each mode. New actions UF1 Jog Mode: User 1 to User 4.
+  - The UF1 fader per jog mode: every jog mode has a menu for it, Track (factory), Item volume, Take volume or Last touched parameter. The channel display names what the fader moves (Item Vol, Take Vol, the parameter) or reads no item, no take, no param.
+  - What the fader moves is fixed while your hand is on it. Each grab on item or take volume is one undo step. Fader = Item Volume from v0.9.2 comes over as Item volume.
+  - The jog mode list is a table: Show, Order, Mode, Fader. UF1 Jog Mode: cycle steps only through the ticked modes.
+  - Items jog mode: on a track with fixed lanes the nav cross selects only items on lanes that play.
+  - Fix: a key with Settings on its long press, such as 360, closes Settings again while the Bindings pane is open.
+  - Fix: with ORC running before REAPER started, the UF8 tab under Bindings could be missing.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
