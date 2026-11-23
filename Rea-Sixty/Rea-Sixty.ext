@@ -1,18 +1,14 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.9.3
+@version 0.9.4
 @changelog
-  - Codename: Reservoir Jogs
-  - Four jog modes of your own on the UF1, and the UF1 fader can go with the jog mode: track, item volume, take volume or the last touched parameter.
-  - Your own jog modes on the UF1: User 1 to User 4, hidden until you tick them under Settings, Bindings, UF1, JOG WHEEL. Each gets a name of up to 8 characters, shown on the UF1 and in the mode banner.
-  - Left / right: each detent fires the Turn left or the Turn right action. One action with direction: the action gets the detents with their direction, like a relative MIDI controller, for REAPER's (MIDI CC relative/mousewheel) actions such as zoom and scroll.
-  - Detents per step 1 to 64. SHIFT without its own action runs the plain one, finer by Shift fine div. The nav cross has its own keys in each mode. New actions UF1 Jog Mode: User 1 to User 4.
-  - The UF1 fader per jog mode: every jog mode has a menu for it, Track (factory), Item volume, Take volume or Last touched parameter. The channel display names what the fader moves (Item Vol, Take Vol, the parameter) or reads no item, no take, no param.
-  - What the fader moves is fixed while your hand is on it. Each grab on item or take volume is one undo step. Fader = Item Volume from v0.9.2 comes over as Item volume.
-  - The jog mode list is a table: Show, Order, Mode, Fader. UF1 Jog Mode: cycle steps only through the ticked modes.
-  - Items jog mode: on a track with fixed lanes the nav cross selects only items on lanes that play.
-  - Fix: a key with Settings on its long press, such as 360, closes Settings again while the Bindings pane is open.
-  - Fix: with ORC running before REAPER started, the UF8 tab under Bindings could be missing.
+  - Codename: No Country for Main Actions
+  - REAPER actions from the MIDI Editor, the MIDI Event List and the Crossfade Editor on any key and in the UF1 jog modes, the keyboard modifiers on Linux, and SEL lit again after leaving a send mode.
+  - REAPER actions outside Main: a REAPER Action binding has a Section menu above the Action ID, Main, MIDI Editor, MIDI Event List or Crossfade Editor. Browse Action opens the Action List on that section, Load ReaScript adds the script there.
+  - MIDI Editor and MIDI Event List actions run in the MIDI editor you used last, with none open the key does nothing. Changing the section clears the action. Name and LED follow the section.
+  - On every key of the UF8, UC1 and UF1 and in the UF1 user jog modes. One action with direction takes Main actions only, use Left / right for a MIDI Editor action. MIDI Inline Editor and Media Explorer are not offered.
+  - Linux, keyboard modifiers: Shift, Ctrl and Alt on the computer keyboard count on Linux now, for the Solo / Cut modifier modes, Settings, Behaviour, Keyboard, Alt + fader drag snap back, keyboard Shift for fine and the FX Learn modifier layers. Alt drives the Cmd slot. Under Wayland while a REAPER window has the focus.
+  - Fix: leaving a Send or Receive mode on the UF8 with its own key lights SEL again.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
