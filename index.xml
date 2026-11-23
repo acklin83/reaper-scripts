@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="aa17fcf2bea13a8964d60322f70795831c9d6553">
+<index version="1" name="Frank Acklin Scripts" commit="7e80926083e2d449bfeb6a34a675520d0055baeb">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1730,6 +1730,27 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.3/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.9.4" author="Frank Acklin" time="2026-11-23T14:42:38Z">
+        <changelog><![CDATA[- Codename: No Country for Main Actions
+- REAPER actions from the MIDI Editor, the MIDI Event List and the Crossfade Editor on any key and in the UF1 jog modes, the keyboard modifiers on Linux, and SEL lit again after leaving a send mode.
+- REAPER actions outside Main: a REAPER Action binding has a Section menu above the Action ID, Main, MIDI Editor, MIDI Event List or Crossfade Editor. Browse Action opens the Action List on that section, Load ReaScript adds the script there.
+- MIDI Editor and MIDI Event List actions run in the MIDI editor you used last, with none open the key does nothing. Changing the section clears the action. Name and LED follow the section.
+- On every key of the UF8, UC1 and UF1 and in the UF1 user jog modes. One action with direction takes Main actions only, use Left / right for a MIDI Editor action. MIDI Inline Editor and Media Explorer are not offered.
+- Linux, keyboard modifiers: Shift, Ctrl and Alt on the computer keyboard count on Linux now, for the Solo / Cut modifier modes, Settings, Behaviour, Keyboard, Alt + fader drag snap back, keyboard Shift for fine and the FX Learn modifier layers. Alt drives the Cmd slot. Under Wayland while a REAPER window has the focus.
+- Fix: leaving a Send or Receive mode on the UF8 with its own key lights SEL again.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
