@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="7e80926083e2d449bfeb6a34a675520d0055baeb">
+<index version="1" name="Frank Acklin Scripts" commit="0efa9c41d9d372a830f4a1c0bacc2b8ca7e19187">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -1751,6 +1751,28 @@ Bug fixes:
         <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/reaper_rea-sixty.so</source>
         <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libusb-1.0.so.0</source>
         <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.4/libhidapi-hidraw.so.0</source>
+      </version>
+      <version name="0.9.5" author="Frank Acklin" time="2026-11-25T13:50:41Z">
+        <changelog><![CDATA[- Codename: Lock, Step and Gone
+- TotalMix pans that stop on the centre and stay there, ORC's lamp colours on the UF8, and Lock position and Lock size for the focused-track panel.
+- Focused-track panel: Lock position and Lock size in its right-click menu, so a stray drag leaves the floating panel where it is. Greyed out while docked.
+- TotalMix, pan: whole percent, and a stop on the centre on the way to the other side, on the UF1's pot above the fader, the UF8's V-Pots and the channel pages. At a V-Pot speed other than 1.00 a pan could skip from L1 to R1.
+- TotalMix, starting up: a UF1 or UF8 that is switched on or comes back on USB can report turns nobody made. For five seconds after Rea-Sixty picks up a surface its turns do nothing in TotalMix. Keys and a fader under the hand work at once.
+- TotalMix, pan log: every change the UF1 and UF8 make to an output's pan goes into rme_pan.log with the control that made it, a turn ignored while a surface starts up as a line with ignored.
+- TotalMix, lamps: the colours set in ORC 1.8 for SEND/PLUG-IN and the bank keys V-POT and 1-5 show on the UF8 in REAPER too.
+- TotalMix, names: with more than one RME interface, snapshot and layout names come from the settings file of the interface TotalMix shows. Until now the newest file was taken.]]></changelog>
+        <source platform="darwin-arm64" file="reaper_rea-sixty.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/reaper_rea-sixty.dylib</source>
+        <source platform="darwin-arm64" file="libusb-1.0.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/libusb-1.0.0.dylib</source>
+        <source platform="darwin-arm64" file="libhidapi.0.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/libhidapi.0.dylib</source>
+        <source platform="darwin64" file="reaper_rea-sixty-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/reaper_rea-sixty-x86_64.dylib</source>
+        <source platform="darwin64" file="libusb-1.0.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/libusb-1.0.0-x86_64.dylib</source>
+        <source platform="darwin64" file="libhidapi.0-x86_64.dylib">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/libhidapi.0-x86_64.dylib</source>
+        <source platform="win64" file="reaper_rea-sixty.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/reaper_rea-sixty.dll</source>
+        <source platform="win64" file="libusb-1.0.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/libusb-1.0.dll</source>
+        <source platform="win64" file="hidapi.dll">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/hidapi.dll</source>
+        <source platform="linux64" file="reaper_rea-sixty.so">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/reaper_rea-sixty.so</source>
+        <source platform="linux64" file="libusb-1.0.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/libusb-1.0.so.0</source>
+        <source platform="linux64" file="libhidapi-hidraw.so.0">https://github.com/acklin83/Rea-Sixty/releases/download/v0.9.5/libhidapi-hidraw.so.0</source>
       </version>
     </reapack>
   </category>
