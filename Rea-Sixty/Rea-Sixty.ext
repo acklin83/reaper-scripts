@@ -1,14 +1,15 @@
 @description Rea-Sixty
 @author Frank Acklin
-@version 0.9.4
+@version 0.9.5
 @changelog
-  - Codename: No Country for Main Actions
-  - REAPER actions from the MIDI Editor, the MIDI Event List and the Crossfade Editor on any key and in the UF1 jog modes, the keyboard modifiers on Linux, and SEL lit again after leaving a send mode.
-  - REAPER actions outside Main: a REAPER Action binding has a Section menu above the Action ID, Main, MIDI Editor, MIDI Event List or Crossfade Editor. Browse Action opens the Action List on that section, Load ReaScript adds the script there.
-  - MIDI Editor and MIDI Event List actions run in the MIDI editor you used last, with none open the key does nothing. Changing the section clears the action. Name and LED follow the section.
-  - On every key of the UF8, UC1 and UF1 and in the UF1 user jog modes. One action with direction takes Main actions only, use Left / right for a MIDI Editor action. MIDI Inline Editor and Media Explorer are not offered.
-  - Linux, keyboard modifiers: Shift, Ctrl and Alt on the computer keyboard count on Linux now, for the Solo / Cut modifier modes, Settings, Behaviour, Keyboard, Alt + fader drag snap back, keyboard Shift for fine and the FX Learn modifier layers. Alt drives the Cmd slot. Under Wayland while a REAPER window has the focus.
-  - Fix: leaving a Send or Receive mode on the UF8 with its own key lights SEL again.
+  - Codename: Lock, Step and Gone
+  - TotalMix pans that stop on the centre and stay there, ORC's lamp colours on the UF8, and Lock position and Lock size for the focused-track panel.
+  - Focused-track panel: Lock position and Lock size in its right-click menu, so a stray drag leaves the floating panel where it is. Greyed out while docked.
+  - TotalMix, pan: whole percent, and a stop on the centre on the way to the other side, on the UF1's pot above the fader, the UF8's V-Pots and the channel pages. At a V-Pot speed other than 1.00 a pan could skip from L1 to R1.
+  - TotalMix, starting up: a UF1 or UF8 that is switched on or comes back on USB can report turns nobody made. For five seconds after Rea-Sixty picks up a surface its turns do nothing in TotalMix. Keys and a fader under the hand work at once.
+  - TotalMix, pan log: every change the UF1 and UF8 make to an output's pan goes into rme_pan.log with the control that made it, a turn ignored while a surface starts up as a line with ignored.
+  - TotalMix, lamps: the colours set in ORC 1.8 for SEND/PLUG-IN and the bank keys V-POT and 1-5 show on the UF8 in REAPER too.
+  - TotalMix, names: with more than one RME interface, snapshot and layout names come from the settings file of the interface TotalMix shows. Until now the newest file was taken.
 @provides
   [darwin-arm64] reaper_rea-sixty.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
   [darwin-arm64] libusb-1.0.0.dylib https://github.com/acklin83/Rea-Sixty/releases/download/v$version/$path
