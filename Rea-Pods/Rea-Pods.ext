@@ -1,0 +1,36 @@
+@description Rea-Pods
+@author Frank Acklin
+@version 0.1.0
+@changelog
+  - First release.
+@provides
+  [darwin] reaper_rea-pods.dylib https://github.com/acklin83/reaper-scripts/releases/download/rea-pods-v$version/$path
+@about
+  # Rea-Pods
+
+  REAPER extension for macOS. Plays REAPER's output on AirPods, or on any other output device, while REAPER keeps running on its audio interface. Both play at the same time.
+
+  ## What it does
+
+  - Takes REAPER's hardware outputs 1/2 (selectable), the same signal that goes to the audio interface
+  - Corrects the clock drift between the two devices itself, so no aggregate device is needed
+  - Starts playing as soon as the AirPods connect, and waits when they are gone
+  - Uses only the AirPods' output. If another app opens their microphone, macOS switches them to headset quality until that app lets go
+  - Settings panel, floating or docked: on/off, device, source outputs, volume, buffer
+
+  ## Actions
+
+  - Rea-Pods: Mirror output to AirPods (on/off)
+  - Rea-Pods: Show settings panel (dockable)
+  - Rea-Pods: AirPods volume +1 dB / -1 dB
+  - Rea-Pods: Show status
+
+  ## Notes
+
+  - Bluetooth adds a delay on the AirPods: for listening, not for recording.
+  - The settings panel needs **ReaImGui** 0.10 or newer (via ReaPack). The mirror itself runs without it.
+
+  ## Requirements
+
+  - macOS 12 or later, universal binary (Apple Silicon and Intel)
+  - Tested with REAPER 7.86
