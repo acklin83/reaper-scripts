@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Frank Acklin Scripts" commit="0efa9c41d9d372a830f4a1c0bacc2b8ca7e19187">
+<index version="1" name="Frank Acklin Scripts" commit="0c4ff50df16580b63ef325712ea0b0bd06f11bf0">
   <category name="RAPID">
     <reapack name="RAPID.lua" type="script" desc="RAPID - Recording Auto-Placement &amp; Intelligent Dynamics">
       <version name="2.4" author="Frank Acklin" time="2026-02-03T17:42:24Z">
@@ -74,6 +74,41 @@ Fixed items deleted / tracks appearing empty after import (SetTempoTimeSigMarker
 Lane-safe "Delete gaps between regions": no longer wipes the whole comp lane on comped multi-lane tracks
 Markers/regions created before normalization; source-RPP region count shown pre-commit]]></changelog>
         <source main="main">https://github.com/acklin83/reaper-scripts/raw/eb1ff5be5cd09f62cfbddae7eb72caaf077d9bd0/RAPID/RAPID.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Rea-Pods">
+    <reapack name="Rea-Pods.ext" type="extension" desc="Rea-Pods">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 Rea-Pods\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 REAPER extension for macOS. Plays REAPER's output on AirPods, or on any other output device, while REAPER keeps running on its audio interface. Both play at the same time.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 What it does\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Takes REAPER's hardware outputs 1/2 (selectable), the same signal that goes to the audio interface\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Corrects the clock drift between the two devices itself, so no aggregate device is needed\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Starts playing as soon as the AirPods connect, and waits when they are gone\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Uses only the AirPods' output. If another app opens their microphone, macOS switches them to headset quality until that app lets go\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Settings panel, floating or docked: on/off, device, source outputs, volume, buffer\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Actions\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Rea-Pods: Mirror output to AirPods (on/off)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Rea-Pods: Show settings panel (dockable)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Rea-Pods: AirPods volume +1 dB / -1 dB\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Rea-Pods: Show status\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Notes\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Bluetooth adds a delay on the AirPods: for listening, not for recording.\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab The settings panel needs {\b ReaImGui} 0.10 or newer (via ReaPack). The mirror itself runs without it.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 Requirements\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab macOS 12 or later, universal binary (Apple Silicon and Intel)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab Tested with REAPER 7.86\sa180\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.1.0" author="Frank Acklin" time="2026-11-26T14:42:25Z">
+        <changelog><![CDATA[- First release.]]></changelog>
+        <source platform="darwin" file="reaper_rea-pods.dylib">https://github.com/acklin83/reaper-scripts/releases/download/rea-pods-v0.1.0/reaper_rea-pods.dylib</source>
       </version>
     </reapack>
   </category>
