@@ -2,7 +2,7 @@
 @author Frank Acklin
 @version 0.1.1
 @changelog
-  - Windows x64, as a beta. It builds and passes its tests, but has not run on a real Windows machine yet. Reports welcome.
+  - Windows x64, as a beta. Tested on one machine so far (Windows 11, REAPER 7.66, AirPods). Reports welcome.
   - macOS: no changes.
 @provides
   [darwin] reaper_rea-pods.dylib https://github.com/acklin83/reaper-scripts/releases/download/rea-pods-v$version/$path
@@ -35,4 +35,4 @@
   ## Requirements
 
   - macOS 12 or later, universal binary (Apple Silicon and Intel). Tested with REAPER 7.86.
-  - Windows x64 (beta): built and tested in CI, not yet on a real Windows machine.
+  - Windows x64 (beta). Tested with Windows 11 and REAPER 7.66.
