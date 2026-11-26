@@ -2,7 +2,7 @@
 @author Frank Acklin
 @version 0.1.1
 @changelog
-  - Windows x64, as a beta. Tested on one machine so far (Windows 11, REAPER 7.66, AirPods). Reports welcome.
+  - Windows x64. Tested with Windows 11, REAPER 7.66 and AirPods.
   - macOS: no changes.
 @provides
   [darwin] reaper_rea-pods.dylib https://github.com/acklin83/reaper-scripts/releases/download/rea-pods-v$version/$path
@@ -10,7 +10,7 @@
 @about
   # Rea-Pods
 
-  REAPER extension for macOS, and for Windows as a beta. Plays REAPER's output on AirPods, or on any other output device, while REAPER keeps running on its audio interface. Both play at the same time.
+  REAPER extension for macOS and Windows. Plays REAPER's output on AirPods, or on any other output device, while REAPER keeps running on its audio interface. Both play at the same time.
 
   ## What it does
 
@@ -35,4 +35,4 @@
   ## Requirements
 
   - macOS 12 or later, universal binary (Apple Silicon and Intel). Tested with REAPER 7.86.
-  - Windows x64 (beta). Tested with Windows 11 and REAPER 7.66.
+  - Windows x64. Tested with Windows 11 and REAPER 7.66.
